@@ -1,6 +1,6 @@
 "use client";
-import { useState, useMemo } from "react";
-import Link from "next/link";
+import Image from "next/image";
+import { useState, useMemo, useEffect } from "react";
 
 /* =========================
    FilterSection
@@ -20,9 +20,9 @@ const FilterSection = ({ title, children }) => (
 ========================= */
 const CategoryFilter = ({ value, onChange }) => {
   const categories = [
-    { id: "hoodies", label: "Hoodies & Sweatshirts" },
-    { id: "shirts", label: "Dress Shirts & Button Downs" },
-    { id: "accessories", label: "Accessories & Gift Cards" },
+    { id: "classicsarees", label: "Classic Sarees" },
+    { id: "cotton", label: "Cotton Wear" },
+    { id: "formal", label: "Formal Wear" },
   ];
 
   return (
@@ -53,7 +53,7 @@ const CategoryFilter = ({ value, onChange }) => {
    ColorFilter
 ========================= */
 const ColorFilter = ({ value, onChange }) => {
-  const colors = ["black", "grey", "blue"];
+  const colors = ["black", "#8B6F47", "#1e3a8a"];
 
   return (
     <FilterSection title="Color">
@@ -136,110 +136,22 @@ const FilterSidebar = ({ filters, setFilters }) => (
    ProductCard
 ========================= */
 const ProductCard = ({ product }) => {
-  const [activeColor, setActiveColor] = useState(product.colors[0]);
-
   return (
-    <article className="bg-gray-100 rounded-lg overflow-hidden">
-      <img
-        src={product.images[activeColor]}
-        alt={product.name}
-        className="w-full h-[400px] object-cover"
-      />
+    <article className="bg-gray-100 rounded-lg overflow-hidden hover:shadow-lg transition">
+      <div className="relative w-full h-96">
+        <Image
+          src={product.image}
+          alt={product.name}
+          fill
+          className="object-cover"
+        />
+      </div>
 
       <div className="p-4">
         <h3 className="text-sm font-medium">{product.name}</h3>
-
-        <div className="flex gap-2 text-sm my-1">
-          <span className="line-through text-gray-400">
-            ${product.originalPrice}
-          </span>
-          <span className="font-semibold">
-            ${product.salePrice}
-          </span>
-        </div>
-
-        <div className="flex gap-2 mt-3">
-          {product.colors.map((c) => (
-            <button
-              key={c}
-              onClick={() => setActiveColor(c)}
-              className={`w-6 h-6 rounded-full border-2 ${
-                activeColor === c ? "border-black" : "border-gray-300"
-              }`}
-              style={{ backgroundColor: c }}
-            />
-          ))}
-        </div>
+        <p className="text-red-600 font-semibold mt-2">₹{product.price}</p>
       </div>
     </article>
-  );
-};
-
-/* =========================
-   ProductGrid
-========================= */
-const ProductGrid = ({ filters }) => {
-  const products = [
-    {
-      id: 1,
-      name: "Relaxed Hoodie",
-      category: "hoodies",
-      colors: ["black", "grey", "blue"],
-      sizes: ["M", "L", "XL"],
-      originalPrice: 188,
-      salePrice: 132,
-      images: {
-        black:
-          "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=800",
-        grey:
-          "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800",
-        blue:
-          "https://images.unsplash.com/photo-1523381294911-8d3cead13475?w=800",
-      },
-    },
-    {
-      id: 2,
-      name: "Formal Shirt",
-      category: "shirts",
-      colors: ["black", "blue"],
-      sizes: ["S", "M", "L"],
-      originalPrice: 160,
-      salePrice: 110,
-      images: {
-        black:
-          "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?w=800",
-        blue:
-          "https://images.unsplash.com/photo-1520975916090-3105956dac38?w=800",
-      },
-    },
-  ];
-
-  const filteredProducts = useMemo(() => {
-    return products.filter((p) => {
-      if (filters.category.length && !filters.category.includes(p.category))
-        return false;
-      if (filters.color.length && !filters.color.some((c) => p.colors.includes(c)))
-        return false;
-      if (filters.size.length && !filters.size.some((s) => p.sizes.includes(s)))
-        return false;
-      return true;
-    });
-  }, [filters]);
-
-  return (
-    <main className="flex-1">
-      <h1 className="mb-6 text-3xl font-semibold">
-        Men's Clothing & Apparel
-      </h1>
-
-      <section className="grid grid-cols-3 gap-6 max-md:grid-cols-2 max-sm:grid-cols-1">
-        {filteredProducts.map((p) => (
-          <Link key={p.id} href={`/product/${p.id}`}>
-            <ProductCard product={p} />
-          </Link>
-        ))}
-      </section>
-    </main>
   );
 };
 
@@ -252,12 +164,50 @@ export default function MenPage() {
     color: [],
     size: [],
   });
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    fetch("/api/products")
+      .then((res) => res.json())
+      .then((data) => setProducts(data));
+  }, []);
 
   return (
     <div className="min-h-screen bg-white">
+      {/* BANNER SECTION */}
+      <section className="relative w-full h-96 md:h-[500px] overflow-hidden">
+        <Image
+          src="/Classic/classicsarees.jpg"
+          alt="Men's Collection"
+          fill
+          className="object-cover"
+          priority
+        />
+        <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+          <div className="text-center text-white">
+            <h1 className="text-5xl md:text-6xl font-bold mb-4">Classic Collection</h1>
+            <p className="text-lg md:text-xl">Timeless elegance for every occasion</p>
+          </div>
+        </div>
+      </section>
+
+      {/* PRODUCTS SECTION */}
       <div className="max-w-[1400px] mx-auto px-5 py-10 flex gap-10 max-md:flex-col">
         <FilterSidebar filters={filters} setFilters={setFilters} />
-        <ProductGrid filters={filters} />
+        
+        <main className="flex-1">
+          <h1 className="mb-6 text-3xl font-semibold">Classic Saree Collection</h1>
+
+          {products.length > 0 ? (
+            <section className="grid grid-cols-3 gap-6 max-md:grid-cols-2 max-sm:grid-cols-1">
+              {products.slice(0, 9).map((p) => (
+                <ProductCard key={p._id} product={p} />
+              ))}
+            </section>
+          ) : (
+            <p className="text-gray-500 text-center py-12">Loading products...</p>
+          )}
+        </main>
       </div>
     </div>
   );

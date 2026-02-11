@@ -15,7 +15,6 @@ export default function ChatBot() {
   ]);
   const [inputValue, setInputValue] = useState("");
   const [loading, setLoading] = useState(false);
-  const [windowHeight, setWindowHeight] = useState(0);
   const messagesEndRef = useRef(null);
 
   // Auto-scroll to latest message
@@ -26,14 +25,6 @@ export default function ChatBot() {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
-
-  // Track window height for responsive design
-  useEffect(() => {
-    setWindowHeight(window.innerHeight);
-    const handleResize = () => setWindowHeight(window.innerHeight);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
@@ -74,7 +65,7 @@ export default function ChatBot() {
       console.error("Error:", error);
       const errorMessage = {
         id: messages.length + 2,
-        text: "Sorry, I couldn't process that. Please try again or contact us at +91 91064 81092 📞",
+        text: "Sorry, I couldn't process that. Please try again or contact us at +91 88008 70709 📞",
         sender: "bot",
         timestamp: new Date(),
       };
@@ -86,10 +77,10 @@ export default function ChatBot() {
 
   return (
     <>
-      {/* Floating Chat Button - Responsive */}
+      {/* Floating Chat Button */}
       <motion.button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-50 w-12 h-12 md:w-14 md:h-14 bg-black text-white rounded-full shadow-lg hover:bg-gray-800 transition flex items-center justify-center text-xl md:text-2xl"
+        className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-black text-white rounded-full shadow-lg hover:bg-gray-800 transition flex items-center justify-center text-2xl"
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
         aria-label="Open chat"
@@ -97,7 +88,7 @@ export default function ChatBot() {
         {isOpen ? "✕" : "💬"}
       </motion.button>
 
-      {/* Chat Window - Fully Responsive */}
+      {/* Chat Window */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -105,34 +96,17 @@ export default function ChatBot() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 md:inset-auto bottom-0 md:bottom-20 right-0 md:right-6 z-50 w-full md:w-96 bg-white rounded-t-3xl md:rounded-2xl shadow-2xl flex flex-col overflow-hidden"
-            style={{
-              height: "100vh",
-              maxHeight: windowHeight > 600 ? "600px" : "calc(100vh - 100px)",
-              "@media (min-width: 768px)": {
-                height: "600px",
-              },
-            }}
+            className="fixed bottom-24 right-6 z-50 w-96 max-w-[calc(100vw-2rem)] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden"
+            style={{ height: "600px" }}
           >
             {/* Header */}
-            <div className="bg-gradient-to-r from-black to-gray-800 text-white p-3 md:p-4 flex-shrink-0">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="text-base md:text-lg font-bold">Mayur Poshak Support</h2>
-                  <p className="text-xs md:text-sm text-gray-300">Always here to help! 🌟</p>
-                </div>
-                <button
-                  onClick={() => setIsOpen(false)}
-                  className="md:hidden text-white hover:bg-gray-700 p-2 rounded-lg transition"
-                  aria-label="Close chat"
-                >
-                  ✕
-                </button>
-              </div>
+            <div className="bg-gradient-to-r from-black to-gray-800 text-white p-4">
+              <h2 className="text-lg font-bold">Mayur Poshak Support</h2>
+              <p className="text-sm text-gray-300">Always here to help! 🌟</p>
             </div>
 
             {/* Messages Container */}
-            <div className="flex-1 overflow-y-auto p-3 md:p-4 space-y-3 md:space-y-4 bg-gray-50 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
               {messages.map((msg) => (
                 <motion.div
                   key={msg.id}
@@ -144,13 +118,13 @@ export default function ChatBot() {
                   }`}
                 >
                   <div
-                    className={`max-w-sm md:max-w-xs px-3 md:px-4 py-2 rounded-lg text-sm md:text-base ${
+                    className={`max-w-xs px-4 py-2 rounded-lg ${
                       msg.sender === "user"
-                        ? "bg-black text-white rounded-br-none break-words"
-                        : "bg-white text-gray-800 border border-gray-200 rounded-bl-none break-words"
+                        ? "bg-black text-white rounded-br-none"
+                        : "bg-white text-gray-800 border border-gray-200 rounded-bl-none"
                     }`}
                   >
-                    <p className="whitespace-pre-wrap">
+                    <p className="text-sm break-words whitespace-pre-wrap">
                       {msg.text}
                     </p>
                     <p
@@ -176,7 +150,7 @@ export default function ChatBot() {
                   animate={{ opacity: 1 }}
                   className="flex justify-start"
                 >
-                  <div className="bg-white text-gray-800 border border-gray-200 px-3 md:px-4 py-2 rounded-lg rounded-bl-none flex gap-2">
+                  <div className="bg-white text-gray-800 border border-gray-200 px-4 py-2 rounded-lg rounded-bl-none flex gap-2">
                     <div className="w-2 h-2 bg-black rounded-full animate-bounce"></div>
                     <div className="w-2 h-2 bg-black rounded-full animate-bounce delay-100"></div>
                     <div className="w-2 h-2 bg-black rounded-full animate-bounce delay-200"></div>
@@ -190,27 +164,26 @@ export default function ChatBot() {
             {/* Input Form */}
             <form
               onSubmit={handleSendMessage}
-              className="border-t border-gray-200 p-3 md:p-4 bg-white flex-shrink-0"
+              className="border-t border-gray-200 p-4 bg-white"
             >
-              <div className="flex gap-2 mb-2">
+              <div className="flex gap-2">
                 <input
                   type="text"
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
-                  placeholder="Type message..."
-                  className="flex-1 px-3 py-2 md:py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-xs md:text-sm"
+                  placeholder="Type your message..."
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-sm"
                   disabled={loading}
-                  autoFocus={isOpen}
                 />
                 <button
                   type="submit"
                   disabled={loading || !inputValue.trim()}
-                  className="bg-black text-white px-3 md:px-4 py-2 rounded-lg hover:bg-gray-800 transition disabled:opacity-50 disabled:cursor-not-allowed font-medium text-xs md:text-sm whitespace-nowrap"
+                  className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition disabled:opacity-50 disabled:cursor-not-allowed font-medium"
                 >
                   Send
                 </button>
               </div>
-              <p className="text-xs text-gray-500 leading-tight">
+              <p className="text-xs text-gray-500 mt-2">
                 💡 Ask about products, shipping, returns, or anything else!
               </p>
             </form>

@@ -1,8 +1,3 @@
-// Contact Information
-const CONTACT_PHONE = "9106481092";
-const CONTACT_EMAIL = "mayurnish18@gmail.com";
-const CONTACT_PHONE_DISPLAY = "+91 91064 81092";
-
 // API route for chatbot responses
 export async function POST(request) {
   const { message } = await request.json();
@@ -60,7 +55,7 @@ function getBotResponse(userMessage) {
     userMessage.includes("fit") ||
     userMessage.includes("measurement")
   ) {
-      return "Great question! Standard saree sizes are fixed, but we offer:\n📏 One-size fit for most body types\n✂️ Custom tailoring available\n🔄 Free adjustments on certain items\n\nNeed specific measurements? Our team can help! Contact: " + CONTACT_PHONE_DISPLAY + " 📞";
+    return "Great question! Standard saree sizes are fixed, but we offer:\n📏 One-size fit for most body types\n✂️ Custom tailoring available\n🔄 Free adjustments on certain items\n\nNeed specific measurements? Our team can help! Contact: +91 88008 70709 📞";
   }
 
   // Shipping & Delivery
@@ -70,7 +65,7 @@ function getBotResponse(userMessage) {
     userMessage.includes("how long") ||
     userMessage.includes("when")
   ) {
-    return "📦 Shipping Information:\n⏱️ Delivery Time: 3-7 business days\n📍 Pan-India shipping available\n💳 Free shipping on orders ₹2000+\n🚚 Tracked delivery\n\nNeed urgent delivery? Contact us at " + CONTACT_EMAIL + " 🚚";
+    return "📦 Shipping Information:\n⏱️ Delivery Time: 3-7 business days\n📍 Pan-India shipping available\n💳 Free shipping on orders ₹2000+\n🚚 Tracked delivery\n\nNeed urgent delivery? Contact us at mayurposhak.in@gmail.com 🚚";
   }
 
   // Return & Refund
@@ -80,7 +75,7 @@ function getBotResponse(userMessage) {
     userMessage.includes("exchange") ||
     userMessage.includes("policy")
   ) {
-    return "🔄 Return & Exchange Policy:\n⏳ 30-day return window\n✅ Unused items with original tag\n💰 Full refund or exchange\n📮 Free return shipping on orders ₹5000+\n\nInitiate a return: Contact " + CONTACT_PHONE_DISPLAY + " or " + CONTACT_EMAIL + "";
+    return "🔄 Return & Exchange Policy:\n⏳ 30-day return window\n✅ Unused items with original tag\n💰 Full refund or exchange\n📮 Free return shipping on orders ₹5000+\n\nInitiate a return: Contact +91 88008 70709 or mayurposhak.in@gmail.com";
   }
 
   // Payment & Orders
@@ -118,7 +113,7 @@ function getBotResponse(userMessage) {
     userMessage.includes("design") ||
     userMessage.includes("personalize")
   ) {
-    return "✨ Customization Services:\nWe offer:\n🎨 Custom designs\n👗 Tailor-made sarees\n🧵 Color customization\n📏 Personal fitting\n\nFor custom orders, contact: " + CONTACT_PHONE_DISPLAY + " or " + CONTACT_EMAIL + " 💌";
+    return "✨ Customization Services:\nWe offer:\n🎨 Custom designs\n👗 Tailor-made sarees\n🧵 Color customization\n📏 Personal fitting\n\nFor custom orders, contact: +91 88008 70709 or mayurposhak.in@gmail.com 💌";
   }
 
   // Bulk Orders
@@ -127,7 +122,7 @@ function getBotResponse(userMessage) {
     userMessage.includes("wholesale") ||
     userMessage.includes("corporate")
   ) {
-    return "🏢 Bulk & Corporate Orders:\nWe provide special rates for:\n📦 Bulk purchases\n🎁 Corporate gifts\n👥 Group orders\n🤝 Wholesale partnerships\n\nFor quotes & details: " + CONTACT_EMAIL + " or " + CONTACT_PHONE_DISPLAY + " 📞";
+    return "🏢 Bulk & Corporate Orders:\nWe provide special rates for:\n📦 Bulk purchases\n🎁 Corporate gifts\n👥 Group orders\n🤝 Wholesale partnerships\n\nFor quotes & details: mayurposhak.in@gmail.com or +91 88008 70709 📞";
   }
 
   // Contact & Hours
@@ -137,7 +132,7 @@ function getBotResponse(userMessage) {
     userMessage.includes("hours") ||
     userMessage.includes("business")
   ) {
-    return "📞 Contact Mayur Poshak:\n☎️ Phone: " + CONTACT_PHONE_DISPLAY + "\n📧 Email: " + CONTACT_EMAIL + "\n📍 Address: 168 Jagriti Enclave, Delhi-110092\n⏰ Business Hours: Mon-Sat, 10:00 AM - 7:00 PM IST\n\nWe're here to help! 😊";
+    return "📞 Contact Mayur Poshak:\n☎️ Phone: +91 88008 70709\n📧 Email: mayurposhak.in@gmail.com\n📍 Address: 168 Jagriti Enclave, Delhi-110092\n⏰ Business Hours: Mon-Sat, 10:00 AM - 7:00 PM IST\n\nWe're here to help! 😊";
   }
 
   // General Greeting
@@ -152,5 +147,5 @@ function getBotResponse(userMessage) {
   }
 
   // Default fallback
-  return "😊 Thanks for your message! I'm here to help with:\n✅ Saree collections & products\n✅ Shipping & delivery\n✅ Returns & refunds\n✅ Sizing & care\n✅ Payment options\n✅ Custom orders\n\nFor anything else, contact our team:\n📞 " + CONTACT_PHONE_DISPLAY + "\n📧 " + CONTACT_EMAIL + "\n\nHow can I assist you? 🛍️";
+  return "😊 Thanks for your message! I'm here to help with:\n✅ Saree collections & products\n✅ Shipping & delivery\n✅ Returns & refunds\n✅ Sizing & care\n✅ Payment options\n✅ Custom orders\n\nFor anything else, contact our team:\n📞 +91 88008 70709\n📧 mayurposhak.in@gmail.com\n\nHow can I assist you? 🛍️";
 }

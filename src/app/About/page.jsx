@@ -19,6 +19,23 @@ const slideUp = {
 export default function AboutUs() {
   return (
     <div className="bg-white text-black min-h-screen">
+      {/* HERO BANNER */}
+      <section className="relative w-full h-96 md:h-[500px] overflow-hidden">
+        <Image
+          src="/Banner/sareesbanner.jpg"
+          alt="Mayur Poshak"
+          fill
+          className="object-cover"
+          priority
+        />
+        <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+          <div className="text-center text-white">
+            <h1 className="text-5xl md:text-6xl font-bold">Mayur Poshak</h1>
+            <p className="text-lg md:text-xl mt-2">Where Tradition Meets Innovation</p>
+          </div>
+        </div>
+      </section>
+
       {/* Hero - Compact & Centered */}
       <section className="pt-16 pb-12 md:pt-24 md:pb-20 border-b border-gray-200">
         <div className="max-w-5xl mx-auto px-5 md:px-8 text-center">
@@ -28,7 +45,7 @@ export default function AboutUs() {
             variants={slideUp}
             className="text-4xl md:text-5xl font-serif font-bold tracking-tight"
           >
-            Mayur Poshak
+            About Us
           </motion.h1>
 
           <motion.p
@@ -48,7 +65,7 @@ export default function AboutUs() {
             className="mt-8"
           >
             <Link
-              href="/collections"
+              href="/ladies"
               className="inline-block bg-black text-white px-7 py-3 text-sm md:text-base font-medium rounded-full hover:bg-gray-800 transition"
             >
               View Collection

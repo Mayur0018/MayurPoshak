@@ -155,7 +155,7 @@ export default function BlogsPage() {
       {/* HERO BANNER */}
       <section className="relative w-full h-80 md:h-96 overflow-hidden">
         <Image
-          src="/Banner/sareesbanner3.jpg"
+          src="/Banner/bannerimg.jpg"
           alt="Mayur Poshak Blog"
           fill
           className="object-cover"
