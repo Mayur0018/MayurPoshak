@@ -3,14 +3,14 @@ import { HiOutlineTruck } from "react-icons/hi2";
 import { Ri24HoursLine } from "react-icons/ri";
 import { LuCodesandbox } from "react-icons/lu";
 export const images = [
-  "/SliderImage/Slider1.png",
-  "/SliderImage/Slider2.png",
-  "/SliderImage/Slider3.png",
+  "/SliderImage/sareesslide1.webp",
+  "/SliderImage/sareesslide2.webp",
+  "/SliderImage/sareesslide2.webp",
 ];
 export const mobileimages = [
-  "/SliderImage/mobilesilder1.jpg",
-  "/SliderImage/mobileslider2.jpg",
-  "/SliderImage/mobileslider3.jpg",
+  "/SliderImage/mobileslidesarees1.webp",
+  "/SliderImage/mobileslidesarees.webp",
+  "/SliderImage/mobileslidesarees2.webp",
 ];
 export const logoSliders = [
   { id: 1, logos: <TbTruckDelivery />, name: "FREE DELIVERY" },

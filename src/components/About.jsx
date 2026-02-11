@@ -78,7 +78,7 @@ const About = () => {
           <div className="w-full md:w-[1100px] h-60 bg-gray-300 animate-pulse rounded-xl block mx-auto py-6" />
         ) : (
           <Image
-            src="/instabanner.jpg"
+            src="/bannerimg.jpg"
             width={1000}
             height={600}
             alt="insta-banner"

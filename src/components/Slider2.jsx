@@ -105,8 +105,8 @@ export default ImageCarousel2;
 
 // Banner image data
 const slider2Cards = [
-  { url: "/Banner/sareesbanner.jpg", id: 101 },
-  { url: "/Banner/sareesbanner.jpg", id: 102 },
-  { url: "/Banner/sareesbanner.jpg", id: 103 },
+  { url: "/Banner/sareesbanner1.jpg", id: 101 },
+  { url: "/Banner/sareesbanner3.jpg", id: 102 },
+  { url: "/Banner/sareesbanner3.jpg", id: 103 },
   { url: "/Banner/sareesbanner.jpg", id: 104 },
 ];
