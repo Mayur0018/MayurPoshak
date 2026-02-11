@@ -1,0 +1,64 @@
+import { connectDB } from "@/lib/mongodb";
+import Product from "@/models/Product";
+import { ObjectId } from "mongodb";
+
+/* =========================
+   GET PRODUCT BY ID
+========================= */
+export async function GET(request, context) {
+  await connectDB();
+
+  const { id } = await context.params; // ✅ FIX
+  console.log(id);
+  try {
+    const product = await Product.findOne({
+      _id: new ObjectId(id),
+    });
+
+    if (!product) {
+      return Response.json(
+        { message: "Product Not Found" },
+        { status: 404 }
+      );
+    }
+
+    return Response.json(product);
+  } catch (error) {
+    return Response.json(
+      { message: "Error fetching product", error: error.message },
+      { status: 500 }
+    );
+  }
+}
+
+/* =========================
+   DELETE PRODUCT BY ID
+========================= */
+export async function DELETE(request, context) {
+  await connectDB();
+
+  const { id } = await context.params; // ✅ FIX
+
+  try {
+    const deletedProduct = await Product.findOneAndDelete({
+      _id: new ObjectId(id),
+    });
+
+    if (!deletedProduct) {
+      return Response.json(
+        { message: "Product Not Found" },
+        { status: 404 }
+      );
+    }
+
+    return Response.json(
+      { message: "Product deleted successfully" },
+      { status: 200 }
+    );
+  } catch (error) {
+    return Response.json(
+      { message: "Error deleting product", error: error.message },
+      { status: 500 }
+    );
+  }
+}
