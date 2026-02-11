@@ -16,6 +16,8 @@ const CartPage = () => {
   const cartItems = useSelector((state) => state.cart.cartItems);
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const stripePromise = loadStripe(
     process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
@@ -27,14 +29,44 @@ const CartPage = () => {
   }, []);
 
   const handleCheckout = async () => {
-    const stripe = await stripePromise;
-    const response = await fetch("/api/checkout", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ cartItems }),
-    });
-    const data = await response.json();
-    await stripe.redirectToCheckout({ sessionId: data.id });
+    if (!cartItems || cartItems.length === 0) {
+      setError("Your cart is empty");
+      return;
+    }
+
+    if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
+      setError("Payment system is not configured");
+      return;
+    }
+
+    try {
+      setCheckoutLoading(true);
+      setError(null);
+      
+      const stripe = await stripePromise;
+      const response = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cartItems }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Checkout failed");
+      }
+
+      const data = await response.json();
+      
+      if (!data.id) {
+        throw new Error("Invalid checkout session");
+      }
+
+      await stripe.redirectToCheckout({ sessionId: data.id });
+    } catch (err) {
+      console.error("Checkout error:", err);
+      setError(err.message || "Checkout failed. Please try again.");
+      setCheckoutLoading(false);
+    }
   };
 
   const handleDelete = (id) => dispatch(removeFromCart(id));
@@ -171,12 +203,19 @@ const CartPage = () => {
                   </li>
                 </ul>
 
+                {error && (
+                  <div className="mt-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+                    {error}
+                  </div>
+                )}
+
                 <div className="mt-8 space-y-4">
                   <button
-                    className="w-full py-2.5 text-sm font-medium tracking-wide text-white bg-slate-800 hover:bg-slate-900 rounded-md cursor-pointer"
+                    className="w-full py-2.5 text-sm font-medium tracking-wide text-white bg-slate-800 hover:bg-slate-900 disabled:bg-slate-400 disabled:cursor-not-allowed rounded-md cursor-pointer transition"
                     onClick={handleCheckout}
+                    disabled={checkoutLoading || cartItems.length === 0}
                   >
-                    Buy Now
+                    {checkoutLoading ? "Processing..." : "Buy Now"}
                   </button>
                   <button className="w-full py-2.5 text-sm font-medium tracking-wide text-slate-900 bg-slate-50 hover:bg-slate-100 border border-gray-300 rounded-md">
                     Continue Shopping

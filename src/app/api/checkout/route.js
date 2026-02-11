@@ -1,26 +1,43 @@
 import Stripe from 'stripe';
+
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export async function POST(request) {
-  const { cartItems } = await request.json();
+  try {
+    const { cartItems } = await request.json();
 
-  const session = await stripe.checkout.sessions.create({
-    payment_method_types: ['card'],
-    mode: 'payment',
-    line_items: cartItems.map(item => ({
-      price_data: {
-        currency: 'usd',
-        product_data: {
-          name: item.name,
-          images: [item.image],
+    if (!cartItems || cartItems.length === 0) {
+      return Response.json(
+        { error: "Cart is empty" },
+        { status: 400 }
+      );
+    }
+
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      mode: 'payment',
+      line_items: cartItems.map(item => ({
+        price_data: {
+          currency: 'inr',
+          product_data: {
+            name: item.name,
+            images: [item.image],
+            description: item.selectedSize ? `Size: ${item.selectedSize}` : "Saree",
+          },
+          unit_amount: Math.round(item.price * 100), // Convert to paise
         },
-        unit_amount: item.price * 100,
-      },
-      quantity: 1,
-    })),
-    success_url: `${process.env.NEXT_PUBLIC_SITE_URL}/success`,
-    cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL}/cancel`,
-  });
+        quantity: item.quantity || 1,
+      })),
+      success_url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/success`,
+      cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/cancel`,
+    });
 
-  return Response.json({ id: session.id });
+    return Response.json({ id: session.id });
+  } catch (error) {
+    console.error("Stripe error:", error);
+    return Response.json(
+      { error: error.message || "Checkout failed" },
+      { status: 500 }
+    );
+  }
 }

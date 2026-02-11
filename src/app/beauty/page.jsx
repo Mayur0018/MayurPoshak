@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import {
   Dialog,
   DialogBackdrop,
@@ -80,11 +81,22 @@ function classNames(...classes) {
 export default function Page() {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [products, setProducts] = useState([]);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch("api/products")
-      .then((res) => res.json())
-      .then((data) => setProducts(data));
+    const fetchProducts = async () => {
+      try {
+        const res = await fetch("/api/products");
+        if (!res.ok) throw new Error("Failed to fetch products");
+        const data = await res.json();
+        setProducts(data);
+      } catch (err) {
+        console.error("Error fetching products:", err);
+        setError(err.message);
+      }
+    };
+    
+    fetchProducts();
   }, []);
 
   return (
@@ -250,24 +262,26 @@ export default function Page() {
           {/* Products - right */}
           <div className="lg:col-span-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {products.map((product,index) => (
-              <div
-                key={product.id || index}
-                className="group relative border rounded-lg overflow-hidden hover:shadow-lg transition"
+              <Link
+                key={product._id || index}
+                href={`/product/${product._id}`}
               >
-                <div className="w-full aspect-w-1 aspect-h-1 bg-gray-200 overflow-hidden">
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="w-full h-full object-cover object-center"
-                  />
+                <div className="group relative border rounded-lg overflow-hidden hover:shadow-lg transition cursor-pointer h-full">
+                  <div className="w-full aspect-w-1 aspect-h-1 bg-gray-200 overflow-hidden">
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                    />
+                  </div>
+                  <div className="p-4">
+                    <h3 className="text-sm font-medium text-gray-700 group-hover:text-red-600 transition">
+                      {product.name}
+                    </h3>
+                    <p className="mt-1 text-sm text-gray-500">₹{product.price}</p>
+                  </div>
                 </div>
-                <div className="p-4">
-                  <h3 className="text-sm font-medium text-gray-700">
-                    <a href={product.href}>{product.name}</a>
-                  </h3>
-                  <p className="mt-1 text-sm text-gray-500">{product.price}</p>
-                </div>
-              </div>
+              </Link>
             ))}
           </div>
         </div>

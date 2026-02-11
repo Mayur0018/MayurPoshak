@@ -1,5 +1,6 @@
 "use client";
 import { useState, useMemo } from "react";
+import Link from "next/link";
 
 /* =========================
    FilterSection
@@ -228,7 +229,9 @@ const ProductGrid = ({ filters }) => {
 
       <section className="grid grid-cols-3 gap-6 max-md:grid-cols-2 max-sm:grid-cols-1">
         {filteredProducts.map((p) => (
-          <ProductCard key={p.id} product={p} />
+          <Link key={p.id} href={`/product/${p.id}`}>
+            <ProductCard product={p} />
+          </Link>
         ))}
       </section>
     </main>

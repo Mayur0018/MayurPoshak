@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { category } from "@/Data/Category";
 import Slider3 from "./Slider3";
@@ -36,28 +37,30 @@ const Categories = () => {
               </div>
             ))
           : category.map((items, index) => (
-              <motion.div
-                key={items.id}
-                className="px-1 py-1 flex flex-col items-center"
-                initial={{ opacity: 0, scale: 0.7 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{
-                  duration: 0.6,
-                  delay: index * 0.1,
-                  type: "spring",
-                  stiffness: 100,
-                }}
-              >
-                <Image
-                  src={items.Image}
-                  width={80}
-                  height={80}
-                  alt=""
-                  className="object-cover rounded-full md:w-24 md:h-24 h-24 w-24 aspect-[253/337] object-top shadow-md hover:scale-[1.05] transition-all duration-300"
-                />
-                <p className="text-[10px] mt-4 font-medium">{items.text}</p>
-              </motion.div>
+              <Link href={`/categories/${encodeURIComponent(items.text.replace(/\s+/g, "-").toLowerCase())}`}>
+                <motion.div
+                  key={items.id}
+                  className="px-1 py-1 flex flex-col items-center cursor-pointer"
+                  initial={{ opacity: 0, scale: 0.7 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{
+                    duration: 0.6,
+                    delay: index * 0.1,
+                    type: "spring",
+                    stiffness: 100,
+                  }}
+                >
+                  <Image
+                    src={items.Image}
+                    width={80}
+                    height={80}
+                    alt={items.text}
+                    className="object-cover rounded-full md:w-24 md:h-24 h-24 w-24 aspect-[253/337] object-top shadow-md hover:scale-[1.05] transition-all duration-300"
+                  />
+                  <p className="text-[10px] mt-4 font-medium hover:text-red-600 transition-colors">{items.text}</p>
+                </motion.div>
+              </Link>
             ))}
       </div>
 
