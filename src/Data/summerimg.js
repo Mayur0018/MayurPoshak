@@ -1,8 +1,8 @@
 export const summerimg = [
-  { image: "/Summer/summer6.jpg" },
-  { image: "/Summer/summer2.jpg" },
-  { image: "/Summer/summer3.jpg" },
-  { image: "/Summer/summer4.jpg" },
-  { image: "/Summer/summer5.jpg" },
-  { image: "/Summer/summer6.jpg" },
+  { image: "/Summer/summersarees.jpg" },
+  { image: "/Summer/summersarees1.jpg" },
+  { image: "/Summer/summersarees2.jpg" },
+  { image: "/Summer/summersarees3.jpg" },
+  { image: "/Summer/summersarees4.jpg" },
+  { image: "/Summer/summersarees5.jpg" },
 ];
