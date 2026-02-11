@@ -17,9 +17,9 @@ export default Slider1;
 
 // Image Data
 const cards = [
-  { src: "/Luximg/Lux2.jpg", id: 2, alt: "Image 1" },
-  { src: "/Luximg/Lux3.jpg", id: 3, alt: "Image 1" },
-  { src: "/Luximg/Lux4.jpg", id: 4, alt: "Image 1" },
-  { src: "/Luximg/Lux5.jpg", id: 5, alt: "Image 1" },
-  { src: "/Luximg/Lux6.jpg", id: 6, alt: "Image 1" },
+  { src: "/Classic/classicsarees6.jpg", id: 2, alt: "Image 1" },
+  { src: "/Classic/classicsarees7.jpg", id: 3, alt: "Image 1" },
+  { src: "/Classic/classicsarees8.jpg", id: 4, alt: "Image 1" },
+  { src: "/Classic/classicsarees9.jpg", id: 5, alt: "Image 1" },
+  { src: "/Classic/classicsarees10.jpg", id: 6, alt: "Image 1" },
 ];

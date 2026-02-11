@@ -7,9 +7,9 @@ const images = [
   { src: "/Classic/classicsarees.jpg", alt: "Image 1" },
   { src: "/Classic/classicsarees1.jpg", alt: "Image 2" },
   { src: "/Classic/classicsarees2.jpg", alt: "Image 3" },
-  { src: "/Classic/classicsarees.jpg", alt: "Image 4" },
-  { src: "/Classic/classicsarees2.jpg", alt: "Image 5" },
-  { src: "/Classic/classicsarees.jpg", alt: "Image 6" },
+  { src: "/Classic/classicsarees3.jpg", alt: "Image 4" },
+  { src: "/Classic/classicsarees4.jpg", alt: "Image 5" },
+  { src: "/Classic/classicsarees5.jpg", alt: "Image 6" },
 ];
 
 const Slider3 = () => {
