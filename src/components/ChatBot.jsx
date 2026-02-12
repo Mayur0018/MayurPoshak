@@ -80,7 +80,7 @@ export default function ChatBot() {
       {/* Floating Chat Button */}
       <motion.button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-black text-white rounded-full shadow-lg hover:bg-gray-800 transition flex items-center justify-center text-2xl"
+        className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 w-12 h-12 sm:w-14 sm:h-14 bg-black text-white rounded-full shadow-lg hover:bg-gray-800 transition flex items-center justify-center text-lg sm:text-2xl"
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
         aria-label="Open chat"
@@ -96,17 +96,17 @@ export default function ChatBot() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="fixed bottom-24 right-6 z-50 w-96 max-w-[calc(100vw-2rem)] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden"
-            style={{ height: "600px" }}
+            className="fixed inset-0 sm:inset-auto sm:bottom-20 sm:right-6 z-50 w-full sm:w-96 sm:max-w-[calc(100vw-2rem)] bg-white rounded-t-3xl sm:rounded-2xl shadow-2xl flex flex-col overflow-hidden"
+            style={{ height: "100vh", maxHeight: "100vh", bottom: 0 } || { height: "600px", maxHeight: "600px" }}
           >
             {/* Header */}
-            <div className="bg-gradient-to-r from-black to-gray-800 text-white p-4">
-              <h2 className="text-lg font-bold">Mayur Poshak Support</h2>
-              <p className="text-sm text-gray-300">Always here to help! 🌟</p>
+            <div className="bg-gradient-to-r from-black to-gray-800 text-white p-3 sm:p-4 flex-shrink-0">
+              <h2 className="text-base sm:text-lg font-bold">Mayur Poshak Support</h2>
+              <p className="text-xs sm:text-sm text-gray-300">Always here to help! 🌟</p>
             </div>
 
             {/* Messages Container */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+            <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-4 bg-gray-50 scroll-smooth">
               {messages.map((msg) => (
                 <motion.div
                   key={msg.id}
@@ -118,13 +118,13 @@ export default function ChatBot() {
                   }`}
                 >
                   <div
-                    className={`max-w-xs px-4 py-2 rounded-lg ${
+                    className={`max-w-[75%] sm:max-w-xs px-3 sm:px-4 py-2 rounded-lg text-sm sm:text-sm ${
                       msg.sender === "user"
                         ? "bg-black text-white rounded-br-none"
                         : "bg-white text-gray-800 border border-gray-200 rounded-bl-none"
                     }`}
                   >
-                    <p className="text-sm break-words whitespace-pre-wrap">
+                    <p className="break-words whitespace-pre-wrap text-xs sm:text-sm">
                       {msg.text}
                     </p>
                     <p
@@ -150,7 +150,7 @@ export default function ChatBot() {
                   animate={{ opacity: 1 }}
                   className="flex justify-start"
                 >
-                  <div className="bg-white text-gray-800 border border-gray-200 px-4 py-2 rounded-lg rounded-bl-none flex gap-2">
+                  <div className="bg-white text-gray-800 border border-gray-200 px-3 sm:px-4 py-2 rounded-lg rounded-bl-none flex gap-2">
                     <div className="w-2 h-2 bg-black rounded-full animate-bounce"></div>
                     <div className="w-2 h-2 bg-black rounded-full animate-bounce delay-100"></div>
                     <div className="w-2 h-2 bg-black rounded-full animate-bounce delay-200"></div>
@@ -164,27 +164,27 @@ export default function ChatBot() {
             {/* Input Form */}
             <form
               onSubmit={handleSendMessage}
-              className="border-t border-gray-200 p-4 bg-white"
+              className="border-t border-gray-200 p-3 sm:p-4 bg-white flex-shrink-0"
             >
               <div className="flex gap-2">
                 <input
                   type="text"
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
-                  placeholder="Type your message..."
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-sm"
+                  placeholder="Type message..."
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black text-xs sm:text-sm"
                   disabled={loading}
                 />
                 <button
                   type="submit"
                   disabled={loading || !inputValue.trim()}
-                  className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                  className="bg-black text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-gray-800 transition disabled:opacity-50 disabled:cursor-not-allowed font-medium text-xs sm:text-sm"
                 >
                   Send
                 </button>
               </div>
               <p className="text-xs text-gray-500 mt-2">
-                💡 Ask about products, shipping, returns, or anything else!
+                💡 Ask about products, shipping, returns, etc!
               </p>
             </form>
           </motion.div>
