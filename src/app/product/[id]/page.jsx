@@ -2,7 +2,7 @@ import ProductDetails from "@/components/ProductDetails";
 import { FaShoppingCart } from "react-icons/fa"; // 🛒 Shopping cart icon
 
 export default async function ProductPage({ params}) {
-  const { id } = params;
+  const { id } = await params;
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/${id}`, {
     cache: "no-store",
   });
