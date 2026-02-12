@@ -18,5 +18,5 @@ export default async function ProductPage({ params}) {
 
   const product = await res.json();
 
-  return <ProductDetails product={product} />;
+  return <ProductDetails product={product} />
 }
