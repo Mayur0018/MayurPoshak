@@ -25,13 +25,13 @@ export default async function CategoryPage({ params }) {
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Page Title */}
-        <h1 className="text-4xl sm:text-5xl font-bold text-center text-gray-900 mb-10">
+        <h1 className="text-xl sm:text-2xl font-bold text-center text-gray-900 mb-10">
           {categoryData.text}
         </h1>
 
         {/* Main Image Section */}
         <div className="flex justify-center">
-          <div className="w-full max-w-2xl rounded-2xl overflow-hidden shadow-2xl">
+          <div className="w-full max-w-sm rounded-xl overflow-hidden shadow-2xl">
             <Image
               src={categoryData.Image}
               alt={categoryData.text}
@@ -53,13 +53,6 @@ export default async function CategoryPage({ params }) {
             </span>{" "}
             category
           </p>
-
-          {/* You can add more content here later */}
-          {/* <div className="mt-10">
-            <button className="bg-indigo-600 text-white px-8 py-4 rounded-lg text-lg font-medium hover:bg-indigo-700 transition">
-              Browse Products
-            </button>
-          </div> */}
         </div>
       </div>
     </div>
