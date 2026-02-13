@@ -83,7 +83,7 @@ const Header = () => {
   return (
     <>
       {/* ================= Desktop Header ================= */}
-      <div className="hidden lg:block sticky top-0 bg-white z-0 shadow-sm">
+      <div className="hidden lg:block sticky top-0 bg-white z-40 shadow-sm">
         {/* Top Section */}
         <div className="flex items-center justify-between px-4 md:px-6 lg:px-8 py-3 lg:py-4 gap-4">
           {/* Left - Search */}
