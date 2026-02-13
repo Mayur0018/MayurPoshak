@@ -19,9 +19,9 @@ export default function ContactPage() {
   return (
     <div className="bg-white min-h-screen text-black">
       {/* HERO BANNER */}
-      <section className="relative w-full h-96 md:h-[500px] overflow-hidden">
+      <section className="relative w-full h-96 md:h-[650px] overflow-hidden">
         <Image
-          src="/Banner/banner3.jpg"
+          src="/Banner/sareesbanner1.jpg"
           alt="Contact Us"
           fill
           className="object-cover"

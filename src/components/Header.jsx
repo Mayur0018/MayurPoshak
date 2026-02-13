@@ -58,7 +58,7 @@ const Header = () => {
   }, []);
 
   const filteredProducts = products.filter((item) =>
-    item.name?.toLowerCase().includes(searchInput.toLowerCase())
+    item.name?.toLowerCase().includes(searchInput.toLowerCase()),
   );
 
   /* ---------------- auth ---------------- */
@@ -69,8 +69,7 @@ const Header = () => {
     };
 
     getUser();
-    const { data: authListener } =
-      supabase.auth.onAuthStateChange(getUser);
+    const { data: authListener } = supabase.auth.onAuthStateChange(getUser);
 
     return () => authListener?.subscription?.unsubscribe();
   }, []);
@@ -84,7 +83,7 @@ const Header = () => {
   return (
     <>
       {/* ================= Desktop Header ================= */}
-      <div className="hidden lg:block sticky top-0 bg-white z-40 shadow-sm">
+      <div className="hidden lg:block sticky top-0 bg-white z-0 shadow-sm">
         {/* Top Section */}
         <div className="flex items-center justify-between px-4 md:px-6 lg:px-8 py-3 lg:py-4 gap-4">
           {/* Left - Search */}
@@ -124,7 +123,9 @@ const Header = () => {
                       </Link>
                     ))
                   ) : (
-                    <p className="p-3 text-sm text-gray-400">No results found</p>
+                    <p className="p-3 text-sm text-gray-400">
+                      No results found
+                    </p>
                   )}
                 </div>
               )}
@@ -145,7 +146,10 @@ const Header = () => {
           {/* Right - User & Cart */}
           <div className="flex items-center gap-4 lg:gap-6">
             {user ? (
-              <Link href="/profile" className="flex items-center gap-2 hover:opacity-70 transition">
+              <Link
+                href="/profile"
+                className="flex items-center gap-2 hover:opacity-70 transition"
+              >
                 <img
                   src="https://ui-avatars.com/api/?name=User"
                   className="w-8 h-8 rounded-full"
@@ -200,14 +204,14 @@ const Header = () => {
                     {item}
                   </p>
                 </Link>
-              )
+              ),
             )}
           </div>
         </div>
       </div>
 
       {/* ================= Mobile Header ================= */}
-      <div className="lg:hidden fixed top-0 w-full bg-white z-50 shadow-md">
+      <div className="lg:hidden fixed top-0 w-full bg-white z-40 shadow-md">
         <div className="flex items-center justify-between px-3 sm:px-4 py-2 sm:py-3 gap-2 sm:gap-3">
           <button
             className="flex-shrink-0 p-1 hover:bg-gray-100 rounded transition"
@@ -217,16 +221,19 @@ const Header = () => {
           </button>
 
           <Link href="/" className="flex-1 flex justify-center flex-shrink-0">
-            <Image 
-              src="/mayurposhak.png" 
-              width={110} 
-              height={35} 
+            <Image
+              src="/mayurposhak.png"
+              width={110}
+              height={35}
               alt="logo"
               className="h-auto w-auto max-w-[110px] sm:max-w-[130px]"
             />
           </Link>
 
-          <Link href="/cart" className="relative flex-shrink-0 p-1 hover:bg-gray-100 rounded transition">
+          <Link
+            href="/cart"
+            className="relative flex-shrink-0 p-1 hover:bg-gray-100 rounded transition"
+          >
             <TbShoppingBag className="text-2xl sm:text-3xl" />
             {cartCount > 0 && (
               <span className="absolute -top-1 -right-1 bg-black text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
@@ -268,13 +275,17 @@ const Header = () => {
                         className="w-8 h-8 sm:w-10 sm:h-10 object-contain"
                       />
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs sm:text-sm font-medium truncate">{p.name}</p>
+                        <p className="text-xs sm:text-sm font-medium truncate">
+                          {p.name}
+                        </p>
                         <p className="text-xs text-gray-500">₹{p.price}</p>
                       </div>
                     </Link>
                   ))
                 ) : (
-                  <p className="p-2 sm:p-3 text-xs sm:text-sm text-gray-400">No results</p>
+                  <p className="p-2 sm:p-3 text-xs sm:text-sm text-gray-400">
+                    No results
+                  </p>
                 )}
               </div>
             )}
@@ -303,30 +314,37 @@ const Header = () => {
                 <RxCross1 className="text-2xl hover:bg-gray-100 p-1 rounded transition" />
               </button>
 
-              <nav className="flex-1 space-y-3 sm:space-y-4">
-                {navItems.map((item) => (
-                  <div key={item} className="space-y-2">
-                    <Link
-                      href={getLink(item)}
-                      onClick={() => setMenuopen(false)}
-                      className="font-semibold text-sm sm:text-base block text-gray-800 hover:text-black transition"
-                    >
-                      {item}
-                    </Link>
+              <nav className="flex-1">
+                {navItems.map((item, index) => (
+                  <div key={item}>
+                    <div className="py-3">
+                      <Link
+                        href={getLink(item)}
+                        onClick={() => setMenuopen(false)}
+                        className="font-semibold text-sm sm:text-base block text-gray-800 hover:text-black transition"
+                      >
+                        {item}
+                      </Link>
 
-                    {item === "SHOP BY CATEGORIES" && (
-                      <div className="ml-4 flex flex-col gap-2">
-                        {shopCategories.map((cat) => (
-                          <Link
-                            key={cat.label}
-                            href={cat.link}
-                            onClick={() => setMenuopen(false)}
-                            className="text-xs sm:text-sm text-gray-500 hover:text-gray-800 transition"
-                          >
-                            {cat.label}
-                          </Link>
-                        ))}
-                      </div>
+                      {item === "SHOP BY CATEGORIES" && (
+                        <div className="ml-4 mt-2 flex flex-col gap-2">
+                          {shopCategories.map((cat) => (
+                            <Link
+                              key={cat.label}
+                              href={cat.link}
+                              onClick={() => setMenuopen(false)}
+                              className="text-xs sm:text-sm text-gray-500 hover:text-gray-800 transition"
+                            >
+                              {cat.label}
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* HR Line */}
+                    {index !== navItems.length - 1 && (
+                      <hr className="border-gray-200" />
                     )}
                   </div>
                 ))}
@@ -335,8 +353,8 @@ const Header = () => {
               {/* User Account Section */}
               <div className="border-t pt-4 mt-4">
                 {user ? (
-                  <Link 
-                    href="/profile" 
+                  <Link
+                    href="/profile"
                     onClick={() => setMenuopen(false)}
                     className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition"
                   >
@@ -350,7 +368,7 @@ const Header = () => {
                     </span>
                   </Link>
                 ) : (
-                  <Link 
+                  <Link
                     href="/Signin"
                     onClick={() => setMenuopen(false)}
                     className="flex items-center gap-2 p-3 bg-black text-white rounded-lg hover:bg-gray-800 transition font-medium text-sm w-full justify-center"
@@ -363,10 +381,16 @@ const Header = () => {
 
               {/* Social Links */}
               <div className="border-t pt-4 mt-4 flex justify-center gap-6">
-                <a href="#" className="text-gray-600 hover:text-black transition">
+                <a
+                  href="#"
+                  className="text-gray-600 hover:text-black transition"
+                >
                   <FaFacebookF className="text-lg" />
                 </a>
-                <a href="#" className="text-gray-600 hover:text-black transition">
+                <a
+                  href="#"
+                  className="text-gray-600 hover:text-black transition"
+                >
                   <FaInstagram className="text-lg" />
                 </a>
               </div>
