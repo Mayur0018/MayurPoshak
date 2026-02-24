@@ -33,6 +33,10 @@ export default function AdminProducts() {
       body: data,
     });
 
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err?.error || "Image upload failed");
+    }
     const result = await res.json();
     return result.url;
   };
@@ -46,6 +50,10 @@ export default function AdminProducts() {
 
     try {
       const imageLink = await handleImageUpload(form.image);
+      if (!imageLink) {
+        alert("Image upload failed");
+        return;
+      }
 
       const res = await fetch("/api/products", {
         method: "POST",
@@ -53,10 +61,15 @@ export default function AdminProducts() {
         body: JSON.stringify({
           name: form.name,
           image: imageLink,
-          price: form.price,
+          price: Number(form.price),
         }),
       });
 
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        alert(err?.message || "Failed to add product");
+        return;
+      }
       const newProduct = await res.json();
 
       // ✅ backend must return created product with _id
@@ -256,15 +269,19 @@ export default function AdminProducts() {
         <p>No Products Found</p>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {products.map((p) => (
-            <div key={p._id} className="border p-4 relative">
-              <img
-                src={p.image}
-                alt={p.name}
-                className="w-full h-96 object-cover mb-2"
-              />
+          {products.map((p, idx) => (
+            <div key={p._id || p.id || `${p.name}-${p.price}-${idx}`} className="border p-4 relative">
+              {p.image ? (
+                <img
+                  src={p.image}
+                  alt={p.name}
+                  className="w-full h-96 object-cover mb-2"
+                />
+              ) : (
+                <div className="w-full h-96 bg-gray-100 mb-2" />
+              )}
               <h2 className="font-medium">{p.name}</h2>
-              <p>₹{p.price}</p>
+              <p>₹{Number(p.price ?? 0)}</p>
 
               <div className="flex gap-2 absolute top-2 right-2">
                 <button

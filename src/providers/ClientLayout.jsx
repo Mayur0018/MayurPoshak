@@ -6,7 +6,7 @@ import ChatBot from "@/components/ChatBot";
 
 export default function ClientLayout({ children }) {
   const pathname = usePathname();
-  const hideLayout = pathname.startsWith("/success");
+  const hideLayout = pathname.startsWith("/success") || pathname.startsWith("/admin");
 
   return (
     <>

@@ -1,6 +1,5 @@
 import { connectDB } from "@/lib/mongodb";
 import Product from "@/models/Product";
-import { ObjectId } from "mongodb";
 
 /* =========================
    GET PRODUCT BY ID
@@ -8,12 +7,12 @@ import { ObjectId } from "mongodb";
 export async function GET(request, context) {
   await connectDB();
 
-  const { id } = await context.params; // ✅ FIX
-  console.log(id);
+  const { id } = context.params;
+  if (!id || typeof id !== "string" || !/^[0-9a-fA-F]{24}$/.test(id)) {
+    return Response.json({ message: "Invalid ID" }, { status: 400 });
+  }
   try {
-    const product = await Product.findOne({
-      _id: new ObjectId(id),
-    });
+    const product = await Product.findById(id);
 
     if (!product) {
       return Response.json(
@@ -37,7 +36,10 @@ export async function GET(request, context) {
 export async function PUT(request, context) {
   await connectDB();
 
-  const { id } = await context.params;
+  const { id } = context.params;
+  if (!id || typeof id !== "string" || !/^[0-9a-fA-F]{24}$/.test(id)) {
+    return Response.json({ message: "Invalid ID" }, { status: 400 });
+  }
   const { name, image, price } = await request.json();
 
   try {
@@ -48,11 +50,7 @@ export async function PUT(request, context) {
       );
     }
 
-    const updatedProduct = await Product.findOneAndUpdate(
-      { _id: new ObjectId(id) },
-      { name, image, price },
-      { new: true }
-    );
+    const updatedProduct = await Product.findByIdAndUpdate(id, { name, image, price }, { new: true });
 
     if (!updatedProduct) {
       return Response.json(
@@ -76,12 +74,13 @@ export async function PUT(request, context) {
 export async function DELETE(request, context) {
   await connectDB();
 
-  const { id } = await context.params; // ✅ FIX
+  const { id } = context.params;
+  if (!id || typeof id !== "string" || !/^[0-9a-fA-F]{24}$/.test(id)) {
+    return Response.json({ message: "Invalid ID" }, { status: 400 });
+  }
 
   try {
-    const deletedProduct = await Product.findOneAndDelete({
-      _id: new ObjectId(id),
-    });
+    const deletedProduct = await Product.findByIdAndDelete(id);
 
     if (!deletedProduct) {
       return Response.json(

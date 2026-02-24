@@ -12,6 +12,8 @@ const Shimmer = ({ className }) => (
 );
 
 export default function ProductDetails({ product }) {
+  console.log(product);
+  
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(true);
   const [selectedSize, setSelectedSize] = useState(null);
@@ -49,6 +51,7 @@ export default function ProductDetails({ product }) {
   const safeImage =
     product.image ||
     "/placeholder.png"; // keep a placeholder in /public
+  const displayId = product._id ?? product.id ?? null;
 
   if (loading) {
     return (
@@ -107,6 +110,11 @@ export default function ProductDetails({ product }) {
           <h2 className="text-xl font-semibold text-slate-900">
             {product.name}
           </h2>
+          {displayId && (
+            <div className="text-xs text-gray-500 mt-1">
+              ID: {String(displayId)}
+            </div>
+          )}
 
           <p className="text-sm text-slate-500 mt-2">
             Well-Versed Commerce
