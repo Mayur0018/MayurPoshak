@@ -3,7 +3,7 @@ import { z } from "zod";
 import { getServerSupabase } from "@/lib/supabaseServer";
 
 const ReviewSchema = z.object({
-  product_id: z.number().int().positive(),
+  product_id: z.string(),
   rating: z.number().int().min(1).max(5),
   comment: z.string().max(2000).optional(),
 });
@@ -35,7 +35,7 @@ export async function upsertReview(userId: string, input: unknown) {
   }
 }
 
-export async function deleteReview(userId: string, productId: number) {
+export async function deleteReview(userId: string, productId: string) {
   const supabase = await getServerSupabase();
   const { error } = await supabase
     .from("reviews")
@@ -43,5 +43,15 @@ export async function deleteReview(userId: string, productId: number) {
     .eq("user_id", userId)
     .eq("product_id", productId);
   if (error) return { ok: false };
+  return { ok: true };
+}
+
+export async function adminDeleteReview(reviewId: string) {
+  const supabase = await getServerSupabase();
+  const { error } = await supabase
+    .from("reviews")
+    .delete()
+    .eq("id", reviewId);
+  if (error) return { ok: false, error: error.message };
   return { ok: true };
 }

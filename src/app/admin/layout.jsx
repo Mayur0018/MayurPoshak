@@ -14,6 +14,7 @@ export default function AdminLayout({ children }) {
             <a href="/admin/products" className="block px-3 py-2 rounded hover:bg-gray-100">Products</a>
             <a href="/admin/orders" className="block px-3 py-2 rounded hover:bg-gray-100">Orders</a>
             <a href="/admin/users" className="block px-3 py-2 rounded hover:bg-gray-100">Users</a>
+            <a href="/admin/reviews" className="block px-3 py-2 rounded hover:bg-gray-100">Reviews</a>
             <a href="/admin/coupons" className="block px-3 py-2 rounded hover:bg-gray-100">Coupons</a>
             <a href="/admin/analytics" className="block px-3 py-2 rounded hover:bg-gray-100">Analytics</a>
             <a href="/admin/settings" className="block px-3 py-2 rounded hover:bg-gray-100">Settings</a>

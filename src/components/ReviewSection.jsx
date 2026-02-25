@@ -250,7 +250,9 @@ const ReviewSection = ({ productId }) => {
                   alt="avatar"
                 />
                 <div>
-                  <h4 className="text-sm font-bold text-slate-900">{rev.users?.full_name || "Verified Customer"}</h4>
+                  <h4 className="text-sm font-bold text-slate-900">
+                    {rev.users?.full_name || rev.users?.email?.split('@')[0] || "Verified Customer"}
+                  </h4>
                   <div className="flex items-center gap-2">
                     <div className="flex text-yellow-400 text-xs">
                       {[...Array(5)].map((_, i) => (
