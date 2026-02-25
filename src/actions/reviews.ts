@@ -12,6 +12,27 @@ export async function upsertReview(userId: string, input: unknown) {
   const parsed = ReviewSchema.safeParse(input);
   if (!parsed.success) return { ok: false };
   const supabase = await getServerSupabase();
+
+  // --- LAZY PROFILE CREATION ---
+  const { data: profile } = await supabase
+    .from("users")
+    .select("id")
+    .eq("id", userId)
+    .maybeSingle();
+
+  if (!profile) {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      await supabase.from("users").insert({
+        id: userId,
+        email: user.email,
+        full_name: user.user_metadata?.full_name || user.email?.split('@')[0] || "User",
+        avatar_url: user.user_metadata?.avatar_url || `https://ui-avatars.com/api/?name=${user.email?.split('@')[0] || 'U'}`
+      });
+    }
+  }
+  // ----------------------------
+
   const { data: prior } = await supabase
     .from("reviews")
     .select("id")

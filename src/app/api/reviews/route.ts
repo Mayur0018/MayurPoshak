@@ -50,6 +50,36 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Product ID and rating are required" }, { status: 400 });
     }
 
+    // --- LAZY PROFILE CREATION ---
+    // Ensure the user exists in public.users to satisfy foreign key constraint
+    const { data: profile, error: profileError } = await supabase
+      .from("users")
+      .select("id")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (profileError) {
+      console.error("Error checking user profile:", profileError);
+    }
+
+    if (!profile) {
+      console.log("Creating missing profile for user:", user.id);
+      const { error: insertError } = await supabase
+        .from("users")
+        .insert({
+          id: user.id,
+          email: user.email,
+          full_name: user.user_metadata?.full_name || user.email?.split('@')[0] || "User",
+          avatar_url: user.user_metadata?.avatar_url || `https://ui-avatars.com/api/?name=${user.email?.split('@')[0] || 'U'}`
+        });
+
+      if (insertError) {
+        console.error("Failed to create lazy profile:", insertError);
+        // We continue, but the review insert might fail if this insert failed
+      }
+    }
+    // ----------------------------
+
     // Check if user has already reviewed this product
     const { data: existing, error: checkError } = await supabase
       .from("reviews")

@@ -61,8 +61,13 @@ export default function ProfilePage() {
               <div className="text-xl font-semibold">{fullName}</div>
               <div className="text-sm text-gray-600">{user.email}</div>
             </div>
-            <div className="ml-auto">
-              <button onClick={handleLogout} className="text-sm border px-3 py-1 rounded hover:bg-gray-50">Logout</button>
+            <div className="ml-auto flex gap-3">
+              <button
+                onClick={handleLogout}
+                className="text-sm px-5 py-2 bg-red-50 text-red-600 font-bold rounded-lg border border-red-100 hover:bg-red-600 hover:text-white transition-all shadow-sm"
+              >
+                Logout Account
+              </button>
             </div>
           </div>
 

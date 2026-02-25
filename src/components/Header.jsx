@@ -74,15 +74,6 @@ const Header = () => {
     return () => authListener?.subscription?.unsubscribe();
   }, []);
 
-  const handleLogout = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      console.error("Logout error:", error.message);
-    } else {
-      window.location.reload();
-    }
-  };
-
   const sidebarVariants = {
     hidden: { x: "-100%" },
     visible: { x: 0, transition: { duration: 0.4 } },
@@ -167,12 +158,6 @@ const Header = () => {
                 <span className="text-xs lg:text-sm font-medium truncate">
                   {user.email.split("@")[0]}
                 </span>
-                <button
-                  onClick={handleLogout}
-                  className="text-xs text-red-500 hover:text-red-700 font-medium ml-2"
-                >
-                  Logout
-                </button>
               </Link>
             ) : (
               <Link href="/Signin" className="hover:opacity-70 transition">
@@ -381,15 +366,6 @@ const Header = () => {
                     <span className="text-sm font-medium truncate">
                       {user.email.split("@")[0]}
                     </span>
-                    <button
-                      onClick={(e) => {
-                        e.preventDefault();
-                        handleLogout();
-                      }}
-                      className="text-xs text-red-500 font-bold ml-auto"
-                    >
-                      LOGOUT
-                    </button>
                   </Link>
                 ) : (
                   <Link
