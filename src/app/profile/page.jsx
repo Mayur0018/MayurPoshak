@@ -35,8 +35,21 @@ export default function ProfilePage() {
   }, [router]);
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    router.push("/Signin");
+    try {
+      // 1. Sign out on the client
+      await supabase.auth.signOut();
+      
+      // 2. Call the server-side signout to clear cookies
+      await fetch("/api/auth/signout", { method: "POST" });
+      
+      // 3. Clear local storage/cache and redirect
+      window.localStorage.clear();
+      window.location.href = "/Signin";
+    } catch (error) {
+      console.error("Logout error:", error);
+      // Fallback
+      window.location.href = "/Signin";
+    }
   };
 
   if (!user) {
@@ -55,16 +68,18 @@ export default function ProfilePage() {
       <div className="relative h-40 bg-gradient-to-r from-indigo-600 to-purple-600" />
       <div className="max-w-6xl mx-auto px-4 mt-12">
         <div className="bg-white border rounded-xl shadow-sm p-6">
-          <div className="flex items-center gap-4">
-            <img src={avatar} alt="user" className="w-20 h-20 rounded-full border-4 border-white -mt-10 object-cover" />
-            <div className="-mt-6">
-              <div className="text-xl font-semibold">{fullName}</div>
-              <div className="text-sm text-gray-600">{user.email}</div>
+          <div className="flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
+            <img src={avatar} alt="user" className="w-24 h-24 rounded-full border-4 border-white -mt-12 object-cover shadow-lg" />
+            <div className="flex-1 -mt-2">
+              <div className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+                {fullName}
+              </div>
+              <div className="text-sm text-gray-500 font-medium">{user.email}</div>
             </div>
-            <div className="ml-auto flex gap-3">
+            <div className="flex gap-3 w-full sm:w-auto">
               <button
                 onClick={handleLogout}
-                className="text-sm px-5 py-2 bg-red-50 text-red-600 font-bold rounded-lg border border-red-100 hover:bg-red-600 hover:text-white transition-all shadow-sm"
+                className="w-full sm:w-auto text-sm px-6 py-2.5 bg-red-50 text-red-600 font-bold rounded-xl border border-red-100 hover:bg-red-600 hover:text-white hover:border-red-600 transition-all shadow-sm active:scale-95"
               >
                 Logout Account
               </button>
