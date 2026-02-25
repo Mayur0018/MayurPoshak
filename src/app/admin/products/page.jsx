@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { FaTrash, FaEdit } from "react-icons/fa";
 
 export default function AdminProducts() {
