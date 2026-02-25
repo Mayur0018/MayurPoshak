@@ -1,14 +1,14 @@
 import { NextResponse } from "next/server";
 import { uploadProductImage } from "@/services/storage";
-import { cookies } from "next/headers";
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import { getSupabaseServer } from "@/lib/supabase/server";
 
 export async function POST(req: Request) {
   try {
-    const supabaseUser = createServerComponentClient({ cookies });
-    const { data: { session } } = await supabaseUser.auth.getSession();
-    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    const { data: userRow } = await supabaseUser.from("users").select("role").eq("id", session.user.id).single();
+    const supabaseUser = await getSupabaseServer();
+    const { data: { user } } = await supabaseUser.auth.getUser();
+    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    
+    const { data: userRow } = await supabaseUser.from("users").select("role").eq("id", user.id).single();
     if (!userRow || userRow.role !== "admin") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
     const form = await req.formData();

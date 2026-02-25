@@ -36,7 +36,7 @@ export async function GET(request, context) {
 export async function PUT(request, context) {
   await connectDB();
 
-  const { id } = context.params;
+  const { id } = await context.params;
   if (!id || typeof id !== "string" || !/^[0-9a-fA-F]{24}$/.test(id)) {
     return Response.json({ message: "Invalid ID" }, { status: 400 });
   }
@@ -74,7 +74,7 @@ export async function PUT(request, context) {
 export async function DELETE(request, context) {
   await connectDB();
 
-  const { id } = context.params;
+  const { id } = await context.params;
   if (!id || typeof id !== "string" || !/^[0-9a-fA-F]{24}$/.test(id)) {
     return Response.json({ message: "Invalid ID" }, { status: 400 });
   }

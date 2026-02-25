@@ -112,9 +112,15 @@ export default function AdminProducts() {
         body: JSON.stringify({
           name: editForm.name,
           image: imageLink,
-          price: editForm.price,
+          price: Number(editForm.price),
         }),
       });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        alert(err?.message || "Failed to update product");
+        return;
+      }
 
       const updatedProduct = await res.json();
 
