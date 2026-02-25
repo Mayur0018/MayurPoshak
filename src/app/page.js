@@ -1,3 +1,5 @@
+import { connectDB } from "@/lib/mongodb";
+import Product from "@/models/Product";
 import Hero from "@/components/Hero";
 import Categories from "@/components/Categories";
 import MostTrending from "@/components/MostTrending";
@@ -7,8 +9,13 @@ import Exhibition from "@/components/Exhibition";
 import Link from "next/link";
 
 export default async function Home() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ""}` || "/api/products", { cache: "no-store" });
-  const products = res.ok ? await res.json() : [];
+  let products = [];
+  try {
+    await connectDB();
+    products = await Product.find().lean();
+  } catch (error) {
+    console.error("Error fetching products on Home:", error);
+  }
 
   function cardImage(p) {
     return p.image ?? null;
