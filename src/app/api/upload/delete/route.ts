@@ -4,7 +4,7 @@ import { cloudinary } from "@/lib/cloudinary";
 
 export async function POST(req: Request) {
   try {
-    const supabase = getSupabaseServer();
+    const supabase = await getSupabaseServer();
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     const { data: userRow } = await supabase.from("users").select("role").eq("id", session.user.id).single();
