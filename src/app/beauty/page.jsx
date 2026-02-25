@@ -83,7 +83,7 @@ export default function Page() {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
-    fetch("api/products")
+    fetch("/api/products")
       .then((res) => res.json())
       .then((data) => setProducts(data));
   }, []);

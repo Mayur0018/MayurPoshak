@@ -5,6 +5,7 @@ import { useDispatch } from "react-redux";
 import { addToCart } from "@/redux/cartSlice";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import ReviewSection from "./ReviewSection";
 
 // ✅ Simple shimmer block
 const Shimmer = ({ className }) => (
@@ -173,6 +174,9 @@ export default function ProductDetails({ product }) {
           </div>
         </div>
       </div>
+      
+      {/* Review Section */}
+      <ReviewSection productId={product._id || product.id} />
     </div>
   );
 }

@@ -7,6 +7,7 @@ import supabase from "@/lib/supabaseClient";
 import toast, { Toaster } from "react-hot-toast";
 
 export default function Register() {
+  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
@@ -15,7 +16,15 @@ export default function Register() {
     e.preventDefault();
 
     try {
-      const { data, error } = await supabase.auth.signUp({ email, password });
+      const { data, error } = await supabase.auth.signUp({ 
+        email, 
+        password,
+        options: {
+          data: {
+            full_name: fullName,
+          }
+        }
+      });
       if (error) {
         toast.error(error.message);
         return;
@@ -43,13 +52,25 @@ export default function Register() {
         </div>
         <form onSubmit={handleRegister} className="mt-6 space-y-4">
           <div>
+            <label className="block text-sm font-medium text-gray-700">Full Name</label>
+            <input
+              type="text"
+              required
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+              placeholder="John Doe"
+            />
+          </div>
+          <div>
             <label className="block text-sm font-medium text-gray-700">Email</label>
             <input
               type="email"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+              placeholder="you@example.com"
             />
           </div>
           <div>
@@ -59,10 +80,11 @@ export default function Register() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm"
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+              placeholder="••••••••"
             />
           </div>
-          <button type="submit" className="w-full rounded-md bg-black px-4 py-2 text-sm text-white hover:bg-gray-800">
+          <button type="submit" className="w-full rounded-md bg-black px-4 py-2 text-sm text-white hover:bg-gray-800 transition">
             Register
           </button>
         </form>

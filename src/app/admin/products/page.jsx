@@ -71,10 +71,7 @@ export default function AdminProducts() {
         return;
       }
       const newProduct = await res.json();
-
-      // ✅ backend must return created product with _id
       setProducts((prev) => [...prev, newProduct]);
-
       setForm({ name: "", image: null, price: "" });
     } catch (err) {
       alert("Failed to add product");

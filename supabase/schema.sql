@@ -35,6 +35,7 @@ create table if not exists public.products (
   category_id bigint not null references public.categories(id) on delete restrict,
   brand_id bigint references public.brands(id) on delete set null,
   base_price numeric(12,2) not null,
+  image text,
   discount_percentage numeric(5,2) default 0,
   currency text not null default 'INR',
   is_featured boolean not null default false,
@@ -121,7 +122,7 @@ create index if not exists orders_created_idx on public.orders(created_at);
 create table if not exists public.order_items (
   id bigint generated always as identity primary key,
   order_id bigint not null references public.orders(id) on delete cascade,
-  product_id bigint not null references public.products(id),
+  product_id text not null,
   variant_id bigint references public.product_variants(id),
   quantity int not null check (quantity > 0),
   price numeric(12,2) not null,
@@ -133,9 +134,11 @@ create index if not exists order_items_product_idx on public.order_items(product
 create table if not exists public.reviews (
   id bigint generated always as identity primary key,
   user_id uuid not null references public.users(id) on delete cascade,
-  product_id bigint not null references public.products(id) on delete cascade,
+  product_id text not null,
   rating int not null check (rating between 1 and 5),
+  title text,
   comment text,
+  images text[] default '{}',
   is_verified_purchase boolean not null default false,
   created_at timestamptz not null default now()
 );
@@ -145,7 +148,7 @@ create index if not exists reviews_product_idx on public.reviews(product_id);
 create table if not exists public.wishlist (
   id bigint generated always as identity primary key,
   user_id uuid not null references public.users(id) on delete cascade,
-  product_id bigint not null references public.products(id) on delete cascade,
+  product_id text not null,
   created_at timestamptz not null default now()
 );
 create unique index if not exists wishlist_user_product_unique on public.wishlist(user_id, product_id);
@@ -160,7 +163,7 @@ create unique index if not exists carts_user_unique on public.carts(user_id);
 create table if not exists public.cart_items (
   id bigint generated always as identity primary key,
   cart_id bigint not null references public.carts(id) on delete cascade,
-  product_id bigint not null references public.products(id),
+  product_id text not null,
   variant_id bigint references public.product_variants(id),
   quantity int not null check (quantity > 0),
   created_at timestamptz not null default now()
@@ -174,3 +177,25 @@ language sql stable
 as $$
   select coalesce(sum(total_amount), 0) from public.orders where status = 'paid';
 $$;
+
+-- Trigger to create a user entry in public.users on auth signup
+create or replace function public.handle_new_user()
+returns trigger
+language plpgsql
+security definer set search_path = public
+as $$
+begin
+  insert into public.users (id, email, full_name, avatar_url)
+  values (
+    new.id,
+    new.email,
+    new.raw_user_meta_data->>'full_name',
+    new.raw_user_meta_data->>'avatar_url'
+  );
+  return new;
+end;
+$$;
+
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute procedure public.handle_new_user();
