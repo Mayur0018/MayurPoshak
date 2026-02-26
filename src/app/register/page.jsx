@@ -9,6 +9,7 @@ import toast, { Toaster } from "react-hot-toast";
 export default function Register() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState(""); // Added
   const [password, setPassword] = useState("");
   const router = useRouter();
 
@@ -22,6 +23,7 @@ export default function Register() {
         options: {
           data: {
             full_name: fullName,
+            phone: phoneNumber, // Added
           }
         }
       });
@@ -30,7 +32,13 @@ export default function Register() {
         return;
       }
 
-      // If backend returns a user/session, redirect to profile
+      // Trigger WhatsApp Notification for New User
+      await fetch("/api/notify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messageType: "register", userEmail: email }),
+      });
+
       if (data?.user || data?.session) {
         toast.success("Signup successful — redirecting...");
         router.push("/profile");
@@ -60,6 +68,17 @@ export default function Register() {
               onChange={(e) => setFullName(e.target.value)}
               className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
               placeholder="John Doe"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Phone Number</label>
+            <input
+              type="tel"
+              required
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value)}
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+              placeholder="9106481092"
             />
           </div>
           <div>

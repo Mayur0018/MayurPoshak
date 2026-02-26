@@ -137,27 +137,48 @@ const FilterSidebar = ({ filters, setFilters }) => (
 ========================= */
 const ProductCard = ({ product }) => {
   return (
-    <article className="bg-gray-100 rounded-lg overflow-hidden hover:shadow-lg transition">
-      <div className="relative w-full h-96">
-        <Image
-          src={product.image}
-          alt={product.name}
-          fill
-          className="object-cover"
-        />
+    <Link href={`/product/${product._id}`}>
+      <div className="group relative bg-white border border-gray-100 rounded-xl overflow-hidden hover:shadow-2xl hover:border-gray-200 transition-all duration-500 cursor-pointer h-full flex flex-col">
+        <div className="w-full aspect-[3/4] bg-gray-50 overflow-hidden relative">
+          <Image
+            src={product.image}
+            alt={product.name}
+            fill
+            className="object-cover object-center group-hover:scale-110 transition-transform duration-700"
+          />
+          <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+             <button className="bg-white p-2 rounded-full shadow-md hover:bg-gray-100 text-gray-900">
+                <i className="ti ti-heart text-lg" />
+             </button>
+          </div>
+        </div>
+        <div className="p-5 flex flex-col flex-1">
+          <h3 className="text-sm font-semibold text-gray-800 group-hover:text-red-600 transition truncate">
+            {product.name}
+          </h3>
+          <div className="mt-2 flex items-center justify-between">
+             <p className="text-lg font-bold text-gray-900">₹{product.price}</p>
+             <div className="flex gap-1">
+                {product.color && product.color.slice(0, 3).map((c, i) => (
+                    <div key={i} className="w-3 h-3 rounded-full border border-gray-200" style={{ backgroundColor: c }} />
+                ))}
+             </div>
+          </div>
+          <button className="mt-4 w-full py-2.5 bg-black text-white text-xs font-bold rounded-lg opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 transition-all duration-300">
+            VIEW DETAILS
+          </button>
+        </div>
       </div>
-
-      <div className="p-4">
-        <h3 className="text-sm font-medium">{product.name}</h3>
-        <p className="text-red-600 font-semibold mt-2">₹{product.price}</p>
-      </div>
-    </article>
+    </Link>
   );
 };
 
 /* =========================
    Page
 ========================= */
+import { useEffect as useEff } from 'react'; // Using alias to avoid conflict if I add more imports
+import Link from "next/link";
+
 export default function MenPage() {
   const [filters, setFilters] = useState({
     category: [],
@@ -165,17 +186,42 @@ export default function MenPage() {
     size: [],
   });
   const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/products")
-      .then((res) => res.json())
-      .then((data) => setProducts(data));
-  }, []);
+    const fetchProducts = async () => {
+      setLoading(true);
+      try {
+        let url = `/api/products?category=men`;
+        if (filters.category.length > 0) {
+          filters.category.forEach(cat => url += `&subCategory=${cat}`);
+        }
+        if (filters.color.length > 0) {
+          filters.color.forEach(col => url += `&color=${encodeURIComponent(col)}`);
+        }
+        if (filters.size.length > 0) {
+          filters.size.forEach(sz => url += `&size=${sz}`);
+        }
+        const res = await fetch(url);
+        const data = await res.json();
+        setProducts(data);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProducts();
+  }, [filters]);
+
+  const clearFilters = () => {
+    setFilters({ category: [], color: [], size: [] });
+  };
 
   return (
     <div className="min-h-screen bg-white">
       {/* BANNER SECTION */}
-      <section className="relative w-full h-96 md:h-[500px] overflow-hidden">
+      <section className="relative w-full h-80 md:h-[450px] overflow-hidden">
         <Image
           src="/Classic/classicsarees.jpg"
           alt="Men's Collection"
@@ -183,29 +229,52 @@ export default function MenPage() {
           className="object-cover"
           priority
         />
-        <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-          <div className="text-center text-white">
-            <h1 className="text-5xl md:text-6xl font-bold mb-4">Classic Collection</h1>
-            <p className="text-lg md:text-xl">Timeless elegance for every occasion</p>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-center justify-center">
+          <div className="text-center text-white px-4">
+            <h1 className="text-5xl md:text-7xl font-light tracking-tighter mb-4">MEN&apos;S COUTURE</h1>
+            <p className="text-lg md:text-xl font-medium uppercase tracking-[0.2em]">Exquisite Classic Collection</p>
           </div>
         </div>
       </section>
 
-      {/* PRODUCTS SECTION */}
-      <div className="max-w-[1400px] mx-auto px-5 py-10 flex gap-10 max-md:flex-col">
-        <FilterSidebar filters={filters} setFilters={setFilters} />
+      <div className="max-w-[1400px] mx-auto px-5 py-16 flex gap-12 max-md:flex-col">
+        <aside className="w-[240px] shrink-0">
+          <div className="flex items-center justify-between mb-8 pb-4 border-b">
+             <h2 className="text-xl font-bold uppercase tracking-wider">Filters</h2>
+             {(filters.category.length > 0 || filters.color.length > 0 || filters.size.length > 0) && (
+               <button onClick={clearFilters} className="text-xs text-red-600 font-bold hover:underline">CLEAR ALL</button>
+             )}
+          </div>
+          <FilterSidebar filters={filters} setFilters={setFilters} />
+        </aside>
         
         <main className="flex-1">
-          <h1 className="mb-6 text-3xl font-semibold">Classic Saree Collection</h1>
+          <div className="flex items-center justify-between mb-10">
+             <h2 className="text-2xl font-bold text-gray-900 uppercase tracking-wide">
+                Showing {products.length} Products
+             </h2>
+             <div className="text-sm text-gray-500 font-medium">
+                Home / Men / Classics
+             </div>
+          </div>
 
-          {products.length > 0 ? (
-            <section className="grid grid-cols-3 gap-6 max-md:grid-cols-2 max-sm:grid-cols-1">
-              {products.slice(0, 9).map((p) => (
+          {loading ? (
+            <div className="flex justify-center items-center h-64">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
+            </div>
+          ) : products.length > 0 ? (
+            <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
+              {products.map((p) => (
                 <ProductCard key={p._id} product={p} />
               ))}
             </section>
           ) : (
-            <p className="text-gray-500 text-center py-12">Loading products...</p>
+            <div className="text-center py-20 bg-gray-50 rounded-2xl">
+              <h2 className="text-xl font-semibold text-gray-500 mb-4">Luxury awaits. No items match your selection.</h2>
+              <button onClick={clearFilters} className="px-6 py-2 bg-black text-white font-bold rounded-lg hover:bg-gray-800 transition">
+                RESET FILTERS
+              </button>
+            </div>
           )}
         </main>
       </div>

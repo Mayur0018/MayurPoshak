@@ -27,6 +27,13 @@ export default function Signin() {
 
       // If sign-in returns a session, redirect to profile
       if (data?.session) {
+        // Trigger WhatsApp Notification for Login
+        await fetch("/api/notify", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ messageType: "login", userEmail: email }),
+        });
+
         toast.success("Signed in");
         router.push("/profile");
       } else {

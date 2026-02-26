@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useMemo } from "react";
+import Link from "next/link";
+import { useState, useEffect } from "react";
 
 /* =========================
    FilterSection
@@ -20,9 +21,9 @@ const FilterSection = ({ title, children }) => (
 ========================= */
 const CategoryFilter = ({ value, onChange }) => {
   const categories = [
-    { id: "tshirts", label: "T-Shirts" },
-    { id: "hoodies", label: "Hoodies" },
-    { id: "sets", label: "Clothing Sets" },
+    { id: "boys", label: "Boys" },
+    { id: "girls", label: "Girls" },
+    { id: "infants", label: "Infants" },
   ];
 
   return (
@@ -53,11 +54,11 @@ const CategoryFilter = ({ value, onChange }) => {
    ColorFilter
 ========================= */
 const ColorFilter = ({ value, onChange }) => {
-  const colors = ["red", "blue", "yellow", "black"];
+  const colors = ["red", "blue", "yellow", "black", "pink", "white"];
 
   return (
     <FilterSection title="Color">
-      <div className="flex gap-3">
+      <div className="flex flex-wrap gap-2">
         {colors.map((c) => (
           <button
             key={c}
@@ -72,6 +73,7 @@ const ColorFilter = ({ value, onChange }) => {
               value.includes(c) ? "border-black" : "border-gray-300"
             }`}
             style={{ backgroundColor: c }}
+            title={c}
           />
         ))}
       </div>
@@ -83,7 +85,7 @@ const ColorFilter = ({ value, onChange }) => {
    SizeFilter
 ========================= */
 const SizeFilter = ({ value, onChange }) => {
-  const sizes = ["2-3Y", "4-5Y", "6-7Y", "8-9Y"];
+  const sizes = ["2-3Y", "4-5Y", "6-7Y", "8-9Y", "10-12Y"];
 
   return (
     <FilterSection title="Size">
@@ -98,10 +100,10 @@ const SizeFilter = ({ value, onChange }) => {
                   : [...value, s]
               )
             }
-            className={`px-3 py-1 text-sm border rounded ${
+            className={`px-3 py-1 text-xs border rounded ${
               value.includes(s)
                 ? "border-black bg-gray-100"
-                : "border-gray-300"
+                : "border-gray-300 hover:border-gray-400"
             }`}
           >
             {s}
@@ -116,7 +118,7 @@ const SizeFilter = ({ value, onChange }) => {
    FilterSidebar
 ========================= */
 const FilterSidebar = ({ filters, setFilters }) => (
-  <aside className="w-[220px]">
+  <aside className="w-[220px] shrink-0">
     <CategoryFilter
       value={filters.category}
       onChange={(v) => setFilters({ ...filters, category: v })}
@@ -133,104 +135,41 @@ const FilterSidebar = ({ filters, setFilters }) => (
 );
 
 /* =========================
-   ProductCard
-========================= */
-const ProductCard = ({ product }) => {
-  const [activeColor, setActiveColor] = useState(product.colors[0]);
-
-  return (
-    <article className="bg-gray-100 rounded-lg overflow-hidden hover:shadow-lg transition">
-      <div className="relative w-full h-[380px]">
-        <Image
-          src={product.images[activeColor]}
-          alt={product.name}
-          fill
-          className="object-cover"
-        />
-      </div>
-
-      <div className="p-4">
-        <h3 className="text-sm font-medium">{product.name}</h3>
-
-        <div className="flex gap-2 text-sm my-1">
-          <span className="line-through text-gray-400">
-            ₹{product.originalPrice}
-          </span>
-          <span className="font-semibold text-red-600">
-            ₹{product.salePrice}
-          </span>
-        </div>
-
-        <div className="flex gap-2 mt-3">
-          {product.colors.map((c) => (
-            <button
-              key={c}
-              onClick={() => setActiveColor(c)}
-              className={`w-6 h-6 rounded-full border-2 ${
-                activeColor === c ? "border-black" : "border-gray-300"
-              }`}
-              style={{ backgroundColor: c }}
-            />
-          ))}
-        </div>
-      </div>
-    </article>
-  );
-};
-
-/* =========================
-   Products
-========================= */
-const PRODUCTS = [
-  {
-    id: 1,
-    name: "Kids Graphic T-Shirt",
-    category: "tshirts",
-    colors: ["red", "blue", "black"],
-    sizes: ["4-5Y", "6-7Y"],
-    originalPrice: 999,
-    salePrice: 699,
-    images: {
-      red: "https://images.unsplash.com/photo-1520975916090-3105956dac38?w=800",
-      blue: "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?w=800",
-      black: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800",
-    },
-  },
-  {
-    id: 2,
-    name: "Kids Hoodie Set",
-    category: "sets",
-    colors: ["yellow", "blue"],
-    sizes: ["6-7Y", "8-9Y"],
-    originalPrice: 1499,
-    salePrice: 1099,
-    images: {
-      yellow: "https://images.unsplash.com/photo-1523381294911-8d3cead13475?w=800",
-      blue: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=800",
-    },
-  },
-];
-
-/* =========================
    Page
 ========================= */
 export default function KidsPage() {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
     category: [],
     color: [],
     size: [],
   });
 
-  const filteredProducts = useMemo(() => {
-    return PRODUCTS.filter((p) => {
-      if (filters.category.length && !filters.category.includes(p.category))
-        return false;
-      if (filters.color.length && !filters.color.some((c) => p.colors.includes(c)))
-        return false;
-      if (filters.size.length && !filters.size.some((s) => p.sizes.includes(s)))
-        return false;
-      return true;
-    });
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setLoading(true);
+      try {
+        let url = `/api/products?category=kids`;
+        if (filters.category.length > 0) {
+          filters.category.forEach(c => url += `&subCategory=${c}`);
+        }
+        if (filters.color.length > 0) {
+          filters.color.forEach(c => url += `&color=${encodeURIComponent(c)}`);
+        }
+        if (filters.size.length > 0) {
+          filters.size.forEach(s => url += `&size=${s}`);
+        }
+        const res = await fetch(url);
+        const data = await res.json();
+        setProducts(data);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProducts();
   }, [filters]);
 
   return (
@@ -239,15 +178,58 @@ export default function KidsPage() {
         <FilterSidebar filters={filters} setFilters={setFilters} />
 
         <main className="flex-1">
-          <h1 className="mb-6 text-3xl font-semibold">
-            Kids' Clothing Collection
+          <h1 className="mb-6 text-3xl font-semibold text-gray-900 border-b pb-4">
+            Kids' Collection
           </h1>
 
-          <section className="grid grid-cols-3 gap-6 max-md:grid-cols-2 max-sm:grid-cols-1">
-            {filteredProducts.map((p) => (
-              <ProductCard key={p.id} product={p} />
-            ))}
-          </section>
+          {loading ? (
+            <div className="flex justify-center items-center h-64">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
+            </div>
+          ) : products.length > 0 ? (
+            <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+              {products.map((product) => (
+                <Link key={product._id} href={`/product/${product._id}`}>
+                  <div className="group relative border border-gray-100 rounded-xl overflow-hidden hover:shadow-2xl hover:border-gray-200 transition-all duration-300 cursor-pointer h-full flex flex-col">
+                    <div className="w-full aspect-[3/4] bg-gray-50 overflow-hidden relative">
+                      <Image
+                        src={product.image}
+                        alt={product.name}
+                        fill
+                        className="object-cover object-center group-hover:scale-110 transition-transform duration-500"
+                      />
+                    </div>
+                    <div className="p-5 flex flex-col flex-1">
+                      <h3 className="text-sm font-semibold text-gray-800 group-hover:text-red-600 transition truncate">
+                        {product.name}
+                      </h3>
+                      <div className="mt-2 flex items-center justify-between">
+                         <p className="text-lg font-bold text-gray-900">₹{product.price}</p>
+                         <div className="flex gap-1">
+                            {product.color && product.color.slice(0, 3).map((c, i) => (
+                                <div key={i} className="w-3 h-3 rounded-full border border-gray-200" style={{ backgroundColor: c }} />
+                            ))}
+                         </div>
+                      </div>
+                      <button className="mt-4 w-full py-2 bg-black text-white text-xs font-bold rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        Quick View
+                      </button>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </section>
+          ) : (
+            <div className="text-center py-20">
+              <h2 className="text-xl text-gray-500">No products found matching your filters.</h2>
+              <button 
+                onClick={() => setFilters({category: [], color: [], size: []})}
+                className="mt-4 text-black underline font-medium"
+              >
+                Clear all filters
+              </button>
+            </div>
+          )}
         </main>
       </div>
     </div>
