@@ -12,8 +12,10 @@ export async function GET(request) {
     const category = searchParams.get("category");
     if (category) query.category = category;
 
-    const subCategory = searchParams.get("subCategory");
-    if (subCategory) query.subCategory = subCategory;
+    // Support multiple subCategory values for filtering (e.g. Gen Z style filter)
+    const subCategories = searchParams.getAll("subCategory");
+    if (subCategories.length === 1) query.subCategory = subCategories[0];
+    else if (subCategories.length > 1) query.subCategory = { $in: subCategories };
 
     const brand = searchParams.get("brand");
     if (brand) query.brand = brand;

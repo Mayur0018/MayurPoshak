@@ -25,6 +25,7 @@ const Header = () => {
     { label: "MEN", link: "/men" },
     { label: "LADIES", link: "/ladies" },
     { label: "KIDS", link: "/kids" },
+    { label: "GEN Z", link: "/genz" },
   ];
 
   const navItems = [
