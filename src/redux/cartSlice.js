@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   cartItems: [],
+  sidebarOpen: false,
 };
 
 const cartSlice = createSlice({
@@ -17,6 +18,8 @@ const cartSlice = createSlice({
       } else {
         state.cartItems.push({ ...action.payload, quantity: 1 });
       }
+      // Auto-open sidebar when item is added
+      state.sidebarOpen = true;
     },
     incrementQty: (state, action) => {
       const item = state.cartItems.find((item) => item._id === action.payload);
@@ -31,9 +34,22 @@ const cartSlice = createSlice({
         (item) => item._id !== action.payload
       );
     },
+    openCartSidebar: (state) => {
+      state.sidebarOpen = true;
+    },
+    closeCartSidebar: (state) => {
+      state.sidebarOpen = false;
+    },
   },
 });
 
-export const { addToCart, incrementQty, decrementQty, removeFromCart } =
-  cartSlice.actions;
+export const {
+  addToCart,
+  incrementQty,
+  decrementQty,
+  removeFromCart,
+  openCartSidebar,
+  closeCartSidebar,
+} = cartSlice.actions;
+
 export default cartSlice.reducer;

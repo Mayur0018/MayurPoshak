@@ -19,7 +19,9 @@ import {
   ChevronDownIcon,
   FunnelIcon,
   PlusIcon,
+  CheckIcon,
 } from "@heroicons/react/20/solid";
+import { TfiLayoutGrid2, TfiLayoutGrid3, TfiLayoutGrid4 } from "react-icons/tfi";
 
 const sortOptions = [
   { name: "Newest", value: "createdAt", current: true },
@@ -66,6 +68,9 @@ export default function LadiesPage() {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [cols, setCols] = useState(3);
+  const [priceRange, setPriceRange] = useState(25000);
+  const [availability, setAvailability] = useState("all");
   const [selectedFilters, setSelectedFilters] = useState({
     subCategory: [],
     size: [],
@@ -88,6 +93,9 @@ export default function LadiesPage() {
       setLoading(true);
       try {
         let url = `/api/products?category=women&sort=${selectedFilters.sort}`;
+        if (priceRange < 25000) url += `&maxPrice=${priceRange}`;
+        if (availability !== "all") url += `&availability=${availability}`;
+        
         if (selectedFilters.subCategory.length > 0) {
            selectedFilters.subCategory.forEach(s => url += `&subCategory=${s}`);
         }
@@ -107,11 +115,27 @@ export default function LadiesPage() {
       }
     };
     fetchProducts();
-  }, [selectedFilters]);
+  }, [selectedFilters, priceRange, availability]);
 
   const clearFilters = () => {
     setSelectedFilters({ subCategory: [], size: [], color: [], sort: "createdAt" });
+    setPriceRange(25000);
+    setAvailability("all");
   };
+
+  const removeFilter = (key, value) => {
+    if (key === 'maxPrice') setPriceRange(25000);
+    else if (key === 'availability') setAvailability("all");
+    else {
+      setSelectedFilters(prev => ({
+        ...prev,
+        [key]: prev[key].filter(v => v !== value)
+      }));
+    }
+  };
+
+  const hasActiveFilters = priceRange < 25000 || availability !== "all" || Object.values(selectedFilters).some(v => Array.isArray(v) && v.length > 0);
+
 
   return (
     <div className="bg-white min-h-screen">
@@ -164,7 +188,7 @@ export default function LadiesPage() {
                             type="checkbox"
                             checked={selectedFilters[section.id].includes(option.value)}
                             onChange={() => handleFilterChange(section.id, option.value)}
-                            className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                            className="h-4 w-4 rounded border-gray-300 text-black focus:ring-black"
                           />
                           <label htmlFor={`filter-mobile-${section.id}-${optionIdx}`} className="ml-3 min-w-0 flex-1 text-gray-500">
                             {option.label}
@@ -192,7 +216,7 @@ export default function LadiesPage() {
                   <ChevronDownIcon className="-mr-1 ml-1 h-5 w-5 flex-shrink-0 text-gray-400 group-hover:text-gray-500" />
                 </MenuButton>
               </div>
-              <MenuItems className="absolute right-0 z-10 mt-2 w-40 origin-top-right rounded-md bg-white shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none">
+              <MenuItems className="absolute right-0 z-[40] mt-2 w-40 origin-top-right rounded-md bg-white shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none">
                 <div className="py-1">
                   {sortOptions.map((option) => (
                     <MenuItem key={option.name}>
@@ -214,14 +238,158 @@ export default function LadiesPage() {
             <button onClick={() => setMobileFiltersOpen(true)} className="-m-2 ml-4 p-2 text-gray-400 hover:text-gray-500 sm:ml-6 lg:hidden">
               <FunnelIcon className="h-5 w-5" />
             </button>
+
+            {/* Desktop Grid Switcher */}
+            <div className="hidden lg:flex items-center border border-gray-100 rounded-full px-4 py-2 gap-4 h-[38px] ml-6">
+              <button 
+                onClick={() => setCols(2)}
+                className={classNames(cols === 2 ? "text-black" : "text-gray-300", "hover:text-black transition")}
+              >
+                <TfiLayoutGrid2 className="text-xl" />
+              </button>
+              <button 
+                onClick={() => setCols(3)}
+                className={classNames(cols === 3 ? "text-black" : "text-gray-300", "hover:text-black transition")}
+              >
+                <TfiLayoutGrid3 className="text-xl" />
+              </button>
+              <button 
+                onClick={() => setCols(4)}
+                className={classNames(cols === 4 ? "text-black" : "text-gray-300", "hover:text-black transition")}
+              >
+                <TfiLayoutGrid4 className="text-xl" />
+              </button>
+            </div>
           </div>
         </div>
+
+        {/* Mobile Category Ribbon */}
+        <div className="lg:hidden -mx-4 px-4 overflow-x-auto no-scrollbar py-4 border-b border-gray-100 bg-white sticky top-[100px] z-20 shadow-sm">
+          <div className="flex items-center gap-2 min-w-max">
+            <button
+              onClick={clearFilters}
+              className={classNames(
+                !selectedFilters.subCategory.length ? "bg-black text-white" : "bg-gray-50 text-gray-400 font-medium",
+                "px-5 py-2 rounded-full text-[10px] uppercase tracking-widest transition shadow-sm whitespace-nowrap"
+              )}
+            >
+              All Arrivals
+            </button>
+            {subCategories.map((cat) => (
+              <button
+                key={cat.id}
+                onClick={() => handleFilterChange("subCategory", cat.id)}
+                className={classNames(
+                  selectedFilters.subCategory.includes(cat.id) ? "bg-black text-white" : "bg-gray-50 text-gray-400 font-medium",
+                  "px-5 py-2 rounded-full text-[10px] uppercase tracking-widest transition shadow-sm whitespace-nowrap"
+                )}
+              >
+                {cat.name}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Active Filter Chips */}
+        {hasActiveFilters && (
+          <div className="flex flex-wrap items-center gap-3 py-6 animate-in fade-in slide-in-from-top-2 duration-500">
+            <button 
+              onClick={clearFilters}
+              className="px-4 py-1.5 border border-black bg-black text-white text-[10px] font-bold uppercase tracking-widest rounded-full hover:bg-gray-800 transition shadow-sm"
+            >
+              Clear All
+            </button>
+            <span className="w-px h-4 bg-gray-200 mx-1 hidden sm:block" />
+            
+            {priceRange < 25000 && (
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 border border-gray-100 rounded-full group hover:border-black transition cursor-pointer" onClick={() => removeFilter('maxPrice')}>
+                <span className="text-[10px] text-gray-400 font-bold uppercase">Price:</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest">Under ₹{priceRange.toLocaleString()}</span>
+                <XMarkIcon className="h-3 w-3 text-gray-300 group-hover:text-black" />
+              </div>
+            )}
+
+            {availability !== "all" && (
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 border border-gray-100 rounded-full group hover:border-black transition cursor-pointer" onClick={() => removeFilter('availability')}>
+                <span className="text-[10px] text-gray-400 font-bold uppercase">Status:</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest">{availability === 'in-stock' ? 'In Stock' : 'Out of Stock'}</span>
+                <XMarkIcon className="h-3 w-3 text-gray-300 group-hover:text-black" />
+              </div>
+            )}
+
+            {Object.entries(selectedFilters).map(([key, vals]) => 
+              Array.isArray(vals) && vals.map(val => (
+                <div key={`${key}-${val}`} className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 border border-gray-100 rounded-full group hover:border-black transition cursor-pointer" onClick={() => removeFilter(key, val)}>
+                  <span className="text-[10px] text-gray-400 font-bold uppercase">{key}:</span>
+                  <span className="text-[10px] font-bold uppercase tracking-widest">{val}</span>
+                  <XMarkIcon className="h-3 w-3 text-gray-300 group-hover:text-black" />
+                </div>
+              ))
+            )}
+          </div>
+        )}
 
         <section className="pb-24 pt-6">
           <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-4">
             {/* Filters */}
-            <form className="hidden lg:block">
-              <h3 className="text-sm font-bold text-gray-900 uppercase tracking-widest mb-4">Categories</h3>
+            <form className="hidden lg:block pr-8">
+              {/* Availability */}
+              <div className="mb-10">
+                <h3 className="text-[10px] font-bold text-gray-900 uppercase tracking-[0.3em] mb-6">Availability</h3>
+                <div className="space-y-4">
+                  {[
+                    { id: 'all', label: 'All Products' },
+                    { id: 'in-stock', label: 'In stock' },
+                    { id: 'out-of-stock', label: 'Out of stock' }
+                  ].map((opt) => (
+                    <div key={opt.id} className="flex items-center group cursor-pointer" onClick={() => setAvailability(opt.id)}>
+                      <div className={classNames(
+                        availability === opt.id ? "bg-black border-black" : "border-gray-200 bg-white",
+                        "w-4 h-4 rounded border flex items-center justify-center transition-all duration-300"
+                      )}>
+                        {availability === opt.id && <CheckIcon className="h-3 w-3 text-white" />}
+                      </div>
+                      <span className={classNames(
+                        availability === opt.id ? "text-black font-bold" : "text-gray-500",
+                        "ml-3 text-[10px] uppercase tracking-widest transition-all group-hover:text-black"
+                      )}>{opt.label}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Price Filter */}
+              <div className="mb-10 border-t border-gray-100 pt-8">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-[10px] font-bold text-gray-900 uppercase tracking-[0.3em]">Price</h3>
+                  <button 
+                    onClick={() => setPriceRange(25000)}
+                    className="text-[9px] font-bold text-gray-400 hover:text-black uppercase tracking-widest underline decoration-dotted"
+                  >
+                    Reset
+                  </button>
+                </div>
+                <div className="px-1">
+                  <input 
+                    type="range"
+                    min="0"
+                    max="25000"
+                    step="500"
+                    value={priceRange}
+                    onChange={(e) => setPriceRange(Number(e.target.value))}
+                    className="w-full h-1 bg-gray-100 rounded-lg appearance-none cursor-pointer accent-black mb-4"
+                  />
+                  <div className="flex items-center justify-between text-[9px] font-bold tracking-widest text-gray-400 uppercase">
+                    <span>₹0</span>
+                    <span className="text-black bg-gray-50 px-2 py-0.5 rounded-full border border-gray-100">
+                      Under ₹{priceRange.toLocaleString()}
+                    </span>
+                    <span>₹25k+</span>
+                  </div>
+                </div>
+              </div>
+
+              <h3 className="text-xs font-bold text-gray-900 uppercase tracking-widest mb-4">Categories</h3>
               <ul className="space-y-4 border-b border-gray-200 pb-6 text-sm font-medium text-gray-900">
                 {subCategories.map((category) => (
                   <li key={category.id}>
@@ -283,14 +451,20 @@ export default function LadiesPage() {
             {/* Product grid */}
             <div className="lg:col-span-3">
                {loading ? (
-                <div className="flex justify-center items-center h-96">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
+                <div className="flex flex-col justify-center items-center h-96 gap-4">
+                  <div className="w-10 h-10 border-2 border-gray-100 border-t-black rounded-full animate-spin" />
+                  <p className="text-[10px] font-bold tracking-[0.2em] text-gray-400 uppercase">Searching Collection...</p>
                 </div>
                ) : products.length > 0 ? (
-                <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:gap-x-8">
+                <div className={classNames(
+                  "grid gap-x-6 gap-y-12 transition-all duration-500",
+                  cols === 2 ? "grid-cols-1 sm:grid-cols-2" : 
+                  cols === 3 ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" : 
+                  "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+                )}>
                   {products.map((product) => (
                     <Link key={product._id} href={`/product/${product._id}`} className="group relative flex flex-col">
-                      <div className="aspect-[3/4] w-full overflow-hidden rounded-xl bg-gray-100 group-hover:opacity-75 relative shadow-sm transition-all duration-300 group-hover:shadow-xl">
+                      <div className="aspect-[3/4] w-full overflow-hidden rounded-[2rem] bg-gray-50 group-hover:opacity-95 relative shadow-sm transition-all duration-500 group-hover:shadow-2xl border border-gray-50">
                         <Image
                           src={product.image}
                           alt={product.name}

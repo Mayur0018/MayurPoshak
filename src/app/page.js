@@ -6,19 +6,19 @@ import MostTrending from "@/components/MostTrending";
 import About from "@/components/About";
 import ProductOffer from "@/components/ProductOffer";
 import Exhibition from "@/components/Exhibition";
-import Link from "next/link";
+import Testimonials from "@/components/Testimonials";
+import NewsletterCTA from "@/components/NewsletterCTA";
+import NewArrivals from "@/components/NewArrivals";
 
 export default async function Home() {
   let products = [];
   try {
     await connectDB();
-    products = await Product.find().lean();
+    const raw = await Product.find().sort({ createdAt: -1 }).limit(8).lean();
+    // Serialize MongoDB objects (ObjectId, Date, etc.) to plain values
+    products = JSON.parse(JSON.stringify(raw));
   } catch (error) {
     console.error("Error fetching products on Home:", error);
-  }
-
-  function cardImage(p) {
-    return p.image ?? null;
   }
 
   return (
@@ -30,26 +30,10 @@ export default async function Home() {
           <MostTrending />
           <ProductOffer />
           <About />
-          <Exhibition/>
-          <div className="px-4 sm:px-6 lg:px-8 mt-10">
-            <h2 className="text-xl font-semibold mb-4">Latest Products</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-              {(products ?? []).map((p, idx) => {
-                const img = cardImage(p);
-                return (
-                  <Link key={p._id || `${p.name}-${idx}`} href={`/product/${p._id}`} className="border rounded bg-white overflow-hidden">
-                    {img && <img src={img} alt={p.name} className="w-full h-40 object-cover" />}
-                    <div className="p-3">
-                      <div className="text-sm font-semibold truncate">{p.name}</div>
-                      <div className="mt-1">
-                        <span className="text-green-600 font-bold">₹{Number(p.price ?? 0).toFixed(2)}</span>
-                      </div>
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
+          <Testimonials />
+          <Exhibition />
+          <NewArrivals products={products} />
+          <NewsletterCTA />
         </div>
       </main>
     </>

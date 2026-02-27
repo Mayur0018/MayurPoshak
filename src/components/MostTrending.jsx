@@ -2,98 +2,152 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Partnership } from "@/Data/Partnership";
 import { summerimg } from "@/Data/summerimg";
 import { addToCart } from "@/redux/cartSlice";
 import { useDispatch } from "react-redux";
 import toast, { Toaster } from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import SkeletonCard from "@/components/SkeletonCard"; // 👈
+import SkeletonCard from "@/components/SkeletonCard";
 import Slider1 from "./Slider1";
 import Slider2 from "./Slider2";
 
-export default function MostTrending() {
-  const [product, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true); // 👈
+/* ========================
+   SIZE PICKER PRODUCT CARD
+========================= */
+const SIZES = ["XS", "S", "M", "L", "XL"];
+
+const ProductCard = ({ item, index }) => {
+  const [hovered, setHovered] = useState(false);
+  const [selectedSize, setSelectedSize] = useState(null);
   const dispatch = useDispatch();
   const router = useRouter();
+
+  const handleAddToCart = (e) => {
+    e.preventDefault();
+    if (!selectedSize) {
+      toast.error("Please select a size first");
+      return;
+    }
+    dispatch(addToCart({ ...item, size: selectedSize }));
+    toast.success(`Added to cart — Size ${selectedSize}`);
+  };
+
+  return (
+    <motion.div
+      key={item._id || index}
+      className="relative cursor-pointer group"
+      initial={{ opacity: 0, scale: 0.8 }}
+      whileInView={{ opacity: 1, scale: 1 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5, delay: index * 0.07 }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => { setHovered(false); setSelectedSize(null); }}
+    >
+      <Link href={`/product/${item._id}`}>
+        {/* Product Image */}
+        <div className="relative overflow-hidden">
+          <Image
+            src={item.image}
+            width={800}
+            height={0}
+            loading="lazy"
+            alt={item.name}
+            className="aspect-[253/337] object-cover object-top shadow-md group-hover:scale-[1.04] transition-transform duration-500"
+          />
+
+          {/* Hover Overlay */}
+          <AnimatePresence>
+            {hovered && (
+              <motion.div
+                className="absolute bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm px-3 py-3"
+                initial={{ y: "100%", opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: "100%", opacity: 0 }}
+                transition={{ duration: 0.25, ease: "easeOut" }}
+              >
+                {/* Size picker */}
+                <div className="flex gap-1.5 justify-center mb-2 flex-wrap">
+                  {SIZES.map((sz) => (
+                    <button
+                      key={sz}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setSelectedSize(sz);
+                      }}
+                      className={`text-[10px] font-semibold px-2 py-1 border rounded transition-all duration-200 ${
+                        selectedSize === sz
+                          ? "bg-black text-white border-black"
+                          : "bg-white text-gray-700 border-gray-300 hover:border-black"
+                      }`}
+                    >
+                      {sz}
+                    </button>
+                  ))}
+                </div>
+                {/* Add to cart */}
+                <button
+                  onClick={handleAddToCart}
+                  className="w-full bg-black text-white text-[11px] font-bold py-2 rounded hover:bg-gray-800 transition"
+                >
+                  ADD TO CART
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </Link>
+
+      <p className="font-medium text-[12px] py-1.5 truncate">{item.name}</p>
+      <p className="text-[12px] font-semibold text-gray-800">₹{item.price}</p>
+    </motion.div>
+  );
+};
+
+/* ========================
+   MOST TRENDING
+========================= */
+export default function MostTrending() {
+  const [product, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetch("api/products")
       .then((res) => res.json())
       .then((data) => {
         setProducts(data);
-        setLoading(false); // 👈
+        setLoading(false);
       });
   }, []);
-
-  const handleAddToCart = (item) => {
-    try {
-      const user = true;
-
-      if (!user) {
-        toast.error("Please login first to add to cart");
-        setTimeout(() => {
-          router.push("/Signin");
-        }, 1000);
-        return;
-      }
-      dispatch(addToCart(item));
-      toast.success("Product added to cart successfully");
-    } catch (err) {
-      console.error("Unexpected error:", err);
-      toast.error("Unexpected error occurred");
-    }
-  };
 
   return (
     <>
       <Toaster position="top-right" reverseOrder={false} />
 
       {/* Heading */}
-      <motion.h1
-        className="text-2xl font-medium mt-8 px-9 overflow-hidden"
-        initial={{ opacity: 0, y: -50 }}
+      <motion.div
+        className="px-9 mt-10 flex items-center justify-between"
+        initial={{ opacity: 0, y: -30 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        transition={{ duration: 0.8 }}
+        transition={{ duration: 0.7 }}
       >
-        Most Trending
-      </motion.h1>
+        <h1 className="text-2xl font-bold tracking-tight">Most Trending</h1>
+        <Link
+          href="/products"
+          className="text-xs font-semibold uppercase tracking-widest border-b border-black hover:text-gray-500 hover:border-gray-500 transition"
+        >
+          View All →
+        </Link>
+      </motion.div>
 
       {/* Products or Skeletons */}
-      <div className="py-8 grid grid-cols-2 md:grid-cols-4 gap-3 px-8 md:gap-0">
+      <div className="py-8 grid grid-cols-2 md:grid-cols-4 gap-x-3 gap-y-8 px-8">
         {loading
           ? [...Array(8)].map((_, index) => <SkeletonCard key={index} />)
-          : product.map((item, index) => (
-              <motion.div
-                key={item._id || index}
-                className="md:px-4 md:py-4 cursor-pointer"
-                initial={{ opacity: 0, scale: 0.8 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-              >
-                <Link href={`/product/${item._id}`}>
-                  <Image
-                    src={item.image}
-                    width={800}
-                    height={0}
-                    loading="lazy" // 👈 lazy loading
-                    alt="trendingimgs"
-                    className="aspect-[253/337] object-cover object-top shadow-md hover:scale-[1.05] transition-all duration-300"
-                  />
-                </Link>
-                <p className="font-medium text-[12px] py-2">{item.name}</p>
-                <p className="text-[12px] font-medium py-2">Rs.{item.price}</p>
-                <button
-                  className="text-[12px] w-full px-2 py-2 md:py-4 md:px-4 font-medium bg-black text-white cursor-pointer"
-                  onClick={() => handleAddToCart(item)}
-                >
-                  ADD TO CART
-                </button>
-              </motion.div>
+          : product.slice(0, 8).map((item, index) => (
+              <ProductCard key={item._id || index} item={item} index={index} />
             ))}
       </div>
 
@@ -131,9 +185,9 @@ export default function MostTrending() {
         viewport={{ once: true }}
         transition={{ duration: 0.8 }}
       >
-        <h1 className="text-1xl md:text-2xl font-medium text-center">
+        <h1 className="text-1xl md:text-2xl font-bold text-center">
           SUMMER ESSENTIALS 🎇
-          <p className="text-[12px] text-gray-500">Hot Picks For The Season</p>
+          <p className="text-[12px] text-gray-500 font-normal mt-1">Hot Picks For The Season</p>
         </h1>
         <div className="px-3 md:px-10 md:gap-6 grid grid-cols-3 gap-2 mt-6">
           {summerimg.map((item, index) => (
@@ -149,28 +203,26 @@ export default function MostTrending() {
                 width={400}
                 height={400}
                 alt={`summer-img-${index}`}
-                loading="lazy" // 👈 lazy loading
+                loading="lazy"
                 className="rounded-lg w-full aspect-[253/337] object-cover object-top shadow-md hover:scale-[1.05] transition-all duration-300"
               />
             </motion.div>
           ))}
         </div>
       </motion.div>
+
+      {/* New Trends */}
       <motion.div
         className="mt-10"
         initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
-        <motion.h1
-          className="text-1xl md:text-2xl font-medium text-center"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-        >
+        <h1 className="text-1xl md:text-2xl font-bold text-center">
           NEW TRENDS TO TRY 👓
-          <p className="text-[12px] text-gray-500">Hot Picks For The Season</p>
-        </motion.h1>
+          <p className="text-[12px] text-gray-500 font-normal mt-1">Hot Picks For The Season</p>
+        </h1>
 
         <motion.div
           initial={{ opacity: 0, y: 50 }}

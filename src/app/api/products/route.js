@@ -8,9 +8,22 @@ export async function GET(request) {
 
     const query = {};
 
+    // Searching
+    const searchTerm = searchParams.get("search");
+    if (searchTerm) {
+      const regex = new RegExp(searchTerm, "i");
+      query.$or = [
+        { name: regex },
+        { brand: regex },
+        { category: regex },
+        { subCategory: regex },
+      ];
+    }
+
     // Filtering
-    const category = searchParams.get("category");
-    if (category) query.category = category;
+    const categories = searchParams.getAll("category");
+    if (categories.length === 1) query.category = categories[0];
+    else if (categories.length > 1) query.category = { $in: categories };
 
     // Support multiple subCategory values for filtering (e.g. Gen Z style filter)
     const subCategories = searchParams.getAll("subCategory");
@@ -32,6 +45,14 @@ export async function GET(request) {
       query.price = {};
       if (minPrice) query.price.$gte = Number(minPrice);
       if (maxPrice) query.price.$lte = Number(maxPrice);
+    }
+
+    // Availability
+    const availability = searchParams.get("availability");
+    if (availability === "in-stock") {
+      query.stock = { $gt: 0 };
+    } else if (availability === "out-of-stock") {
+      query.stock = { $lte: 0 };
     }
 
     // Sorting

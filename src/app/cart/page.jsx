@@ -1,58 +1,47 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { useSelector, useDispatch } from "react-redux";
-import { AiOutlineHeart, AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
-import { MdDeleteOutline } from "react-icons/md";
-import { FaShoppingCart } from "react-icons/fa";
+import { motion, AnimatePresence } from "framer-motion";
+import { decrementQty, incrementQty, removeFromCart } from "@/redux/cartSlice";
 import { loadStripe } from "@stripe/stripe-js";
-import {
-  decrementQty,
-  incrementQty,
-  removeFromCart,
-} from "@/redux/cartSlice";
+import { RxCross1 } from "react-icons/rx";
+import { FiShoppingCart, FiArrowRight } from "react-icons/fi";
+import { MdLock } from "react-icons/md";
 
-const CartPage = () => {
+const FREE_SHIPPING_THRESHOLD = 999;
+
+export default function CartPage() {
   const cartItems = useSelector((state) => state.cart.cartItems);
   const dispatch = useDispatch();
-
-  const [loading, setLoading] = useState(true);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const stripePromise = loadStripe(
-    process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+  const subtotal = cartItems.reduce(
+    (sum, item) => sum + Number(item.price ?? 0) * item.quantity,
+    0
   );
-
-  useEffect(() => {
-    const timeout = setTimeout(() => setLoading(false), 1000);
-    return () => clearTimeout(timeout);
-  }, []);
+  const remaining = FREE_SHIPPING_THRESHOLD - subtotal;
+  const shipping = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : 49;
+  const total = subtotal + shipping;
 
   const handleCheckout = async () => {
     if (!cartItems || cartItems.length === 0) {
       setError("Your cart is empty");
       return;
     }
-
     try {
       setCheckoutLoading(true);
       setError(null);
-
-      const stripe = await stripePromise;
-
+      const stripe = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
       const response = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ cartItems }),
       });
-
       const data = await response.json();
-
-      if (!response.ok || !data.id) {
-        throw new Error(data.error || "Checkout failed");
-      }
-
+      if (!response.ok || !data.id) throw new Error(data.error || "Checkout failed");
       await stripe.redirectToCheckout({ sessionId: data.id });
     } catch (err) {
       setError(err.message || "Checkout failed");
@@ -60,179 +49,203 @@ const CartPage = () => {
     }
   };
 
-  const subtotal = cartItems.reduce(
-    (total, item) => total + item.price * (item.quantity || 1),
-    0
-  );
-  const shipping = 2.0;
-  const tax = 4.0;
-  const total = subtotal + shipping + tax;
-
-  const renderShimmer = () => (
-    <div className="max-w-5xl mx-auto p-4 animate-pulse">
-      {[1, 2].map((_, i) => (
-        <div
-          key={i}
-          className="flex gap-4 bg-gray-100 px-4 py-6 rounded-md shadow-sm border border-gray-200 mb-4"
-        >
-          <div className="w-24 h-24 bg-gray-300 rounded" />
-          <div className="flex-1 space-y-3">
-            <div className="h-4 bg-gray-300 rounded w-2/3" />
-            <div className="h-4 bg-gray-300 rounded w-1/3" />
-            <div className="h-4 bg-gray-300 rounded w-1/4" />
-          </div>
+  if (cartItems.length === 0) {
+    return (
+      <div className="min-h-[70vh] flex flex-col items-center justify-center gap-6 px-4">
+        <FiShoppingCart className="text-8xl text-gray-200" />
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900">Your cart is empty</h1>
+          <p className="text-gray-400 mt-2">Looks like you haven't added anything yet.</p>
         </div>
-      ))}
-    </div>
-  );
-
-  if (loading) return renderShimmer();
+        <Link
+          href="/"
+          className="mt-2 px-10 py-3.5 bg-black text-white font-bold rounded-full hover:bg-gray-800 transition text-sm"
+        >
+          Start Shopping
+        </Link>
+      </div>
+    );
+  }
 
   return (
-    <div>
-      {cartItems.length > 0 ? (
-        <div className="max-w-5xl max-lg:max-w-2xl mx-auto p-4">
-          <h1 className="text-xl font-semibold text-slate-900">
-            Shopping Cart
-          </h1>
+    <div className="min-h-screen bg-gray-50 py-10 px-4">
+      <div className="max-w-6xl mx-auto">
+        {/* Heading */}
+        <div className="mb-8">
+          <p className="text-xs uppercase tracking-[0.3em] text-gray-400 font-medium">Review your items</p>
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mt-1">Shopping Cart</h1>
+          <p className="text-sm text-gray-400 mt-1">{cartItems.length} item{cartItems.length !== 1 ? "s" : ""}</p>
+        </div>
 
-          {/* 🔥 FIX: GRID OUTSIDE MAP */}
-          <div className="grid lg:grid-cols-3 lg:gap-x-8 gap-x-6 gap-y-8 mt-6">
-
-            {/* LEFT SIDE - CART ITEMS */}
-            <div className="lg:col-span-2 space-y-6">
-              {cartItems.map((item, index) => (
+        {/* Free Shipping bar */}
+        <div className="mb-6 bg-white rounded-2xl px-6 py-4 shadow-sm border border-gray-100">
+          {remaining > 0 ? (
+            <>
+              <p className="text-sm text-gray-600">
+                Add <span className="font-bold text-gray-900">₹{remaining.toLocaleString("en-IN")}</span> more to get{" "}
+                <span className="font-bold text-green-600">FREE shipping!</span>
+              </p>
+              <div className="w-full bg-gray-100 h-1.5 rounded-full mt-3">
                 <div
-                  key={item._id || index}
-                  className="flex gap-4 bg-white px-4 py-6 rounded-md shadow-sm border border-gray-200"
+                  className="bg-green-500 h-1.5 rounded-full transition-all duration-700"
+                  style={{ width: `${Math.min((subtotal / FREE_SHIPPING_THRESHOLD) * 100, 100)}%` }}
+                />
+              </div>
+            </>
+          ) : (
+            <p className="text-sm font-semibold text-green-600">🎉 You're eligible for free shipping!</p>
+          )}
+        </div>
+
+        <div className="grid lg:grid-cols-3 gap-8">
+          {/* LEFT — Cart Items */}
+          <div className="lg:col-span-2 flex flex-col gap-4">
+            <AnimatePresence>
+              {cartItems.map((item) => (
+                <motion.div
+                  key={item._id}
+                  layout
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, x: -40 }}
+                  transition={{ duration: 0.3 }}
+                  className="bg-white rounded-2xl p-5 flex gap-5 shadow-sm border border-gray-100"
                 >
-                  <div className="flex gap-6 sm:gap-4 max-sm:flex-col">
-                    <div className="w-24 h-24 shrink-0">
+                  {/* Image */}
+                  <Link href={`/product/${item._id}`} className="shrink-0">
+                    <div className="w-24 h-28 rounded-xl overflow-hidden bg-gray-100 relative">
                       <Image
                         src={item.image}
-                        alt="product"
-                        width={100}
-                        height={100}
-                        className="w-full h-full object-contain"
+                        alt={item.name}
+                        fill
+                        className="object-cover object-top"
                       />
                     </div>
+                  </Link>
 
-                    <div className="flex flex-col gap-4">
+                  {/* Details */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-2">
                       <div>
-                        <h3 className="text-sm sm:text-base font-semibold text-slate-900">
-                          {item.name}
-                        </h3>
-                        <p className="text-[13px] font-medium text-slate-500 mt-2 flex items-center gap-2">
-                          Color:
-                          <span className="inline-block w-4 h-4 rounded-sm bg-[#ac7f48]"></span>
-                        </p>
+                        <Link href={`/product/${item._id}`}>
+                          <h3 className="text-sm font-semibold text-gray-900 hover:text-gray-600 transition line-clamp-2">
+                            {item.name}
+                          </h3>
+                        </Link>
+                        {item.size && (
+                          <p className="text-xs text-gray-400 mt-0.5">Size: {item.size}</p>
+                        )}
+                        {item.color && (
+                          <div className="flex items-center gap-1.5 mt-1">
+                            <span className="text-xs text-gray-400">Color:</span>
+                            <span
+                              className="w-4 h-4 rounded-full border border-gray-200"
+                              style={{ backgroundColor: item.color }}
+                            />
+                          </div>
+                        )}
                       </div>
-                      <h3 className="text-sm font-semibold text-slate-900 mt-auto">
-                        {item.price}
-                      </h3>
+                      <button
+                        onClick={() => dispatch(removeFromCart(item._id))}
+                        className="text-gray-300 hover:text-red-500 transition shrink-0"
+                      >
+                        <RxCross1 />
+                      </button>
+                    </div>
+
+                    {/* Price + Qty */}
+                    <div className="flex items-center justify-between mt-4">
+                      <div className="flex items-center gap-2 border border-gray-200 rounded-full px-4 py-1.5">
+                        <button
+                          onClick={() => dispatch(decrementQty(item._id))}
+                          className="text-gray-600 hover:text-black font-bold transition w-4 text-center"
+                        >
+                          −
+                        </button>
+                        <span className="text-sm font-bold w-6 text-center">{item.quantity}</span>
+                        <button
+                          onClick={() => dispatch(incrementQty(item._id))}
+                          className="text-gray-600 hover:text-black font-bold transition w-4 text-center"
+                        >
+                          +
+                        </button>
+                      </div>
+                      <p className="text-base font-bold text-gray-900">
+                        ₹{(Number(item.price) * item.quantity).toLocaleString("en-IN")}
+                      </p>
                     </div>
                   </div>
-
-                  <div className="ml-auto flex flex-col justify-between">
-                    <div className="flex items-start gap-4 justify-end">
-                      <button>
-                        <AiOutlineHeart className="w-5 h-5 text-slate-400 hover:text-pink-600" />
-                      </button>
-                      <button>
-                        <MdDeleteOutline
-                          className="w-5 h-5 text-slate-400 hover:text-red-600 cursor-pointer"
-                          onClick={() => dispatch(removeFromCart(item._id))}
-                        />
-                      </button>
-                    </div>
-
-                    <div className="flex items-center gap-3 mt-4">
-                      <button
-                        className="w-[18px] h-[18px] bg-slate-400 rounded-full flex items-center justify-center text-white cursor-pointer"
-                        onClick={() => dispatch(decrementQty(item._id))}
-                      >
-                        <AiOutlineMinus size={12} />
-                      </button>
-
-                      <span className="font-semibold text-base">
-                        {item.quantity}
-                      </span>
-
-                      <button
-                        className="w-[18px] h-[18px] bg-slate-800 rounded-full flex items-center justify-center text-white cursor-pointer"
-                        onClick={() => dispatch(incrementQty(item._id))}
-                      >
-                        <AiOutlinePlus size={12} />
-                      </button>
-                    </div>
-                  </div>
-                </div>
+                </motion.div>
               ))}
-            </div>
+            </AnimatePresence>
+          </div>
 
-            {/* RIGHT SIDE - SUMMARY */}
-            <div className="bg-white rounded-md px-4 py-6 h-max shadow-sm border border-gray-200">
-              <ul className="text-slate-500 font-medium space-y-4 text-sm">
-                <li className="flex justify-between">
-                  Subtotal
-                  <span className="font-semibold text-slate-900">
-                    {subtotal.toFixed(2)}
+          {/* RIGHT — Order Summary */}
+          <div className="h-max sticky top-24">
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+              <h2 className="text-lg font-bold text-gray-900 mb-5">Order Summary</h2>
+
+              <div className="flex flex-col gap-3 text-sm">
+                <div className="flex justify-between text-gray-500">
+                  <span>Subtotal ({cartItems.length} items)</span>
+                  <span className="font-semibold text-gray-900">₹{subtotal.toLocaleString("en-IN")}</span>
+                </div>
+                <div className="flex justify-between text-gray-500">
+                  <span>Shipping</span>
+                  <span className={`font-semibold ${shipping === 0 ? "text-green-600" : "text-gray-900"}`}>
+                    {shipping === 0 ? "FREE" : `₹${shipping}`}
                   </span>
-                </li>
-                <li className="flex justify-between">
-                  Shipping
-                  <span className="font-semibold text-slate-900">
-                    {shipping.toFixed(2)}
-                  </span>
-                </li>
-                <li className="flex justify-between">
-                  Tax
-                  <span className="font-semibold text-slate-900">
-                    {tax.toFixed(2)}
-                  </span>
-                </li>
-                <hr className="border-slate-300" />
-                <li className="flex justify-between font-semibold text-slate-900">
-                  Total <span>{total.toFixed(2)}</span>
-                </li>
-              </ul>
+                </div>
+                <div className="border-t border-gray-100 pt-3 flex justify-between">
+                  <span className="font-bold text-gray-900 text-base">Total</span>
+                  <span className="font-bold text-gray-900 text-base">₹{total.toLocaleString("en-IN")}</span>
+                </div>
+                <p className="text-xs text-gray-400">Taxes calculated at checkout</p>
+              </div>
 
               {error && (
-                <div className="mt-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+                <div className="mt-4 p-3 bg-red-50 border border-red-200 text-red-600 rounded-xl text-xs">
                   {error}
                 </div>
               )}
 
-              <div className="mt-8 space-y-4">
-                <button
-                  className="w-full py-2.5 text-sm font-medium tracking-wide text-white bg-slate-800 hover:bg-slate-900 disabled:bg-slate-400 disabled:cursor-not-allowed rounded-md cursor-pointer transition"
-                  onClick={handleCheckout}
-                  disabled={checkoutLoading}
-                >
-                  {checkoutLoading ? "Processing..." : "Buy Now"}
-                </button>
+              <button
+                onClick={handleCheckout}
+                disabled={checkoutLoading}
+                className="mt-6 w-full py-4 bg-black text-white font-bold rounded-full flex items-center justify-center gap-2 hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition text-sm"
+              >
+                {checkoutLoading ? (
+                  <>
+                    <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    <MdLock className="text-lg" />
+                    Checkout Securely
+                    <FiArrowRight />
+                  </>
+                )}
+              </button>
 
-                <button className="w-full py-2.5 text-sm font-medium tracking-wide text-slate-900 bg-slate-50 hover:bg-slate-100 border border-gray-300 rounded-md">
-                  Continue Shopping
-                </button>
-              </div>
+              <Link
+                href="/"
+                className="mt-3 w-full py-3 border border-gray-200 text-gray-700 font-medium rounded-full flex items-center justify-center text-sm hover:bg-gray-50 transition"
+              >
+                Continue Shopping
+              </Link>
 
-              <div className="mt-5 flex justify-center gap-4">
-                <Image src="/Cardsimg/gpay.jpg" alt="gpay" width={40} height={20} />
-                <Image src="/Cardsimg/mastercard.png" alt="mc" width={40} height={20} />
-                <Image src="/Cardsimg/paypa.png" alt="paypal" width={40} height={20} />
+              {/* Payment Icons */}
+              <div className="mt-5 flex justify-center gap-3 items-center opacity-60">
+                <Image src="/Cardsimg/gpay.jpg" alt="gpay" width={36} height={22} className="rounded" />
+                <Image src="/Cardsimg/mastercard.png" alt="mastercard" width={36} height={22} className="rounded" />
+                <Image src="/Cardsimg/paypa.png" alt="paypal" width={36} height={22} className="rounded" />
               </div>
+              <p className="text-center text-xs text-gray-400 mt-2">🔒 Your payment is secure & encrypted</p>
             </div>
           </div>
         </div>
-      ) : (
-        <div className="flex flex-col items-center justify-center h-[60vh] text-red-500 gap-4">
-          <FaShoppingCart className="text-5xl" />
-          <p className="text-xl font-bold">Cart is Empty</p>
-        </div>
-      )}
+      </div>
     </div>
   );
-};
-
-export default CartPage;
+}

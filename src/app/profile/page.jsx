@@ -3,6 +3,16 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import supabase from "@/lib/supabaseClient";
 import Link from "next/link";
+import { 
+  TfiPackage, 
+  TfiLocationPin, 
+  TfiSettings, 
+  TfiUser, 
+  TfiPowerOff,
+  TfiHeadphoneAlt,
+  TfiAngleRight
+} from "react-icons/tfi";
+
 export default function ProfilePage() {
   const router = useRouter();
   const [user, setUser] = useState(null);
@@ -10,6 +20,7 @@ export default function ProfilePage() {
   const [orders, setOrders] = useState([]);
   const [addresses, setAddresses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -36,143 +47,257 @@ export default function ProfilePage() {
 
   const handleLogout = async () => {
     try {
-      // 1. Sign out on the client
+      setIsLoggingOut(true);
       await supabase.auth.signOut();
-      
-      // 2. Call the server-side signout to clear cookies
       await fetch("/api/auth/signout", { method: "POST" });
-      
-      // 3. Clear local storage/cache and redirect
       window.localStorage.clear();
-      window.location.href = "/Signin";
+      window.location.replace("/");
     } catch (error) {
       console.error("Logout error:", error);
-      // Fallback
-      window.location.href = "/Signin";
+      window.location.replace("/");
     }
   };
 
-  if (!user) {
+  if (isLoggingOut) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-10 w-10 border-t-4 border-indigo-600"></div>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-white gap-4">
+        <div className="w-12 h-12 border-2 border-gray-100 border-t-black rounded-full animate-spin"></div>
+        <div className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-400">Auth Cleanup...</div>
       </div>
     );
   }
 
-  const avatar = user.user_metadata?.avatar_url || "https://pagedone.io/asset/uploads/1705471668.png";
-  const fullName = user.user_metadata?.full_name || user.email;
+  if (!user) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-white">
+        <div className="w-12 h-12 border-2 border-gray-100 border-t-black rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  const avatar = user.user_metadata?.avatar_url || `https://ui-avatars.com/api/?name=${user.email}&background=000&color=fff`;
+  const fullName = user.user_metadata?.full_name || user.email.split('@')[0];
+
+  const MenuItems = [
+    { id: "overview", label: "Dashboard", icon: TfiUser },
+    { id: "orders", label: "Order History", icon: TfiPackage },
+    { id: "addresses", label: "Saved Addresses", icon: TfiLocationPin },
+    { id: "settings", label: "Account Settings", icon: TfiSettings },
+  ];
 
   return (
-    <section className="min-h-screen bg-gray-50">
-      <div className="relative h-40 bg-gradient-to-r from-indigo-600 to-purple-600" />
-      <div className="max-w-6xl mx-auto px-4 mt-12">
-        <div className="bg-white border rounded-xl shadow-sm p-6">
-          <div className="flex flex-col sm:flex-row items-center gap-6 text-center sm:text-left">
-            <img src={avatar} alt="user" className="w-24 h-24 rounded-full border-4 border-white -mt-12 object-cover shadow-lg" />
-            <div className="flex-1 -mt-2">
-              <div className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
-                {fullName}
-              </div>
-              <div className="text-sm text-gray-500 font-medium">{user.email}</div>
-            </div>
-            <div className="flex gap-3 w-full sm:w-auto">
-              <button
-                onClick={handleLogout}
-                className="w-full sm:w-auto text-sm px-6 py-2.5 bg-red-50 text-red-600 font-bold rounded-xl border border-red-100 hover:bg-red-600 hover:text-white hover:border-red-600 transition-all shadow-sm active:scale-95"
-              >
-                Logout Account
-              </button>
-            </div>
-          </div>
-
-          <div className="mt-6 border-b flex gap-6 text-sm">
-            {["overview","orders","addresses","settings"].map((t) => (
-              <button
-                key={t}
-                className={`pb-2 ${tab === t ? "border-b-2 border-indigo-600 text-indigo-700" : "text-gray-600"}`}
-                onClick={() => setTab(t)}
-              >
-                {t[0].toUpperCase() + t.slice(1)}
-              </button>
-            ))}
-          </div>
-
-          <div className="mt-6">
-            {tab === "overview" && (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="border rounded p-4">
-                  <div className="text-sm text-gray-600">Orders</div>
-                  <div className="text-2xl font-semibold">{orders.length}</div>
-                </div>
-                <div className="border rounded p-4">
-                  <div className="text-sm text-gray-600">Addresses</div>
-                  <div className="text-2xl font-semibold">{addresses.length}</div>
-                </div>
-                <div className="border rounded p-4">
-                  <div className="text-sm text-gray-600">Member since</div>
-                  <div className="text-2xl font-semibold">{new Date(user.created_at || Date.now()).toLocaleDateString()}</div>
-                </div>
-              </div>
-            )}
-
-            {tab === "orders" && (
-              <div className="space-y-3">
-                {loading ? (
-                  <div className="text-sm text-gray-600">Loading orders...</div>
-                ) : orders.length === 0 ? (
-                  <div className="text-sm text-gray-600">No orders yet</div>
-                ) : (
-                  orders.map((o) => (
-                    <div key={o.id} className="border rounded p-3 flex items-center justify-between">
-                      <div>
-                        <div className="font-medium">Order #{o.id}</div>
-                        <div className="text-xs text-gray-600">{new Date(o.created_at).toLocaleString()}</div>
-                      </div>
-                      <div className="text-sm">₹{Number(o.total_amount ?? 0).toFixed(2)}</div>
-                      <div className="text-xs px-2 py-1 rounded bg-gray-100">{o.status}</div>
-                    </div>
-                  ))
-                )}
-              </div>
-            )}
-
-            {tab === "addresses" && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {loading ? (
-                  <div className="text-sm text-gray-600">Loading addresses...</div>
-                ) : addresses.length === 0 ? (
-                  <div className="text-sm text-gray-600">No saved addresses</div>
-                ) : (
-                  addresses.map((a) => (
-                    <div key={a.id} className="border rounded p-3">
-                      <div className="font-medium">{a.name}</div>
-                      <div className="text-xs text-gray-600">{a.line1}{a.line2 ? `, ${a.line2}` : ""}</div>
-                      <div className="text-xs">{a.city}, {a.state} {a.postal_code}</div>
-                      <div className="text-xs">{a.country}</div>
-                      {a.is_default && <div className="text-xs text-green-700 mt-1">Default</div>}
-                    </div>
-                  ))
-                )}
-              </div>
-            )}
-
-            {tab === "settings" && (
-              <div className="space-y-3">
-                <div className="border rounded p-4">
-                  <div className="text-sm text-gray-600">Email</div>
-                  <div className="text-sm">{user.email}</div>
-                </div>
-                <div className="text-sm text-gray-600">For account changes, contact support.</div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="flex justify-center mt-6">
-          <Link href="/" className="text-sm underline">Back to Home</Link>
+    <div className="min-h-screen bg-[#fafafa] pb-24">
+      {/* Premium Header */}
+      <div className="bg-white border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 py-12 md:py-20 text-center">
+          <p className="text-[10px] uppercase tracking-[0.4em] text-gray-400 font-bold mb-4">Your Private Boutique</p>
+          <h1 className="text-3xl md:text-5xl font-extralight tracking-tight text-gray-900 uppercase">Bonjour, {fullName}</h1>
         </div>
       </div>
-    </section>
+
+      <div className="max-w-7xl mx-auto px-4 mt-8 flex flex-col lg:flex-row gap-12">
+        {/* Navigation Sidebar */}
+        <div className="w-full lg:w-64 flex-shrink-0">
+          <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-gray-50 flex flex-col gap-2">
+            {MenuItems.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => setTab(item.id)}
+                className={`flex items-center justify-between w-full px-5 py-4 rounded-2xl transition-all duration-300 group ${
+                  tab === item.id 
+                    ? "bg-black text-white shadow-xl" 
+                    : "text-gray-400 hover:bg-gray-50 hover:text-black"
+                }`}
+              >
+                <div className="flex items-center gap-4">
+                  <item.icon className="text-lg" />
+                  <span className="text-[11px] font-bold uppercase tracking-widest">{item.label}</span>
+                </div>
+                <TfiAngleRight className={`text-[10px] transition-transform duration-300 ${tab === item.id ? "rotate-90" : "group-hover:translate-x-1"}`} />
+              </button>
+            ))}
+            
+            <div className="h-px bg-gray-50 my-2" />
+            
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-4 w-full px-5 py-4 rounded-2xl text-red-400 hover:bg-red-50 hover:text-red-600 transition-all duration-300"
+            >
+              <TfiPowerOff className="text-lg" />
+              <span className="text-[11px] font-bold uppercase tracking-widest">Sign Out</span>
+            </button>
+          </div>
+
+          <div className="mt-6 bg-black rounded-[2rem] p-6 text-white shadow-2xl relative overflow-hidden">
+             <div className="relative z-10 text-center">
+                <TfiHeadphoneAlt className="text-3xl mx-auto mb-4" />
+                <p className="text-[10px] uppercase tracking-widest font-bold mb-2">Need help?</p>
+                <p className="text-[11px] text-gray-400 mb-4 font-light">Contact our concierge for any assistance.</p>
+                <button className="w-full py-3 bg-white text-black text-[10px] font-black tracking-widest rounded-xl hover:scale-95 transition">SUPPORT</button>
+             </div>
+             <div className="absolute -bottom-8 -right-8 w-32 h-32 bg-white/5 rounded-full blur-2xl" />
+          </div>
+        </div>
+
+        {/* Content Area */}
+        <div className="flex-1">
+          <div className="bg-white rounded-[2.5rem] p-8 md:p-12 shadow-sm border border-gray-50 min-h-[500px]">
+             {tab === "overview" && (
+                <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                  <div className="flex items-center gap-8 mb-12 border-b border-gray-50 pb-12">
+                     <div className="relative">
+                        <img src={avatar} className="w-24 h-24 rounded-full object-cover border-4 border-[#fafafa]" alt="avatar" />
+                        <div className="absolute bottom-0 right-0 w-6 h-6 bg-black rounded-full border-4 border-white flex items-center justify-center">
+                           <div className="w-1.5 h-1.5 bg-green-400 rounded-full" />
+                        </div>
+                     </div>
+                     <div>
+                        <h2 className="text-2xl font-light text-gray-900 uppercase tracking-widest">{fullName}</h2>
+                        <p className="text-xs text-gray-400 mt-1 font-medium">{user.email}</p>
+                        <div className="mt-4 inline-block px-3 py-1 bg-gray-100 rounded-full text-[9px] font-bold text-gray-500 uppercase tracking-widest">Premium Member</div>
+                     </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {[
+                      { label: "Total Orders", value: orders.length, icon: TfiPackage },
+                      { label: "Saved Points", value: "250", icon: TfiUser },
+                      { label: "Concierge Status", value: "Gold", icon: TfiSettings }
+                    ].map((stat, i) => (
+                      <div key={i} className="p-8 bg-[#fafafa] rounded-3xl border border-gray-50 group hover:bg-black transition-all duration-500">
+                        <stat.icon className="text-2xl mb-6 text-gray-400 group-hover:text-white transition-colors" />
+                        <p className="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-1">{stat.label}</p>
+                        <p className="text-3xl font-extralight text-gray-900 group-hover:text-white transition-colors tracking-tighter">{stat.value}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                   <div className="mt-12">
+                      <h3 className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-400 mb-6">Recent Activity</h3>
+                      {orders.slice(0, 1).map((order) => (
+                        <div key={order.id} className="flex items-center justify-between p-6 border border-gray-100 rounded-2xl">
+                           <div className="flex items-center gap-4">
+                              <div className="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center">
+                                 <TfiPackage className="text-gray-900" />
+                              </div>
+                              <div>
+                                 <p className="text-xs font-bold uppercase tracking-widest">Order #{order.id.slice(-6)}</p>
+                                 <p className="text-[10px] text-gray-400 mt-0.5">{new Date(order.created_at).toLocaleDateString()}</p>
+                              </div>
+                           </div>
+                           <p className="text-xs font-black tracking-widest uppercase text-indigo-600">{order.status}</p>
+                        </div>
+                      ))}
+                   </div>
+                </div>
+             )}
+
+             {tab === "orders" && (
+                <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                   <h2 className="text-[11px] font-black uppercase tracking-[0.4em] text-gray-400 mb-10">Purchase History</h2>
+                   <div className="space-y-4">
+                      {orders.length > 0 ? orders.map((order) => (
+                        <div key={order.id} className="group p-6 rounded-[2rem] border border-gray-100 hover:border-black transition-all duration-500 flex flex-col md:flex-row md:items-center justify-between gap-6 hover:shadow-2xl hover:translate-y-[-4px] bg-white">
+                           <div className="flex items-center gap-6">
+                              <div className="w-16 h-20 bg-gray-50 rounded-2xl overflow-hidden shadow-inner flex items-center justify-center border border-gray-100">
+                                 <img src="/mayurposhak.png" className="w-10 opacity-10" alt="logo" />
+                              </div>
+                              <div>
+                                 <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-1">REFERENCE #{order.id.slice(-8).toUpperCase()}</p>
+                                 <h4 className="text-sm font-bold text-gray-900 uppercase tracking-widest">{new Date(order.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</h4>
+                                 <div className="flex items-center gap-2 mt-2">
+                                    <span className={`w-2 h-2 rounded-full ${order.status === 'paid' ? 'bg-green-400' : 'bg-yellow-400'}`} />
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-gray-500">{order.status}</span>
+                                 </div>
+                              </div>
+                           </div>
+                           <div className="flex items-center justify-between md:flex-col md:items-end gap-2 pr-4">
+                              <p className="text-2xl font-extralight tracking-tighter">₹{Number(order.total_amount).toLocaleString('en-IN')}</p>
+                              <button className="text-[10px] font-black uppercase tracking-widest text-black underline underline-offset-4 hover:text-gray-400 transition">View Details</button>
+                           </div>
+                        </div>
+                      )) : (
+                        <div className="text-center py-20 bg-[#fafafa] rounded-[2rem] border-2 border-dashed border-gray-100">
+                           <TfiPackage className="text-4xl mx-auto mb-4 text-gray-200" />
+                           <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">No treasures found yet.</p>
+                        </div>
+                      )}
+                   </div>
+                </div>
+             )}
+
+             {tab === "addresses" && (
+                <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                   <div className="flex items-center justify-between mb-10">
+                      <h2 className="text-[11px] font-black uppercase tracking-[0.4em] text-gray-400">Saved Addresses</h2>
+                      <button className="px-6 py-2 bg-black text-white text-[9px] font-black uppercase tracking-[0.2em] rounded-full hover:scale-95 transition">Add New</button>
+                   </div>
+                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {addresses.length > 0 ? addresses.map((addr) => (
+                        <div key={addr.id} className="relative p-8 rounded-[2rem] border border-gray-100 hover:shadow-xl transition-all duration-300 group">
+                           {addr.is_default && (
+                             <div className="absolute top-6 right-8 px-3 py-1 bg-black text-white text-[8px] font-black uppercase tracking-widest rounded-full">Default</div>
+                           )}
+                           <TfiLocationPin className="text-2xl mb-6 text-gray-300 group-hover:text-black transition-colors" />
+                           <h4 className="text-xs font-bold uppercase tracking-widest mb-3">{addr.name || 'Resident'}</h4>
+                           <div className="text-[11px] text-gray-500 space-y-1 font-medium leading-relaxed">
+                              <p>{addr.line1}</p>
+                              {addr.line2 && <p>{addr.line2}</p>}
+                              <p className="text-black">{addr.city}, {addr.state} - {addr.postal_code}</p>
+                              <p className="uppercase tracking-widest text-[9px] mt-2 block">{addr.country}</p>
+                           </div>
+                           <div className="mt-8 flex gap-4 pt-6 border-t border-gray-50">
+                              <button className="text-[9px] font-black uppercase tracking-widest text-gray-400 hover:text-black transition">Edit</button>
+                              <button className="text-[9px] font-black uppercase tracking-widest text-red-300 hover:text-red-600 transition">Remove</button>
+                           </div>
+                        </div>
+                      )) : (
+                        <div className="col-span-full text-center py-20 bg-[#fafafa] rounded-[2rem] border-2 border-dashed border-gray-100">
+                           <TfiLocationPin className="text-4xl mx-auto mb-4 text-gray-200" />
+                           <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Specify your delivery locations.</p>
+                        </div>
+                      )}
+                   </div>
+                </div>
+             )}
+
+             {tab === "settings" && (
+                <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                   <h2 className="text-[11px] font-black uppercase tracking-[0.4em] text-gray-400 mb-10">Account Settings</h2>
+                   <div className="max-w-xl space-y-10">
+                      <div>
+                         <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 block mb-4">Contact Information</label>
+                         <div className="space-y-4">
+                            <div className="p-5 bg-[#fafafa] rounded-2xl flex items-center justify-between border border-gray-50">
+                               <div>
+                                  <p className="text-[9px] font-bold uppercase text-gray-400 mb-1">Email Address</p>
+                                  <p className="text-sm font-medium">{user.email}</p>
+                               </div>
+                               <button className="text-[10px] font-black uppercase text-indigo-600">Modify</button>
+                            </div>
+                         </div>
+                      </div>
+
+                      <div>
+                         <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 block mb-4">Security</label>
+                         <button className="w-full text-left p-5 bg-[#fafafa] rounded-2xl flex items-center justify-between border border-gray-50 group hover:border-black transition">
+                            <span className="text-sm font-medium uppercase tracking-widest">Update Password</span>
+                            <TfiAngleRight className="text-xs text-gray-300 group-hover:translate-x-1 transition" />
+                         </button>
+                      </div>
+
+                      <div className="pt-10">
+                         <button className="text-[10px] font-black uppercase tracking-widest text-red-500 hover:text-red-700 transition">Request Account Deletion</button>
+                         <p className="text-[10px] text-gray-400 mt-4 leading-relaxed font-light">
+                           Closing your account is permanent. All orders, points, and saved addresses will be discarded.
+                         </p>
+                      </div>
+                   </div>
+                </div>
+             )}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

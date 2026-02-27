@@ -48,7 +48,7 @@ export default async function CategoryPage({ params }) {
         <div className="mt-12 text-center">
           <p className="text-xl text-gray-700 max-w-3xl mx-auto">
             Discover our amazing collection in the{" "}
-            <span className="font-semibold text-indigo-600">
+            <span className="font-semibold text-black">
               {categoryData.text}
             </span>{" "}
             category

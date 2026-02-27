@@ -22,7 +22,7 @@ export async function POST(request) {
           product_data: {
             name: item.name,
             images: [item.image],
-            description: item.selectedSize ? `Size: ${item.selectedSize}` : "Saree",
+            description: (item.size || item.selectedSize) ? `Size: ${item.size || item.selectedSize}` : "Saree",
           },
           unit_amount: Math.round(item.price * 100), // Convert to paise
         },
