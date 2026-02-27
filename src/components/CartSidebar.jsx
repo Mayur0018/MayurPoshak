@@ -12,13 +12,14 @@ import Link from "next/link";
 import Image from "next/image";
 import { RxCross1 } from "react-icons/rx";
 import { FiShoppingCart } from "react-icons/fi";
-import { loadStripe } from "@stripe/stripe-js";
+import { useRouter } from "next/navigation";
 import { MdLock } from "react-icons/md";
 
 const FREE_SHIPPING_THRESHOLD = 999;
 
 const CartSidebar = () => {
   const dispatch = useDispatch();
+  const router = useRouter();
   const { cartItems, sidebarOpen } = useSelector((state) => state.cart);
   const [loading, setLoading] = useState(false);
 
@@ -28,23 +29,10 @@ const CartSidebar = () => {
   );
   const remaining = FREE_SHIPPING_THRESHOLD - subtotal;
 
-  const handleCheckout = async () => {
+  const handleCheckout = () => {
     if (!cartItems || cartItems.length === 0) return;
-    try {
-      setLoading(true);
-      const stripe = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
-      const response = await fetch("/api/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cartItems }),
-      });
-      const data = await response.json();
-      if (!response.ok || !data.id) throw new Error(data.error || "Checkout failed");
-      await stripe.redirectToCheckout({ sessionId: data.id });
-    } catch (err) {
-      console.error("Checkout error:", err);
-      setLoading(false);
-    }
+    dispatch(closeCartSidebar());
+    router.push("/checkout");
   };
 
   return (
