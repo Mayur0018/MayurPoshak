@@ -69,20 +69,26 @@ const Header = () => {
 
   /* ---------------- logout ---------------- */
   const handleLogout = async () => {
-    try {
-      // 1. Client-side signout
-      await supabase.auth.signOut();
-      
-      // 3. Clear cookies via API
-      await fetch("/api/auth/signout", { method: "POST" });
-      
-      // 4. Clear storage and redirect forcefully
-      window.localStorage.clear();
+    // Immediate feedback could be added here if needed, but Header logout usually redirects directly
+    const logoutActions = async () => {
+      try {
+        await Promise.allSettled([
+          supabase.auth.signOut(),
+          fetch("/api/auth/signout", { method: "POST" })
+        ]);
+        window.localStorage.clear();
+      } catch (err) {
+        console.error("Logout cleanup error:", err);
+      } finally {
+        window.location.replace("/");
+      }
+    };
+
+    logoutActions();
+    // Fail-safe redirect for consistency
+    setTimeout(() => {
       window.location.replace("/");
-    } catch (err) {
-      console.error("Logout error:", err);
-      window.location.replace("/");
-    }
+    }, 1500);
   };
   // Lively Logout handling 
 

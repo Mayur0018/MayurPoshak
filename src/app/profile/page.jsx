@@ -46,23 +46,35 @@ export default function ProfilePage() {
   }, [router]);
 
   const handleLogout = async () => {
-    try {
-      setIsLoggingOut(true);
-      await supabase.auth.signOut();
-      await fetch("/api/auth/signout", { method: "POST" });
-      window.localStorage.clear();
+    setIsLoggingOut(true);
+    
+    // Non-blocking logout flow
+    const logoutActions = async () => {
+      try {
+        await Promise.allSettled([
+          supabase.auth.signOut(),
+          fetch("/api/auth/signout", { method: "POST" })
+        ]);
+        window.localStorage.clear();
+      } catch (err) {
+        console.error("Logout cleanup error:", err);
+      } finally {
+        window.location.replace("/");
+      }
+    };
+
+    // Trigger logout and ensure a fail-safe redirect after 1.5s max
+    logoutActions();
+    setTimeout(() => {
       window.location.replace("/");
-    } catch (error) {
-      console.error("Logout error:", error);
-      window.location.replace("/");
-    }
+    }, 1500);
   };
 
   if (isLoggingOut) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-white gap-4">
         <div className="w-12 h-12 border-2 border-gray-100 border-t-black rounded-full animate-spin"></div>
-        <div className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-400">Auth Cleanup...</div>
+        <div className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-400">Signing you out...</div>
       </div>
     );
   }
