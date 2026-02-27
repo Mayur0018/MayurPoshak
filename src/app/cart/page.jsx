@@ -9,12 +9,14 @@ import { loadStripe } from "@stripe/stripe-js";
 import { RxCross1 } from "react-icons/rx";
 import { FiShoppingCart, FiArrowRight } from "react-icons/fi";
 import { MdLock } from "react-icons/md";
+import { useRouter } from "next/navigation";
 
 const FREE_SHIPPING_THRESHOLD = 999;
 
 export default function CartPage() {
   const cartItems = useSelector((state) => state.cart.cartItems);
   const dispatch = useDispatch();
+  const router = useRouter();
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [error, setError] = useState(null);
 
