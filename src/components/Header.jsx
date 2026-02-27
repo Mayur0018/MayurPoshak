@@ -4,7 +4,7 @@ import { CiMenuFries, CiUser } from "react-icons/ci";
 import { IoSearchOutline, IoLogOutOutline } from "react-icons/io5";
 import { TbShoppingBag } from "react-icons/tb";
 import { RxCross1 } from "react-icons/rx";
-import { FaFacebookF } from "react-icons/fa";
+import { FaFacebookF, FaHeart, FaRegHeart } from "react-icons/fa";
 import { FaInstagram } from "react-icons/fa6";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
@@ -18,8 +18,28 @@ const Header = () => {
   const [menuOpen, setMenuopen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [user, setUser] = useState(null);
+  const [wishlistCount, setWishlistCount] = useState(0);
   const cartCount = useSelector((state) => state.cart.cartItems.length);
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    const fetchWishlistCount = async () => {
+      if (user) {
+        try {
+          const res = await fetch("/api/wishlist");
+          const data = await res.json();
+          if (Array.isArray(data)) {
+            setWishlistCount(data.length);
+          }
+        } catch (err) {
+          console.error("Error fetching wishlist count:", err);
+        }
+      } else {
+        setWishlistCount(0);
+      }
+    };
+    fetchWishlistCount();
+  }, [user]);
 
   /* ---------------- categories ---------------- */
   const shopCategories = [
@@ -152,6 +172,18 @@ const Header = () => {
               </Link>
             )}
 
+            <Link
+              href="/wishlist"
+              className="relative hover:opacity-70 transition border-none bg-transparent cursor-pointer"
+            >
+              <FaRegHeart className="text-xl lg:text-2xl" />
+              {wishlistCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-bold">
+                  {wishlistCount}
+                </span>
+              )}
+            </Link>
+
             <button
               onClick={() => dispatch(openCartSidebar())}
               className="relative hover:opacity-70 transition border-none bg-transparent cursor-pointer"
@@ -227,6 +259,17 @@ const Header = () => {
             >
               <IoSearchOutline className="text-2xl sm:text-3xl text-gray-700" />
             </button>
+            <Link
+              href="/wishlist"
+              className="relative flex-shrink-0 p-1 hover:bg-gray-100 rounded transition border-none bg-transparent"
+            >
+              <FaRegHeart className="text-2xl sm:text-3xl" />
+              {wishlistCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-bold">
+                  {wishlistCount}
+                </span>
+              )}
+            </Link>
             <button
               onClick={() => dispatch(openCartSidebar())}
               className="relative flex-shrink-0 p-1 hover:bg-gray-100 rounded transition border-none bg-transparent"

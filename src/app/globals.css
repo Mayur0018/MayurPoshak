@@ -1,10 +1,33 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 @custom-variant dark (&:is(.dark *));
-* {
-  font-family: 'Montserrat', sans-serif;
+
+:root {
+  --luxury-gold: #C5A021;
+  --luxury-black: #0A0A0A;
+  --luxury-beige: #F9F9FB;
+  --text-main: #111111;
+  --text-muted: #565959;
+  
+  --font-serif: var(--font-playfair), serif;
+  --font-sans: var(--font-montserrat), sans-serif;
 }
+
+* {
+  font-family: var(--font-sans);
+  scroll-behavior: smooth;
+}
+
+h1, h2, h3, h4, h5, h6, .luxury-serif {
+  font-family: var(--font-serif);
+  letter-spacing: -0.01em;
+}
+
+/* Luxury button style */
+.btn-luxury {
+  @apply bg-black text-white px-8 py-3.5 rounded-full font-bold transition-all duration-300 hover:bg-gray-800 hover:shadow-xl active:scale-95 flex items-center justify-center gap-2;
+}
+
 /* Hide scrollbars while keeping scroll functionality */
 .no-scrollbar::-webkit-scrollbar {
   display: none;

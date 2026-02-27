@@ -26,27 +26,12 @@ export default function CartPage() {
   const shipping = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : 49;
   const total = subtotal + shipping;
 
-  const handleCheckout = async () => {
+  const handleCheckout = () => {
     if (!cartItems || cartItems.length === 0) {
       setError("Your cart is empty");
       return;
     }
-    try {
-      setCheckoutLoading(true);
-      setError(null);
-      const stripe = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
-      const response = await fetch("/api/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cartItems }),
-      });
-      const data = await response.json();
-      if (!response.ok || !data.id) throw new Error(data.error || "Checkout failed");
-      await stripe.redirectToCheckout({ sessionId: data.id });
-    } catch (err) {
-      setError(err.message || "Checkout failed");
-      setCheckoutLoading(false);
-    }
+    router.push("/checkout");
   };
 
   if (cartItems.length === 0) {

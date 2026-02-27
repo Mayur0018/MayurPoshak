@@ -6,6 +6,11 @@ import { addToCart } from "@/redux/cartSlice";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import ReviewSection from "./ReviewSection";
+import { FiHeart } from "react-icons/fi";
+import { FaHeart } from "react-icons/fa";
+import toast, { Toaster } from "react-hot-toast";
+import { useRouter } from "next/navigation";
+import supabase from "@/lib/supabaseClient";
 
 // ✅ Simple shimmer block
 const Shimmer = ({ className }) => (
@@ -16,8 +21,57 @@ export default function ProductDetails({ product }) {
   console.log(product);
   
   const dispatch = useDispatch();
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [selectedSize, setSelectedSize] = useState(null);
+  const [isWishlisted, setIsWishlisted] = useState(false);
+
+  useEffect(() => {
+    const checkWishlist = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user && product) {
+        const id = product._id || product.id;
+        const res = await fetch("/api/wishlist");
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          setIsWishlisted(data.some((w) => w.productId?._id === id || w.productId === id));
+        }
+      }
+    };
+    checkWishlist();
+  }, [product]);
+
+  const toggleWishlist = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      toast.error("Please sign in to add to wishlist");
+      router.push("/Signin");
+      return;
+    }
+
+    const productId = product._id || product.id;
+    try {
+      if (isWishlisted) {
+        await fetch("/api/wishlist", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ productId }),
+        });
+        setIsWishlisted(false);
+        toast.success("Removed from wishlist");
+      } else {
+        await fetch("/api/wishlist", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ productId }),
+        });
+        setIsWishlisted(true);
+        toast.success("Added to wishlist");
+      }
+    } catch (err) {
+      toast.error("Wishlist operation failed");
+    }
+  };
 
   /* =========================
      🔒 SAFETY GUARD (MAIN FIX)
@@ -160,10 +214,22 @@ export default function ProductDetails({ product }) {
           {/* Buttons */}
           <div className="mt-8 space-y-4">
             <button
-              className="w-full px-4 py-2.5 border border-slate-800 bg-transparent hover:bg-slate-50 text-slate-900 text-sm font-medium rounded-md"
+              className="w-full px-4 py-2.5 border border-slate-800 bg-transparent hover:bg-slate-50 text-slate-900 text-sm font-medium rounded-md flex items-center justify-center gap-2"
               onClick={handleAddtoCart}
             >
               Add to cart
+            </button>
+
+            <button
+              className={`w-full px-4 py-2.5 border border-slate-800 text-sm font-medium rounded-md flex items-center justify-center gap-2 transition-all ${
+                isWishlisted 
+                  ? "bg-slate-50 border-red-200 text-red-500" 
+                  : "bg-transparent text-slate-900 hover:bg-slate-50"
+              }`}
+              onClick={toggleWishlist}
+            >
+              {isWishlisted ? <FaHeart /> : <FiHeart />}
+              {isWishlisted ? "In Wishlist" : "Add to Wishlist"}
             </button>
 
             <Link href="/cart">

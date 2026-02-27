@@ -12,6 +12,9 @@ import { useRouter } from "next/navigation";
 import SkeletonCard from "@/components/SkeletonCard";
 import Slider1 from "./Slider1";
 import Slider2 from "./Slider2";
+import { FiHeart } from "react-icons/fi";
+import { FaHeart } from "react-icons/fa";
+import supabase from "@/lib/supabaseClient";
 
 /* ========================
    SIZE PICKER PRODUCT CARD
@@ -21,8 +24,55 @@ const SIZES = ["XS", "S", "M", "L", "XL"];
 const ProductCard = ({ item, index }) => {
   const [hovered, setHovered] = useState(false);
   const [selectedSize, setSelectedSize] = useState(null);
+  const [isWishlisted, setIsWishlisted] = useState(false);
   const dispatch = useDispatch();
   const router = useRouter();
+
+  useEffect(() => {
+    const checkWishlist = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const res = await fetch("/api/wishlist");
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          setIsWishlisted(data.some((w) => w.productId._id === item._id));
+        }
+      }
+    };
+    checkWishlist();
+  }, [item._id]);
+
+  const toggleWishlist = async (e) => {
+    e.preventDefault();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      toast.error("Please sign in to add to wishlist");
+      router.push("/Signin");
+      return;
+    }
+
+    try {
+      if (isWishlisted) {
+        await fetch("/api/wishlist", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ productId: item._id }),
+        });
+        setIsWishlisted(false);
+        toast.success("Removed from wishlist");
+      } else {
+        await fetch("/api/wishlist", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ productId: item._id }),
+        });
+        setIsWishlisted(true);
+        toast.success("Added to wishlist");
+      }
+    } catch (err) {
+      toast.error("Wishlist operation failed");
+    }
+  };
 
   const handleAddToCart = (e) => {
     e.preventDefault();
@@ -56,6 +106,18 @@ const ProductCard = ({ item, index }) => {
             alt={item.name}
             className="aspect-[253/337] object-cover object-top shadow-md group-hover:scale-[1.04] transition-transform duration-500"
           />
+
+          {/* Wishlist Heart */}
+          <button
+            onClick={toggleWishlist}
+            className="absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-white/60 backdrop-blur-md text-slate-900 shadow hover:bg-white transition-all transform hover:scale-110 active:scale-90"
+          >
+            {isWishlisted ? (
+              <FaHeart className="text-red-500 text-sm" />
+            ) : (
+              <FiHeart className="text-sm" />
+            )}
+          </button>
 
           {/* Hover Overlay */}
           <AnimatePresence>
@@ -133,7 +195,7 @@ export default function MostTrending() {
         viewport={{ once: true }}
         transition={{ duration: 0.7 }}
       >
-        <h1 className="text-2xl font-bold tracking-tight">Most Trending</h1>
+        <h1 className="text-3xl font-bold tracking-tight luxury-serif">Most Trending</h1>
         <Link
           href="/products"
           className="text-xs font-semibold uppercase tracking-widest border-b border-black hover:text-gray-500 hover:border-gray-500 transition"
@@ -185,9 +247,9 @@ export default function MostTrending() {
         viewport={{ once: true }}
         transition={{ duration: 0.8 }}
       >
-        <h1 className="text-1xl md:text-2xl font-bold text-center">
+        <h1 className="text-2xl md:text-3xl font-bold text-center luxury-serif">
           SUMMER ESSENTIALS 🎇
-          <p className="text-[12px] text-gray-500 font-normal mt-1">Hot Picks For The Season</p>
+          <p className="text-[12px] text-gray-500 font-normal mt-1 font-sans">Hot Picks For The Season</p>
         </h1>
         <div className="px-3 md:px-10 md:gap-6 grid grid-cols-3 gap-2 mt-6">
           {summerimg.map((item, index) => (
@@ -219,9 +281,9 @@ export default function MostTrending() {
         viewport={{ once: true }}
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
-        <h1 className="text-1xl md:text-2xl font-bold text-center">
+        <h1 className="text-2xl md:text-3xl font-bold text-center luxury-serif">
           NEW TRENDS TO TRY 👓
-          <p className="text-[12px] text-gray-500 font-normal mt-1">Hot Picks For The Season</p>
+          <p className="text-[12px] text-gray-500 font-normal mt-1 font-sans">Hot Picks For The Season</p>
         </h1>
 
         <motion.div

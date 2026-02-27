@@ -1,12 +1,19 @@
-import { Montserrat } from "next/font/google";
+import { Montserrat, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import ReduxProvider from "@/providers/ReduxProvider";
 import ClientLayout from "@/providers/ClientLayout";
 import { Toaster } from "react-hot-toast"; 
+
 const montserrat = Montserrat({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   variable: "--font-montserrat",
+});
+
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  weight: ["400", "600", "700", "900"],
+  variable: "--font-playfair",
 });
 
 export const metadata = {
@@ -17,7 +24,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${montserrat.variable} antialiased`}>
+      <body className={`${montserrat.variable} ${playfair.variable} antialiased font-sans`}>
         <ReduxProvider>
           <ClientLayout>{children}
                <Toaster position="top-right" />

@@ -1,11 +1,12 @@
 import { connectDB } from "@/lib/mongodb";
 import Wishlist from "@/models/Wishlist";
 import Product from "@/models/Product";
-import supabase from "@/lib/supabaseClient";
+import { getSupabaseServer } from "@/lib/supabase/server";
 
 export async function GET(request) {
   try {
     await connectDB();
+    const supabase = await getSupabaseServer();
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
@@ -22,6 +23,7 @@ export async function GET(request) {
 export async function POST(request) {
   try {
     await connectDB();
+    const supabase = await getSupabaseServer();
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
@@ -46,6 +48,7 @@ export async function POST(request) {
 export async function DELETE(request) {
   try {
     await connectDB();
+    const supabase = await getSupabaseServer();
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {

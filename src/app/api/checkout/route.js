@@ -4,7 +4,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export async function POST(request) {
   try {
-    const { cartItems } = await request.json();
+    const { cartItems, shippingDetails, userId } = await request.json();
 
     if (!cartItems || cartItems.length === 0) {
       return Response.json(
@@ -28,8 +28,22 @@ export async function POST(request) {
         },
         quantity: item.quantity || 1,
       })),
+      metadata: {
+        userId: userId || "",
+        items: JSON.stringify(cartItems.map(item => ({
+          _id: item._id,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+          image: item.image
+        }))),
+        address: shippingDetails?.address || "",
+        city: shippingDetails?.city || "",
+        pincode: shippingDetails?.pincode || "",
+        phone: shippingDetails?.phone || "",
+      },
       success_url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/success`,
-      cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/cancel`,
+      cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/checkout`,
     });
 
     return Response.json({ id: session.id });

@@ -1,10 +1,11 @@
 import { connectDB } from "@/lib/mongodb";
 import Order from "@/models/Order";
-import supabase from "@/lib/supabaseClient";
+import { getSupabaseServer } from "@/lib/supabase/server";
 
 export async function GET(request, context) {
   try {
     await connectDB();
+    const supabase = await getSupabaseServer();
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
@@ -33,6 +34,7 @@ export async function GET(request, context) {
 export async function PUT(request, context) {
   try {
     await connectDB();
+    const supabase = await getSupabaseServer();
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
