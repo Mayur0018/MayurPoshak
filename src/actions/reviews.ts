@@ -1,6 +1,7 @@
 "use server";
 import { z } from "zod";
 import { getServerSupabase } from "@/lib/supabaseServer";
+import { checkAdmin } from "./auth";
 
 const ReviewSchema = z.object({
   product_id: z.string(),
@@ -64,10 +65,12 @@ export async function deleteReview(userId: string, productId: string) {
     .eq("user_id", userId)
     .eq("product_id", productId);
   if (error) return { ok: false };
+  if (error) return { ok: false };
   return { ok: true };
 }
 
 export async function adminDeleteReview(reviewId: string) {
+  await checkAdmin();
   const supabase = await getServerSupabase();
   const { error } = await supabase
     .from("reviews")

@@ -31,7 +31,7 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
 
   // Protect sensitive routes
-  const protectedPaths = ['/checkout', '/orders', '/wishlist']
+  const protectedPaths = ['/checkout', '/orders', '/wishlist', '/admin']
   const isProtectedPath = protectedPaths.some(path => request.nextUrl.pathname === path || request.nextUrl.pathname.startsWith(path + '/'))
 
   if (isProtectedPath && !user) {
@@ -39,6 +39,15 @@ export async function middleware(request: NextRequest) {
     url.pathname = '/Signin'
     url.searchParams.set('next', request.nextUrl.pathname)
     return NextResponse.redirect(url)
+  }
+
+  // Admin Role Check
+  const isAdminPath = request.nextUrl.pathname.startsWith('/admin')
+  const role = user?.user_metadata?.role
+
+  if (isAdminPath && role !== 'admin') {
+    // Redirect to home if not an admin
+    return NextResponse.redirect(new URL('/', request.url))
   }
 
   return supabaseResponse

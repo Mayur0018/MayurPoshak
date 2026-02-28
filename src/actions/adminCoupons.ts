@@ -1,6 +1,7 @@
 "use server";
 import { getServiceSupabase } from "@/lib/supabaseServer";
 import { revalidatePath } from "next/cache";
+import { checkAdmin } from "./auth";
 
 export async function createCoupon(input: {
   code: string;
@@ -10,6 +11,7 @@ export async function createCoupon(input: {
   expiry_date?: string;
   is_active?: boolean;
 }) {
+  await checkAdmin();
   const supabase = getServiceSupabase();
   const upperCode = input.code.trim().toUpperCase();
   
@@ -34,6 +36,7 @@ export async function createCoupon(input: {
 }
 
 export async function toggleCouponActive(id: number, is_active: boolean) {
+  await checkAdmin();
   const supabase = getServiceSupabase();
   const { error } = await supabase.from("coupons").update({ is_active }).eq("id", id);
   if (error) return { ok: false };

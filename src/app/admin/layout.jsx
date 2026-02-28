@@ -1,9 +1,18 @@
+import { getSupabaseServer } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
+
 export const metadata = {
   title: "Admin • Mayur Poshak",
   description: "Admin dashboard",
 };
 
-export default function AdminLayout({ children }) {
+export default async function AdminLayout({ children }) {
+  const supabase = await getSupabaseServer();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user || user.user_metadata?.role !== 'admin') {
+    redirect('/');
+  }
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr]">

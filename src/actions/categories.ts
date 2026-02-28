@@ -2,8 +2,10 @@
 import { getServerSupabase } from "@/lib/supabaseServer";
 import { category as staticCategories } from "@/Data/Category";
 import { revalidatePath } from "next/cache";
+import { checkAdmin } from "./auth";
 
 export async function syncCategoriesFromStatic() {
+  await checkAdmin();
   const supabase = await getServerSupabase();
   const { data: existing } = await supabase.from("categories").select("id,slug");
   const existingSlugs = new Set((existing ?? []).map((c: any) => c.slug));

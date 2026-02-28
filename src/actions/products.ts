@@ -2,6 +2,7 @@
 import { z } from "zod";
 import { getServerSupabase } from "@/lib/supabaseServer";
 import { revalidatePath } from "next/cache";
+import { checkAdmin } from "./auth";
 
 const CreateSchema = z.object({
   name: z.string().min(2),
@@ -19,6 +20,7 @@ const CreateSchema = z.object({
 export async function createProduct(input: unknown) {
   const parsed = CreateSchema.safeParse(input);
   if (!parsed.success) return { ok: false };
+  await checkAdmin();
   const supabase = await getServerSupabase();
   const { data, error } = await supabase.from("products").insert(parsed.data).select("id").single();
   if (error || !data) return { ok: false };
@@ -27,6 +29,7 @@ export async function createProduct(input: unknown) {
 }
 
 export async function deleteProduct(id: number) {
+  await checkAdmin();
   const supabase = await getServerSupabase();
   const { error } = await supabase.from("products").delete().eq("id", id);
   if (error) return { ok: false };
@@ -37,6 +40,7 @@ export async function deleteProduct(id: number) {
 export async function updateProduct(id: number, input: unknown) {
   const parsed = CreateSchema.partial().safeParse(input);
   if (!parsed.success) return { ok: false };
+  await checkAdmin();
   const supabase = await getServerSupabase();
   const { error } = await supabase.from("products").update(parsed.data).eq("id", id);
   if (error) return { ok: false };
@@ -45,6 +49,7 @@ export async function updateProduct(id: number, input: unknown) {
 }
 
 export async function toggleActive(id: number, is_active: boolean) {
+  await checkAdmin();
   const supabase = await getServerSupabase();
   const { error } = await supabase.from("products").update({ is_active }).eq("id", id);
   if (error) return { ok: false };
@@ -53,6 +58,7 @@ export async function toggleActive(id: number, is_active: boolean) {
 }
 
 export async function toggleFeatured(id: number, is_featured: boolean) {
+  await checkAdmin();
   const supabase = await getServerSupabase();
   const { error } = await supabase.from("products").update({ is_featured }).eq("id", id);
   if (error) return { ok: false };
@@ -70,6 +76,7 @@ const VariantSchema = z.object({
 export async function setProductVariants(product_id: number, variants: unknown) {
   const list = z.array(VariantSchema).safeParse(variants);
   if (!list.success) return { ok: false };
+  await checkAdmin();
   const supabase = await getServerSupabase();
   await supabase.from("product_variants").delete().eq("product_id", product_id);
   if (list.data.length) {
