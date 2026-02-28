@@ -16,12 +16,19 @@ export default async function ProductPage({ params }) {
   }
 
   let product = null;
+  let relatedProducts = [];
   try {
     await connectDB();
     const data = await Product.findById(id).lean();
     if (data) {
-      // Mongoose .lean() still returns ObjectId for _id, convert to string for React
       product = JSON.parse(JSON.stringify(data));
+      
+      // Fetch related products from same category
+      const related = await Product.find({
+        category: data.category,
+        _id: { $ne: id }
+      }).limit(4).lean();
+      relatedProducts = JSON.parse(JSON.stringify(related));
     }
   } catch (error) {
     console.error("Error fetching product by ID:", error);
@@ -36,5 +43,5 @@ export default async function ProductPage({ params }) {
     );
   }
 
-  return <ProductDetails product={product} />
+  return <ProductDetails product={product} relatedProducts={relatedProducts} />
 }
