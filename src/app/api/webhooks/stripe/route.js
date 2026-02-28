@@ -37,16 +37,43 @@ export async function POST(request) {
 
     try {
       await connectDB();
+      const Product = (await import("@/models/Product")).default;
+
+      // Fetch full product details from DB because Stripe metadata has limited space
+      const orderItems = await Promise.all(
+        items.map(async (item) => {
+          const dbProduct = await Product.findById(item.id);
+          if (!dbProduct) {
+            console.error(`Product not found in DB: ${item.id}`);
+            return {
+              name: "Unknown Product",
+              quantity: item.qty,
+              image: "/placeholder.png",
+              price: 0,
+              product: item.id,
+              size: item.size
+            };
+          }
+
+          // Reduce stock
+          await Product.findByIdAndUpdate(item.id, {
+            $inc: { stock: -item.qty }
+          });
+
+          return {
+            name: dbProduct.name,
+            quantity: item.qty,
+            image: dbProduct.image,
+            price: dbProduct.price,
+            product: item.id,
+            size: item.size
+          };
+        })
+      );
       
       const order = new Order({
         userId,
-        orderItems: items.map(item => ({
-          name: item.name,
-          quantity: item.quantity,
-          image: item.image,
-          price: item.price,
-          product: item._id,
-        })),
+        orderItems,
         shippingAddress,
         itemsPrice: session.amount_subtotal / 100,
         shippingPrice: (session.total_details?.amount_shipping || 0) / 100,
@@ -63,9 +90,9 @@ export async function POST(request) {
       });
 
       await order.save();
-      console.log("Order saved successfully:", order._id);
+      console.log("Order saved successfully and stock updated:", order._id);
     } catch (error) {
-      console.error("Error saving order from webhook:", error);
+      console.error("Error processing order in webhook:", error);
       return Response.json({ message: "Error saving order" }, { status: 500 });
     }
   }

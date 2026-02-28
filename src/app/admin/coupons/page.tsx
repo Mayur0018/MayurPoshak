@@ -1,8 +1,8 @@
-import { getServerSupabase } from "@/lib/supabaseServer";
+import { getServiceSupabase } from "@/lib/supabaseServer";
 import { createCoupon, toggleCouponActive } from "@/actions/adminCoupons";
 
 export default async function AdminCoupons() {
-  const supabase = await getServerSupabase();
+  const supabase = getServiceSupabase();
   const { data: coupons } = await supabase
     .from("coupons")
     .select("id,code,discount_type,discount_value,min_order_value,is_active,expiry_date,created_at")

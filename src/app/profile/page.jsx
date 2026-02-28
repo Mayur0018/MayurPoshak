@@ -33,11 +33,12 @@ export default function ProfilePage() {
       }
       setUser(data.user);
       const uid = data.user.id;
-      const [{ data: ords }, { data: addrs }] = await Promise.all([
-        supabase.from("orders").select("id,total_amount,status,created_at").eq("user_id", uid).order("created_at", { ascending: false }),
+      const [{ data: addrs }, ordsRes] = await Promise.all([
         supabase.from("addresses").select("*").eq("user_id", uid).order("is_default", { ascending: false }),
+        fetch("/api/orders").then(res => res.json())
       ]);
-      setOrders(ords ?? []);
+      
+      setOrders(Array.isArray(ordsRes) ? ordsRes : []);
       setAddresses(addrs ?? []);
       setLoading(false);
     }
@@ -209,22 +210,22 @@ export default function ProfilePage() {
                    <h2 className="text-[11px] font-black uppercase tracking-[0.4em] text-gray-400 mb-10">Purchase History</h2>
                    <div className="space-y-4">
                       {orders.length > 0 ? orders.map((order) => (
-                        <div key={order.id} className="group p-6 rounded-[2rem] border border-gray-100 hover:border-black transition-all duration-500 flex flex-col md:flex-row md:items-center justify-between gap-6 hover:shadow-2xl hover:translate-y-[-4px] bg-white">
+                        <div key={order._id} className="group p-6 rounded-[2rem] border border-gray-100 hover:border-black transition-all duration-500 flex flex-col md:flex-row md:items-center justify-between gap-6 hover:shadow-2xl hover:translate-y-[-4px] bg-white">
                            <div className="flex items-center gap-6">
                               <div className="w-16 h-20 bg-gray-50 rounded-2xl overflow-hidden shadow-inner flex items-center justify-center border border-gray-100">
-                                 <img src="/mayurposhak.png" className="w-10 opacity-10" alt="logo" />
+                                 <img src={order.orderItems?.[0]?.image || "/mayurposhak.png"} className="w-full h-full object-cover" alt="product" />
                               </div>
                               <div>
-                                 <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-1">REFERENCE #{order.id.slice(-8).toUpperCase()}</p>
-                                 <h4 className="text-sm font-bold text-gray-900 uppercase tracking-widest">{new Date(order.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</h4>
+                                 <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-1">REFERENCE #{order._id.slice(-8).toUpperCase()}</p>
+                                 <h4 className="text-sm font-bold text-gray-900 uppercase tracking-widest">{new Date(order.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</h4>
                                  <div className="flex items-center gap-2 mt-2">
-                                    <span className={`w-2 h-2 rounded-full ${order.status === 'paid' ? 'bg-green-400' : 'bg-yellow-400'}`} />
+                                    <span className={`w-2 h-2 rounded-full ${order.isPaid ? 'bg-green-400' : 'bg-yellow-400'}`} />
                                     <span className="text-[10px] font-black uppercase tracking-widest text-gray-500">{order.status}</span>
                                  </div>
                               </div>
                            </div>
                            <div className="flex items-center justify-between md:flex-col md:items-end gap-2 pr-4">
-                              <p className="text-2xl font-extralight tracking-tighter">₹{Number(order.total_amount).toLocaleString('en-IN')}</p>
+                              <p className="text-2xl font-extralight tracking-tighter">₹{Number(order.totalPrice).toLocaleString('en-IN')}</p>
                               <button className="text-[10px] font-black uppercase tracking-widest text-black underline underline-offset-4 hover:text-gray-400 transition">View Details</button>
                            </div>
                         </div>

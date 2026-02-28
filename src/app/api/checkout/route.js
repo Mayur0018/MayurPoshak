@@ -19,7 +19,7 @@ export async function POST(request) {
     }
 
     const body = await request.json().catch(() => ({}));
-    const { cartItems, shippingDetails } = body;
+    const { cartItems, shippingDetails, couponId } = body;
 
     if (!cartItems || cartItems.length === 0) {
       return Response.json(
@@ -42,11 +42,11 @@ export async function POST(request) {
       quantity: Number(item.quantity) || 1,
     }));
 
-    // Stripe metadata has a 500 char limit per value. 
-    // We'll store a simplified items list and rely on the webhook/DB for details.
-    const simplifiedItems = cartItems.slice(0, 5).map(item => ({
+    // Store product IDs and metadata
+    const simplifiedItems = cartItems.map(item => ({
       id: item._id || item.id,
-      qty: item.quantity
+      qty: item.quantity,
+      size: item.size || item.selectedSize
     }));
 
     const session = await stripe.checkout.sessions.create({
@@ -60,6 +60,7 @@ export async function POST(request) {
         city: (shippingDetails?.city || "").substring(0, 100),
         pincode: (shippingDetails?.pincode || "").substring(0, 20),
         phone: (shippingDetails?.phone || "").substring(0, 20),
+        couponId: couponId || "",
       },
       success_url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/success`,
       cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/checkout`,

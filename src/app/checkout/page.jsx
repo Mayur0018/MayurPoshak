@@ -19,13 +19,41 @@ export default function CheckoutPage() {
     pincode: "",
     phone: "",
   });
+  const [couponCode, setCouponCode] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
+  const [couponLoading, setCouponLoading] = useState(false);
+  const [couponError, setCouponError] = useState(null);
 
   const subtotal = cartItems.reduce(
     (sum, item) => sum + Number(item.price ?? 0) * item.quantity,
     0
   );
+  
+  const discount = appliedCoupon ? appliedCoupon.discount : 0;
   const shipping = subtotal >= 999 ? 0 : 49;
-  const total = subtotal + shipping;
+  const total = subtotal - discount + shipping;
+
+  const handleApplyCoupon = async () => {
+    if (!couponCode) return;
+    setCouponLoading(true);
+    setCouponError(null);
+    try {
+      const res = await fetch("/api/coupons/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: couponCode, amount: subtotal }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Invalid coupon");
+      setAppliedCoupon(data);
+      setCouponError(null);
+    } catch (err) {
+      setCouponError(err.message);
+      setAppliedCoupon(null);
+    } finally {
+      setCouponLoading(false);
+    }
+  };
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -63,7 +91,8 @@ export default function CheckoutPage() {
         body: JSON.stringify({ 
           cartItems, 
           shippingDetails,
-          userId: user.id 
+          userId: user.id,
+          couponId: appliedCoupon?.couponId
         }),
       });
 
@@ -159,8 +188,37 @@ export default function CheckoutPage() {
               </div>
             </div>
 
+            {/* Coupon Section */}
+            <div className="bg-gray-50 p-6 rounded-2xl border border-gray-100 mb-6">
+              <h3 className="text-sm font-bold mb-3 uppercase tracking-widest text-gray-500">Apply Coupon</h3>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="Enter code"
+                  value={couponCode}
+                  onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                  className="flex-1 px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-black outline-none transition"
+                />
+                <button
+                  type="button"
+                  onClick={handleApplyCoupon}
+                  disabled={couponLoading || !couponCode}
+                  className="px-6 py-2 bg-gray-900 text-white text-xs font-bold rounded-xl hover:bg-black transition disabled:opacity-50"
+                >
+                  {couponLoading ? "..." : "APPLY"}
+                </button>
+              </div>
+              {couponError && <p className="text-red-500 text-[10px] mt-2 font-bold uppercase">{couponError}</p>}
+              {appliedCoupon && (
+                <div className="flex items-center justify-between mt-3 text-green-600">
+                  <span className="text-[10px] font-bold uppercase tracking-widest">Coupon Applied: {appliedCoupon.code}</span>
+                  <button onClick={() => setAppliedCoupon(null)} className="text-[10px] font-bold underline">Remove</button>
+                </div>
+              )}
+            </div>
+
             {error && (
-              <div className="p-4 bg-red-50 border border-red-200 text-red-600 rounded-xl text-sm">
+              <div className="p-4 bg-red-50 border border-red-200 text-red-600 rounded-xl text-sm mb-6">
                 {error}
               </div>
             )}
@@ -215,6 +273,12 @@ export default function CheckoutPage() {
                 {shipping === 0 ? "FREE" : `₹${shipping}`}
               </span>
             </div>
+            {appliedCoupon && (
+              <div className="flex justify-between text-green-600 text-sm font-bold">
+                <span>Discount ({appliedCoupon.code})</span>
+                <span>-₹{appliedCoupon.discount.toLocaleString("en-IN")}</span>
+              </div>
+            )}
             <div className="flex justify-between items-center pt-4 border-t border-gray-200">
               <span className="text-lg font-bold">Total</span>
               <span className="text-2xl font-black">₹{total.toLocaleString("en-IN")}</span>
