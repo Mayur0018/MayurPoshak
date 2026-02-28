@@ -205,11 +205,17 @@ export default function MostTrending() {
       </motion.div>
 
       {/* Products or Skeletons */}
-      <div className="py-8 grid grid-cols-2 md:grid-cols-4 gap-x-3 gap-y-8 px-8">
+      <div className="py-8 flex overflow-x-auto hide-scrollbar snap-x snap-mandatory gap-4 md:gap-6 px-5 md:px-9 pb-12">
         {loading
-          ? [...Array(8)].map((_, index) => <SkeletonCard key={index} />)
+          ? [...Array(8)].map((_, index) => (
+              <div key={index} className="w-[160px] md:w-[280px] shrink-0 snap-center">
+                <SkeletonCard />
+              </div>
+            ))
           : product.slice(0, 8).map((item, index) => (
-              <ProductCard key={item._id || index} item={item} index={index} />
+              <div key={item._id || index} className="w-[160px] md:w-[280px] shrink-0 snap-center">
+                <ProductCard item={item} index={index} />
+              </div>
             ))}
       </div>
 

@@ -110,10 +110,10 @@ const ScratchCard = () => {
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-28 left-4 z-[45] bg-black text-white p-4 rounded-full shadow-2xl flex items-center justify-center border-4 border-white group transition-transform duration-300 hover:scale-110 active:scale-95"
+        className="fixed bottom-6 right-6 z-[45] bg-black text-white p-4 rounded-full shadow-2xl flex items-center justify-center border-4 border-white group"
       >
         <FaGift size={24} />
-        <span className="absolute left-full ml-4 bg-black text-white px-3 py-1 rounded-lg text-xs font-bold whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
+        <span className="absolute right-full mr-4 bg-black text-white px-3 py-1 rounded-lg text-xs font-bold whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
           SURPRISE GIFT? 🎁
         </span>
       </motion.button>

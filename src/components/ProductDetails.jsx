@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { addToCart } from "@/redux/cartSlice";
 import Link from "next/link";
 import { useEffect, useState, useRef } from "react";
@@ -69,7 +69,6 @@ const Accordion = ({ title, children, defaultOpen = false }) => {
 
 export default function ProductDetails({ product, relatedProducts = [] }) {
   const dispatch = useDispatch();
-  const { sidebarOpen } = useSelector((state) => state.cart);
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [selectedSize, setSelectedSize] = useState(null);
@@ -418,16 +417,16 @@ export default function ProductDetails({ product, relatedProducts = [] }) {
               <div className="h-1.5 w-24 bg-black mt-2 rounded-full" />
             </div>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-10">
-              {relatedProducts.map((item) => (
-                <Link key={item._id} href={`/product/${item._id}`} className="group block">
+              {relatedProducts.filter(Boolean).map((item) => (
+                <Link key={item?._id || item?.id || Math.random()} href={`/product/${item?._id || item?.id}`} className="group block">
                   <div className="relative aspect-[3/4] overflow-hidden rounded-3xl bg-gray-50 mb-4 shadow-sm group-hover:shadow-2xl transition-all duration-700">
-                    <Image src={item.image || "/placeholder.png"} alt={item.name} fill className="object-cover object-top group-hover:scale-110 transition-transform duration-700" />
+                    <Image src={item?.image || "/placeholder.png"} alt={item?.name || "Product"} fill className="object-cover object-top group-hover:scale-110 transition-transform duration-700" />
                     <div className="absolute inset-x-3 bottom-3 opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-500">
                       <button className="w-full bg-white/95 backdrop-blur-md text-black py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-xl">QUICK SHOP</button>
                     </div>
                   </div>
                   <div className="space-y-1 text-center">
-                    <h4 className="text-[14px] font-black text-gray-800 truncate uppercase tracking-tight group-hover:text-black transition-all font-sans">{item.name}</h4>
+                    <h4 className="text-[14px] font-black text-gray-800 truncate uppercase tracking-tight group-hover:text-black transition-all font-sans">{item?.name}</h4>
                     <div className="flex justify-center items-center gap-2">
                        <p className="text-[16px] text-gray-900 font-black italic">₹{item.price}</p>
                        <p className="text-[12px] text-gray-400 line-through">₹{Math.round(item.price * 1.4)}</p>
@@ -445,10 +444,9 @@ export default function ProductDetails({ product, relatedProducts = [] }) {
       </div>
 
       {/* Mobile Sticky Action Bar */}
-      {!sidebarOpen && (
-        <div className="fixed bottom-0 left-0 w-full bg-white border-t border-gray-100 p-4 pb-6 z-40 md:hidden grid grid-cols-2 gap-3 shadow-[0_-10px_30px_rgba(0,0,0,0.05)]">
-           <button 
-            onClick={handleAddtoCart}
+      <div className="fixed bottom-0 left-0 w-full bg-white border-t border-gray-100 p-4 pb-6 z-40 md:hidden grid grid-cols-2 gap-3 shadow-[0_-10px_30px_rgba(0,0,0,0.05)]">
+         <button 
+          onClick={handleAddtoCart}
           className="bg-white border-2 border-black text-black h-12 rounded-xl font-black text-[10px] uppercase tracking-widest active:scale-95 transition-transform"
          >
            Add to Cart
@@ -456,8 +454,7 @@ export default function ProductDetails({ product, relatedProducts = [] }) {
          <button className="bg-black text-white h-12 rounded-xl font-black text-[10px] uppercase tracking-widest active:scale-95 transition-transform shadow-lg">
            Buy Now
          </button>
-        </div>
-      )}
+      </div>
 
       <style jsx global>{`
         ::-webkit-scrollbar { width: 5px; }
