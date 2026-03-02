@@ -5,7 +5,7 @@ import { HiOutlineTruck } from "react-icons/hi2";
 import { Ri24HoursLine } from "react-icons/ri";
 import { LuCodesandbox } from "react-icons/lu";
 import Image from "next/image";
-import Slider4 from "./Slider4";
+import Slider4 from "../ui/Slider4";
 import { motion } from "framer-motion";
 const logoSliders = [
   { id: 1, logos: TbTruckDelivery, name: "FREE DELIVERY" },

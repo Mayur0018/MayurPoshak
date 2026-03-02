@@ -12,7 +12,7 @@ import Link from "next/link";
 import { useSelector, useDispatch } from "react-redux";
 import { openCartSidebar } from "@/redux/cartSlice";
 import supabase from "@/lib/supabaseClient";
-import SearchOverlay from "./SearchOverlay";
+import SearchOverlay from "./features/SearchOverlay";
 
 const Header = () => {
   const [menuOpen, setMenuopen] = useState(false);

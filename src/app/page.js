@@ -1,14 +1,14 @@
 import { connectDB } from "@/lib/mongodb";
 import Product from "@/models/Product";
-import Hero from "@/components/Hero";
-import Categories from "@/components/Categories";
-import MostTrending from "@/components/MostTrending";
-import About from "@/components/About";
-import ProductOffer from "@/components/ProductOffer";
-import Exhibition from "@/components/Exhibition";
-import Testimonials from "@/components/Testimonials";
-import NewsletterCTA from "@/components/NewsletterCTA";
-import NewArrivals from "@/components/NewArrivals";
+import Hero from "@/components/features/Hero";
+import Categories from "@/components/features/Categories";
+import MostTrending from "@/components/features/MostTrending";
+import About from "@/components/features/About";
+import ProductOffer from "@/components/ui/ProductOffer";
+import Exhibition from "@/components/features/Exhibition";
+import Testimonials from "@/components/features/Testimonials";
+import NewsletterCTA from "@/components/features/NewsletterCTA";
+import NewArrivals from "@/components/features/NewArrivals";
 
 export default async function Home() {
   let products = [];

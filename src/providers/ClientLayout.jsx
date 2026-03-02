@@ -1,13 +1,13 @@
 "use client";
 import { usePathname } from "next/navigation";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import ChatBot from "@/components/ChatBot";
-import AnnouncementBar from "@/components/AnnouncementBar";
-import CartSidebar from "@/components/CartSidebar";
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
+import ChatBot from "@/components/features/ChatBot";
+import AnnouncementBar from "@/components/layout/AnnouncementBar";
+import CartSidebar from "@/components/features/CartSidebar";
 
-import SocialProof from "@/components/SocialProof";
-import ScratchCard from "@/components/ScratchCard";
+import SocialProof from "@/components/features/SocialProof";
+import ScratchCard from "@/components/features/ScratchCard";
 
 export default function ClientLayout({ children }) {
   const pathname = usePathname();
