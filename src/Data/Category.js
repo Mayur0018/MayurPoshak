@@ -1,13 +1,13 @@
 export const category = [
   {
     id: 1,
-    Image: "https://images.unsplash.com/photo-1603252109303-2751441dd157?w=800&q=90&fit=crop",
+    Image: "/Category/Categoryimg2.png",
     text: "MEN",
     slug: "men",
   },
   {
     id: 2,
-    Image: "https://images.unsplash.com/photo-1572804013307-a9a7dfdffbb0?w=800&q=90&fit=crop",
+    Image: "/Category/silksarees.jpg",
     text: "LADIES",
     slug: "ladies",
   },
@@ -19,13 +19,13 @@ export const category = [
   },
   {
     id: 4,
-    Image: "https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=800&q=90&fit=crop",
+    Image: "/Category/Categoryimg1.png",
     text: "BAGGY",
     slug: "baggy",
   },
   {
     id: 5,
-    Image: "https://images.unsplash.com/photo-1552902865-b72c031ac5ea?w=800&q=90&fit=crop",
+    Image: "/Category/Categoryimg3.png",
     text: "GEN Z",
     slug: "genz",
   },
