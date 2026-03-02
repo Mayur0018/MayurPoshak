@@ -29,7 +29,8 @@ export default function WishlistPage() {
       const response = await fetch("/api/wishlist");
       const data = await response.json();
       if (response.ok) {
-        setWishlist(data);
+        // Filter out stale entries where the product was deleted (e.g. after a reseed)
+        setWishlist(data.filter((item) => item.productId != null));
       }
     } catch (error) {
       console.error("Error fetching wishlist:", error);
@@ -54,7 +55,7 @@ export default function WishlistPage() {
         body: JSON.stringify({ productId }),
       });
       if (response.ok) {
-        setWishlist(wishlist.filter((item) => item.productId._id !== productId));
+        setWishlist(wishlist.filter((item) => item.productId?._id !== productId));
         toast.success("Removed from wishlist");
       }
     } catch (error) {

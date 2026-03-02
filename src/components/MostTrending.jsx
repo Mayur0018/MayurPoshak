@@ -35,7 +35,7 @@ const ProductCard = ({ item, index }) => {
         const res = await fetch("/api/wishlist");
         const data = await res.json();
         if (Array.isArray(data)) {
-          setIsWishlisted(data.some((w) => w.productId._id === item._id));
+          setIsWishlisted(data.some((w) => w.productId?._id === item._id));
         }
       }
     };

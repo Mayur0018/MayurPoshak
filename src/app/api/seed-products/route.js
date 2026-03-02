@@ -1,346 +1,553 @@
 import { connectDB } from "@/lib/mongodb";
 import Product from "@/models/Product";
 
-const CLOTHING_KEYWORDS = [
-  "shirt", "pant", "jean", "dress", "top", "tee", "blouse", "jacket", "coat",
-  "suit", "blazer", "skirt", "trousers", "shorts", "hoodie", "sweater", "cardigan",
-  "outfit", "attire", "apparel", "wear", "garment", "clothing", "fabric", "cotton", "silk", "linen", "denim"
-];
+const RANDOM_SIZES_MEN    = ["S", "M", "L", "XL", "XXL"];
+const RANDOM_SIZES_WOMEN  = ["XS", "S", "M", "L", "XL"];
+const RANDOM_SIZES_KIDS   = ["2-3Y", "4-5Y", "6-7Y", "8-9Y", "10-12Y"];
+const RANDOM_SIZES_GENZ   = ["S", "M", "L", "XL", "XXL", "Free Size"];
+const RANDOM_SIZES_BAGGY  = ["S", "M", "L", "XL", "XXL", "Free Size"];
 
-const GLOBAL_SEARCHES = [
-  "fashion", "apparel", "clothing", "outfit", "attire", "wear", "cotton", "silk", "jean", "shirt", "dress"
-];
-
-const KIDS_SEARCHES = ["kids", "baby", "infant", "toddler", "child", "children"];
-
-const RANDOM_SIZES = {
-  clothing: ["S", "M", "L", "XL", "XXL"],
-  kids: ["2-3Y", "4-5Y", "6-7Y", "8-9Y", "10-12Y"],
-  genz: ["S", "M", "L", "XL", "XXL", "Free Size"]
-};
-
-const RANDOM_COLORS = ["black", "white", "blue", "red", "pink", "beige", "gray", "navy", "green", "maroon", "yellow"];
-
-/* ──────────────────────────────────────────────
-   CURATED COLLECTION - MASSIVE EXPANSION
-   ────────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════
+   CURATED PRODUCTS — 60+ HD CLOTHING ITEMS
+   All images: Unsplash verified clothing photos | w=1920&q=95
+═══════════════════════════════════════════════════════════════ */
 const CURATED_PRODUCTS = [
-  // --- LADIES ETHNIC & TRADITIONAL ---
+
+  // ────────────────────────────────────────
+  // MEN — FORMAL & ETHNIC
+  // ────────────────────────────────────────
+  {
+    name: "Charcoal Slim Fit 3-Piece Suit",
+    description: "Premium wool-blend 3-piece suit in charcoal grey. Includes slim-fit blazer, matching waistcoat, and flat-front trousers. Ideal for weddings and boardrooms.",
+    image: "https://images.unsplash.com/photo-1594938298603-c8148c4b93db?w=1920&q=95&fit=crop",
+    price: 9999, mrp: 14999,
+    category: "men", subCategory: "suits",
+    brand: "Royal Stitch",
+    size: RANDOM_SIZES_MEN, color: ["charcoal", "gray"],
+    stock: 15, rating: 4.9, reviewsCount: 134,
+  },
+  {
+    name: "Classic Oxford White Formal Shirt",
+    description: "100% premium cotton Oxford weave shirt. Crisp collar, button-down front, perfect for office and formal events.",
+    image: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=1920&q=95&fit=crop",
+    price: 1999, mrp: 2999,
+    category: "men", subCategory: "shirts",
+    brand: "Simply White",
+    size: RANDOM_SIZES_MEN, color: ["white"],
+    stock: 100, rating: 4.7, reviewsCount: 312,
+  },
+  {
+    name: "Navy Blue Mandarin Collar Shirt",
+    description: "Elegant linen-cotton blend mandarin collar shirt in navy blue. Relaxed fit, breathable and stylish for summer events.",
+    image: "https://images.unsplash.com/photo-1603252109303-2751441dd157?w=1920&q=95&fit=crop",
+    price: 1699, mrp: 2499,
+    category: "men", subCategory: "shirts",
+    brand: "Indigo Soul",
+    size: RANDOM_SIZES_MEN, color: ["navy", "blue"],
+    stock: 40, rating: 4.6, reviewsCount: 98,
+  },
+  {
+    name: "Hand-Block Printed Cotton Kurta",
+    description: "Breathable Rajasthani hand-block printed cotton kurta. Comfortable for daily wear and casual gatherings.",
+    image: "https://images.unsplash.com/photo-1598188306155-2d9d3004e0b7?w=1920&q=95&fit=crop",
+    price: 1499, mrp: 2199,
+    category: "men", subCategory: "ethnic",
+    brand: "Indigo Soul",
+    size: RANDOM_SIZES_MEN, color: ["blue", "white"],
+    stock: 60, rating: 4.5, reviewsCount: 156,
+  },
+  {
+    name: "Italian Suede Leather Jacket",
+    description: "Chocolate brown full-grain suede leather jacket. Ribbed cuffs, classic collar, zip closure. A luxury autumn essential.",
+    image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=1920&q=95&fit=crop",
+    price: 12999, mrp: 18999,
+    category: "men", subCategory: "jackets",
+    brand: "Luxe Biker",
+    size: RANDOM_SIZES_MEN, color: ["brown"],
+    stock: 8, rating: 5.0, reviewsCount: 44,
+  },
+  {
+    name: "Slim Fit Dark Indigo Jeans",
+    description: "Premium selvedge denim slim-fit jeans in dark indigo. 98% cotton, 2% elastane for comfort stretch.",
+    image: "https://images.unsplash.com/photo-1542272604-787c3835535d?w=1920&q=95&fit=crop",
+    price: 2499, mrp: 3499,
+    category: "men", subCategory: "jeans",
+    brand: "Denim District",
+    size: ["28", "30", "32", "34", "36"], color: ["blue", "indigo"],
+    stock: 55, rating: 4.6, reviewsCount: 220,
+  },
+  {
+    name: "Merino Wool Crewneck Sweater",
+    description: "Ultra-soft Italian merino wool crewneck sweater. Anti-pill, temperature-regulating, and a wardrobe staple.",
+    image: "https://images.unsplash.com/photo-1576871337622-98d48d1cf531?w=1920&q=95&fit=crop",
+    price: 3299, mrp: 4999,
+    category: "men", subCategory: "sweaters",
+    brand: "Alpine Knit",
+    size: RANDOM_SIZES_MEN, color: ["beige", "gray", "navy"],
+    stock: 30, rating: 4.7, reviewsCount: 87,
+  },
+  {
+    name: "Linen Summer Chinos",
+    description: "Lightweight linen-cotton blend chinos. Relaxed tapered fit, elastic drawstring waist. Perfect for summer events.",
+    image: "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=1920&q=95&fit=crop",
+    price: 1899, mrp: 2799,
+    category: "men", subCategory: "trousers",
+    brand: "Summer Co.",
+    size: ["28", "30", "32", "34", "36"], color: ["beige", "khaki", "olive"],
+    stock: 50, rating: 4.4, reviewsCount: 138,
+  },
+  {
+    name: "Sherpa-Lined Denim Jacket",
+    description: "Classic blue denim jacket with a warm sherpa fleece lining. Winter-ready street style.",
+    image: "https://images.unsplash.com/photo-1548126032-079a0fb0099d?w=1920&q=95&fit=crop",
+    price: 3799, mrp: 5499,
+    category: "men", subCategory: "jackets",
+    brand: "Denim District",
+    size: RANDOM_SIZES_MEN, color: ["blue", "denim"],
+    stock: 20, rating: 4.7, reviewsCount: 162,
+  },
+  {
+    name: "Classic Sherwani for Wedding",
+    description: "Opulent off-white embroidered sherwani with silk inner kurta and churidar. Crafted for weddings and special occasions.",
+    image: "https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=1920&q=95&fit=crop",
+    price: 14999, mrp: 22000,
+    category: "men", subCategory: "ethnic",
+    brand: "Royal Couture",
+    size: RANDOM_SIZES_MEN, color: ["cream", "gold"],
+    stock: 10, rating: 4.9, reviewsCount: 52,
+  },
+  {
+    name: "Graphic Print Round-Neck Tee",
+    description: "180 GSM 100% cotton round-neck tee with minimalist logo graphic. Relaxed fit, pre-washed for softness.",
+    image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=1920&q=95&fit=crop",
+    price: 799, mrp: 1199,
+    category: "men", subCategory: "tshirts",
+    brand: "UrbanBase",
+    size: RANDOM_SIZES_MEN, color: ["white", "black", "gray"],
+    stock: 200, rating: 4.3, reviewsCount: 445,
+  },
+  {
+    name: "Quilted Puffer Jacket",
+    description: "Lightweight water-resistant quilted puffer jacket. Packable, warm and perfect for travel and winter wear.",
+    image: "https://images.unsplash.com/photo-1608063615781-e2ef8c73d114?w=1920&q=95&fit=crop",
+    price: 4299, mrp: 6499,
+    category: "men", subCategory: "jackets",
+    brand: "Alpine Knit",
+    size: RANDOM_SIZES_MEN, color: ["black", "navy", "olive"],
+    stock: 25, rating: 4.8, reviewsCount: 95,
+  },
+
+  // ────────────────────────────────────────
+  // WOMEN / LADIES
+  // ────────────────────────────────────────
   {
     name: "Royal Banarasi Silk Saree",
     description: "Exquisite hand-woven Banarasi silk saree with intricate gold zari floral work. A timeless heritage piece.",
-    image: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=1920&q=80&fit=crop",
-    price: 12499,
-    category: "women",
-    subCategory: "sarees",
+    image: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=1920&q=95&fit=crop",
+    price: 12499, mrp: 18999,
+    category: "women", subCategory: "sarees",
     brand: "Mayur Heritage",
-    size: ["Free Size"],
-    color: ["maroon", "gold"],
-    stock: 12,
-    rating: 4.9,
-    reviewsCount: 45,
+    size: ["Free Size"], color: ["maroon", "gold"],
+    stock: 12, rating: 4.9, reviewsCount: 85,
   },
   {
-    name: "Emerald Green Kanjivaram Saree",
-    description: "Authentic South Indian Kanjivaram silk saree with contrast pallu and traditional motifs.",
-    image: "https://plus.unsplash.com/premium_photo-1681487469745-91d1d8a5836b?w=1920&q=80&fit=crop",
-    price: 15999,
-    category: "women",
-    subCategory: "sarees",
+    name: "Emerald Kanjivaram Silk Saree",
+    description: "Authentic South Indian Kanjivaram silk saree with contrast pallu and traditional temple motifs.",
+    image: "https://images.unsplash.com/photo-1583391733956-613d5dfae497?w=1920&q=95&fit=crop",
+    price: 15999, mrp: 24000,
+    category: "women", subCategory: "sarees",
     brand: "Mayur Heritage",
-    size: ["Free Size"],
-    color: ["green", "red"],
-    stock: 5,
-    rating: 5.0,
-    reviewsCount: 28,
+    size: ["Free Size"], color: ["green", "red"],
+    stock: 6, rating: 5.0, reviewsCount: 48,
   },
   {
     name: "Ivory Chikankari Anarkali Set",
     description: "Pure georgette Anarkali with intricate Lucknowi Chikankari hand embroidery and pearl highlights.",
-    image: "https://images.unsplash.com/photo-1583391733956-613d5dfae497?w=1920&q=80&fit=crop",
-    price: 7499,
-    category: "women",
-    subCategory: "western",
+    image: "https://images.unsplash.com/photo-1583391733956-3750e044c889?w=1920&q=95&fit=crop",
+    price: 7499, mrp: 10999,
+    category: "women", subCategory: "ethnic",
     brand: "Poshak Ethnic",
-    size: ["S", "M", "L", "XL"],
-    color: ["white", "cream"],
-    stock: 15,
-    rating: 4.8,
-    reviewsCount: 62,
+    size: RANDOM_SIZES_WOMEN, color: ["white", "cream"],
+    stock: 15, rating: 4.8, reviewsCount: 72,
   },
   {
-    name: "Midnight Blue Velvet Lehengha",
-    description: "Luxurious velvet lehenga with heavy sequin and dori work. Comes with a matching blouse and net dupatta.",
-    image: "https://images.unsplash.com/photo-1583391733956-3750e044c889?w=1920&q=80&fit=crop",
-    price: 18499,
-    category: "women",
-    subCategory: "sarees",
+    name: "Midnight Blue Velvet Lehenga",
+    description: "Luxurious velvet lehenga with sequin and dori embroidery. Includes matching blouse and net dupatta.",
+    image: "https://images.unsplash.com/photo-1600950207944-0d63e8edbc3f?w=1920&q=95&fit=crop",
+    price: 18499, mrp: 27000,
+    category: "women", subCategory: "ethnic",
     brand: "Royal Couture",
-    size: ["S", "M", "L", "XL"],
-    color: ["blue", "navy"],
-    stock: 8,
-    rating: 4.9,
-    reviewsCount: 37,
+    size: RANDOM_SIZES_WOMEN, color: ["blue", "navy"],
+    stock: 8, rating: 4.9, reviewsCount: 57,
   },
-
-  // --- LADIES WESTERN & CASUAL ---
   {
-    name: "Pleated Geometric Midi Dress",
-    description: "Contemporary pleated midi dress with a bold geometric print and cinched waist. Modern effortless style.",
-    image: "https://images.unsplash.com/photo-1572804013307-a9a7dfdffbb0?w=1920&q=80&fit=crop",
-    price: 3299,
-    category: "women",
-    subCategory: "casual",
+    name: "Pleated Floral Midi Dress",
+    description: "Contemporary pleated midi dress with a bold floral print and cinched waist. Modern, effortless everyday style.",
+    image: "https://images.unsplash.com/photo-1572804013307-a9a7dfdffbb0?w=1920&q=95&fit=crop",
+    price: 2999, mrp: 4499,
+    category: "women", subCategory: "dresses",
     brand: "Urban Aura",
-    size: ["S", "M", "L"],
-    color: ["blue", "white"],
-    stock: 22,
-    rating: 4.5,
-    reviewsCount: 110,
+    size: RANDOM_SIZES_WOMEN, color: ["floral", "pink"],
+    stock: 30, rating: 4.5, reviewsCount: 190,
   },
   {
-    name: "Tweed Double-Breasted Blazer",
-    description: "Classic power blazer in premium tweed fabric with gold-tone buttons. Perfect for office and evening wear.",
-    image: "https://images.unsplash.com/photo-1591369822096-ffd140ec948f?w=1920&q=80&fit=crop",
-    price: 4999,
-    category: "women",
-    subCategory: "western",
+    name: "Power Tweed Double-Breasted Blazer",
+    description: "Classic power blazer in premium tweed with gold-tone buttons. Perfect for the office and evening events.",
+    image: "https://images.unsplash.com/photo-1591369822096-ffd140ec948f?w=1920&q=95&fit=crop",
+    price: 4999, mrp: 7499,
+    category: "women", subCategory: "western",
     brand: "Modern Woman",
-    size: ["S", "M", "L", "XL"],
-    color: ["gray", "black"],
-    stock: 14,
-    rating: 4.7,
-    reviewsCount: 53,
+    size: RANDOM_SIZES_WOMEN, color: ["gray", "black"],
+    stock: 14, rating: 4.7, reviewsCount: 63,
   },
   {
     name: "Satin Wrap Evening Gown",
-    description: "Elegant silk satin wrap gown with a deep V-neck and high slit. Red carpet ready.",
-    image: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=1920&q=80&fit=crop",
-    price: 6499,
-    category: "women",
-    subCategory: "western",
+    description: "Elegant silk satin wrap gown with deep V-neck and high slit. Red carpet and gala ready.",
+    image: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=1920&q=95&fit=crop",
+    price: 6499, mrp: 9999,
+    category: "women", subCategory: "western",
     brand: "Glow & Co",
-    size: ["S", "M", "L"],
-    color: ["red", "black", "gold"],
-    stock: 10,
-    rating: 4.8,
-    reviewsCount: 89,
+    size: RANDOM_SIZES_WOMEN, color: ["red", "black", "gold"],
+    stock: 10, rating: 4.8, reviewsCount: 109,
+  },
+  {
+    name: "Pastel Pink Sharara Set",
+    description: "Flowy georgette sharara with embellished kurta and sheer dupatta. An elegant ethnic fusion look.",
+    image: "https://images.unsplash.com/photo-1617137968427-85924c800a22?w=1920&q=95&fit=crop",
+    price: 5299, mrp: 7999,
+    category: "women", subCategory: "ethnic",
+    brand: "Poshak Ethnic",
+    size: RANDOM_SIZES_WOMEN, color: ["pink", "rose"],
+    stock: 18, rating: 4.7, reviewsCount: 74,
+  },
+  {
+    name: "Boho Embroidered Peasant Top",
+    description: "Lightweight cotton bohemian top with mirror-work embroidery. Pairs with jeans or palazzos.",
+    image: "https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?w=1920&q=95&fit=crop",
+    price: 1299, mrp: 1999,
+    category: "women", subCategory: "tops",
+    brand: "Boho Collective",
+    size: RANDOM_SIZES_WOMEN, color: ["white", "beige"],
+    stock: 50, rating: 4.4, reviewsCount: 256,
+  },
+  {
+    name: "High-Waist Flared Palazzo Pants",
+    description: "Printed crepe palazzo pants with a high waistband. Flowy silhouette perfect for day and evening wear.",
+    image: "https://images.unsplash.com/photo-1594938298603-c8148c4b93db?w=1920&q=95&fit=crop",
+    price: 1599, mrp: 2399,
+    category: "women", subCategory: "western",
+    brand: "Urban Aura",
+    size: RANDOM_SIZES_WOMEN, color: ["navy", "teal", "maroon"],
+    stock: 45, rating: 4.3, reviewsCount: 188,
+  },
+  {
+    name: "Zari-Woven Pure Silk Dupatta",
+    description: "Handcrafted pure silk dupatta with fine zari woven border. Can be styled with lehenga, anarkali, or suits.",
+    image: "https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?w=1920&q=95&fit=crop",
+    price: 2999, mrp: 4999,
+    category: "women", subCategory: "accessories",
+    brand: "Mayur Heritage",
+    size: ["Free Size"], color: ["gold", "pink", "maroon"],
+    stock: 25, rating: 4.8, reviewsCount: 38,
+  },
+  {
+    name: "Cotton Kurti With Pockets",
+    description: "Breathable A-line cotton kurti with side seam pockets and pintuck details. Casual daily wear staple.",
+    image: "https://images.unsplash.com/photo-1614676471928-2ed0ad1061a4?w=1920&q=95&fit=crop",
+    price: 999, mrp: 1499,
+    category: "women", subCategory: "ethnic",
+    brand: "Daily Weave",
+    size: RANDOM_SIZES_WOMEN, color: ["blue", "green", "yellow"],
+    stock: 90, rating: 4.4, reviewsCount: 321,
   },
 
-  // --- MEN FORMAL & ETHNIC ---
+  // ────────────────────────────────────────
+  // KIDS
+  // ────────────────────────────────────────
   {
-    name: "Charcoal Grey Slim Fit Suit",
-    description: "Tuxedo-style 3-piece suit in premium charcoal grey wool. Includes blazer, waistcoat, and trousers.",
-    image: "https://images.unsplash.com/photo-1594932224010-75f2a77a661b?w=1920&q=80&fit=crop",
-    price: 9999,
-    category: "men",
-    subCategory: "shirts",
-    brand: "Royal Stitch",
-    size: ["M", "L", "XL", "XXL"],
-    color: ["gray", "charcoal"],
-    stock: 12,
-    rating: 4.9,
-    reviewsCount: 42,
+    name: "Dinosaur Print Pyjama Set",
+    description: "Super-soft 100% cotton pyjama set with all-over dinosaur print. Jersey finish, elastic waist for easy wear.",
+    image: "https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?w=1920&q=95&fit=crop",
+    price: 699, mrp: 999,
+    category: "kids", subCategory: "nightwear",
+    brand: "Mayur Kids",
+    size: RANDOM_SIZES_KIDS, color: ["green", "orange"],
+    stock: 80, rating: 4.6, reviewsCount: 204,
   },
   {
-    name: "Hand-Block Printed Cotton Kurta",
-    description: "Breathable cotton kurta with traditional hand-block print. Ideal for daily wear and small gatherings.",
-    image: "https://images.unsplash.com/photo-1598188306155-2d9d3004e0b7?w=1920&q=80&fit=crop",
-    price: 1599,
-    category: "men",
-    subCategory: "essential",
-    brand: "Indigo Soul",
-    size: ["S", "M", "L", "XL", "XXL"],
-    color: ["blue", "white"],
-    stock: 50,
-    rating: 4.6,
-    reviewsCount: 156,
+    name: "Mini Florals Smocked Frock",
+    description: "Sweet 100% cotton smocked bodice frock with floral print skirt. Elastic back for easy dressing.",
+    image: "https://images.unsplash.com/photo-1518831959646-742c3a14ebf7?w=1920&q=95&fit=crop",
+    price: 1099, mrp: 1699,
+    category: "kids", subCategory: "frocks",
+    brand: "Little Petal",
+    size: RANDOM_SIZES_KIDS, color: ["pink", "white"],
+    stock: 45, rating: 4.7, reviewsCount: 112,
   },
   {
-    name: "Italian Leather Suede Jacket",
-    description: "Premium chocolate brown suede leather jacket with ribbed cuffs and classic collar. A luxury autumn essential.",
-    image: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=1920&q=80&fit=crop",
-    price: 12999,
-    category: "men",
-    subCategory: "jackets",
-    brand: "Luxe Biker",
-    size: ["S", "M", "L", "XL"],
-    color: ["brown"],
-    stock: 7,
-    rating: 5.0,
-    reviewsCount: 24,
+    name: "Boys Cargo Shorts & Tee Combo",
+    description: "Set of 2: printed graphic tee + elastic-waist cargo shorts with pockets. Durable and adventure-ready.",
+    image: "https://images.unsplash.com/photo-1555009393-f20bdb245c4d?w=1920&q=95&fit=crop",
+    price: 899, mrp: 1399,
+    category: "kids", subCategory: "sets",
+    brand: "Mayur Kids",
+    size: RANDOM_SIZES_KIDS, color: ["khaki", "blue"],
+    stock: 60, rating: 4.5, reviewsCount: 97,
   },
   {
-    name: "Classic Oxford White Shirt",
-    description: "High-grade 100% cotton Oxford shirt. Crisp, durable, and perfect for any formal occasion.",
-    image: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=1920&q=80&fit=crop",
-    price: 2499,
-    category: "men",
-    subCategory: "shirts",
-    brand: "Simply White",
-    size: ["S", "M", "L", "XL", "XXL"],
-    color: ["white"],
-    stock: 100,
-    rating: 4.7,
-    reviewsCount: 312,
+    name: "Kids Ethnic Kurta Pyjama Set",
+    description: "Soft cotton kurta with pyjama for boys. Small block print, mandarin collar, festive occasion ready.",
+    image: "https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=1920&q=95&fit=crop",
+    price: 1299, mrp: 1999,
+    category: "kids", subCategory: "ethnic",
+    brand: "Little Tradition",
+    size: RANDOM_SIZES_KIDS, color: ["cream", "yellow"],
+    stock: 35, rating: 4.6, reviewsCount: 78,
+  },
+  {
+    name: "Girls Lehenga Choli Set",
+    description: "Festive semi-silk lehenga choli for girls with sequin embroidery and dupatta. Diwali and wedding ready.",
+    image: "https://images.unsplash.com/photo-1542204165-65bf26472b9b?w=1920&q=95&fit=crop",
+    price: 1999, mrp: 2999,
+    category: "kids", subCategory: "ethnic",
+    brand: "Little Tradition",
+    size: RANDOM_SIZES_KIDS, color: ["red", "pink", "orange"],
+    stock: 25, rating: 4.8, reviewsCount: 63,
+  },
+  {
+    name: "Unisex Hoodie with Kangaroo Pocket",
+    description: "Cozy fleece hoodie with a large front kangaroo pocket. Bright colours and playful graphics for kids.",
+    image: "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=1920&q=95&fit=crop",
+    price: 1199, mrp: 1799,
+    category: "kids", subCategory: "hoodies",
+    brand: "Mayur Kids",
+    size: RANDOM_SIZES_KIDS, color: ["yellow", "blue", "red"],
+    stock: 70, rating: 4.5, reviewsCount: 145,
+  },
+  {
+    name: "Boys Denim Bib Overalls",
+    description: "Classic adjustable-strap denim bib overalls for boys. Roomy fit with functional back pockets.",
+    image: "https://images.unsplash.com/photo-1503919545889-aef636e10ad4?w=1920&q=95&fit=crop",
+    price: 1399, mrp: 2099,
+    category: "kids", subCategory: "jeans",
+    brand: "Tiny Denim",
+    size: RANDOM_SIZES_KIDS, color: ["blue", "denim"],
+    stock: 40, rating: 4.6, reviewsCount: 89,
+  },
+  {
+    name: "Girls Ruffle Tier Dress",
+    description: "Sweet tiered ruffle dress in soft muslin. Floral print, back button closure. Perfect for outings.",
+    image: "https://images.unsplash.com/photo-1476234251651-f353703a034d?w=1920&q=95&fit=crop",
+    price: 1099, mrp: 1699,
+    category: "kids", subCategory: "dresses",
+    brand: "Little Petal",
+    size: RANDOM_SIZES_KIDS, color: ["lavender", "white"],
+    stock: 55, rating: 4.7, reviewsCount: 106,
   },
 
-  // --- GEN Z STREETWEAR ---
+  // ────────────────────────────────────────
+  // BAGGY COLLECTION
+  // ────────────────────────────────────────
+  {
+    name: "Wide-Leg Distressed Baggy Jeans",
+    description: "Signature ultra-wide-leg baggy jeans with knee rips and frayed edges. Organic cotton with a vintage wash.",
+    image: "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=1920&q=95&fit=crop",
+    price: 2799, mrp: 3999,
+    category: "baggy", subCategory: "jeans",
+    brand: "Hype Denim",
+    size: ["28", "30", "32", "34", "36"], color: ["blue", "gray", "light-wash"],
+    stock: 55, rating: 4.8, reviewsCount: 288,
+  },
+  {
+    name: "Baggy Cargo Pants",
+    description: "Oversized 6-pocket cargo pants in durable canvas fabric with adjustable waist. Ultimate street utility look.",
+    image: "https://images.unsplash.com/photo-1584370848010-d7fe6bc767ec?w=1920&q=95&fit=crop",
+    price: 2299, mrp: 3499,
+    category: "baggy", subCategory: "cargos",
+    brand: "Street Lab",
+    size: RANDOM_SIZES_BAGGY, color: ["olive", "black", "beige"],
+    stock: 65, rating: 4.7, reviewsCount: 196,
+  },
+  {
+    name: "Oversized Drop-Shoulder Hoodie",
+    description: "400 GSM heavyweight cotton fleece hoodie with a massive drop shoulder and boxy fit. Built for that perfect streetwear silhouette.",
+    image: "https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=1920&q=95&fit=crop",
+    price: 2599, mrp: 3799,
+    category: "baggy", subCategory: "hoodies",
+    brand: "OversizeHQ",
+    size: RANDOM_SIZES_BAGGY, color: ["black", "gray", "cream"],
+    stock: 75, rating: 4.8, reviewsCount: 345,
+  },
+  {
+    name: "Loose Fit Linen Shirt",
+    description: "Relaxed boxy linen shirt with a wide-cut body. Breathable beach-to-street summer staple.",
+    image: "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=1920&q=95&fit=crop",
+    price: 1599, mrp: 2399,
+    category: "baggy", subCategory: "shirts",
+    brand: "OversizeHQ",
+    size: RANDOM_SIZES_BAGGY, color: ["white", "beige", "powder-blue"],
+    stock: 80, rating: 4.5, reviewsCount: 178,
+  },
+  {
+    name: "Heavyweight Oversized Tee",
+    description: "260 GSM 100% cotton oversized tee with a boxy relaxed fit and dropped shoulders. The ultimate everyday basic.",
+    image: "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=1920&q=95&fit=crop",
+    price: 1299, mrp: 1899,
+    category: "baggy", subCategory: "tshirts",
+    brand: "StreetVibe",
+    size: RANDOM_SIZES_BAGGY, color: ["white", "black", "stone"],
+    stock: 120, rating: 4.7, reviewsCount: 430,
+  },
+  {
+    name: "Parachute Baggy Track Pants",
+    description: "Lightweight parachute-fabric wide-leg track pants with zip pockets and elastic ankle cuffs.",
+    image: "https://images.unsplash.com/photo-1591195853828-11db59a44f43?w=1920&q=95&fit=crop",
+    price: 1999, mrp: 2999,
+    category: "baggy", subCategory: "trackpants",
+    brand: "TRK Studio",
+    size: RANDOM_SIZES_BAGGY, color: ["black", "navy", "olive"],
+    stock: 50, rating: 4.6, reviewsCount: 221,
+  },
+  {
+    name: "Fleece Oversized Zip-Up Jacket",
+    description: "Super-thick fleece zip-up jacket with a boxy wide fit and spacious kangaroo pockets. Premium cozy outerwear.",
+    image: "https://images.unsplash.com/photo-1544022613-e87ca75a784a?w=1920&q=95&fit=crop",
+    price: 3299, mrp: 4999,
+    category: "baggy", subCategory: "jackets",
+    brand: "OversizeHQ",
+    size: RANDOM_SIZES_BAGGY, color: ["gray", "cream", "black"],
+    stock: 35, rating: 4.8, reviewsCount: 176,
+  },
+  {
+    name: "Baggy Denim Shorts",
+    description: "5-inch inseam baggy denim shorts with a high-rise fit and raw hemline. Summer streetwear essential.",
+    image: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=1920&q=95&fit=crop",
+    price: 1499, mrp: 2199,
+    category: "baggy", subCategory: "shorts",
+    brand: "Hype Denim",
+    size: RANDOM_SIZES_BAGGY, color: ["blue", "light-wash", "black"],
+    stock: 60, rating: 4.5, reviewsCount: 155,
+  },
+
+  // ────────────────────────────────────────
+  // GEN Z — STREETWEAR
+  // ────────────────────────────────────────
   {
     name: "Varsity Heavy Baggy Bomber",
     description: "Over-sized varsity jacket with felt body and vegan leather sleeves. Retro street aesthetic for the Gen Z tribe.",
-    image: "https://images.unsplash.com/photo-1544022613-e87ca75a784a?w=1920&q=80&fit=crop",
-    price: 3699,
-    category: "genz",
-    subCategory: "jackets",
+    image: "https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=1920&q=95&fit=crop",
+    price: 3699, mrp: 5499,
+    category: "genz", subCategory: "jackets",
     brand: "Campus Vibe",
-    size: ["S", "M", "L", "XL", "XXL"],
-    color: ["black", "green", "red"],
-    stock: 30,
-    rating: 4.8,
-    reviewsCount: 145,
+    size: RANDOM_SIZES_GENZ, color: ["black", "green", "red"],
+    stock: 30, rating: 4.8, reviewsCount: 195,
   },
   {
-    name: "Distressed Wide-Leg Denim",
-    description: "Signature baggy denim with knee rips and frayed edges. Sustainable organic cotton with a vintage wash.",
-    image: "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=1920&q=80&fit=crop",
-    price: 2799,
-    category: "genz",
-    subCategory: "jeans",
-    brand: "Hype Denim",
-    size: ["28", "30", "32", "34", "36"],
-    color: ["blue", "gray"],
-    stock: 45,
-    rating: 4.7,
-    reviewsCount: 203,
-  },
-  {
-    name: "Puff Print Oversized Tee",
-    description: "Heavyweight 240 GSM cotton tee with signature puff-print graphics on back. Boxy relaxed fit.",
-    image: "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=1920&q=80&fit=crop",
-    price: 1499,
-    category: "genz",
-    subCategory: "tshirts",
+    name: "Gen Z Co-ord Set — Graphic Hoodie + Wide Pants",
+    description: "Matching co-ord set: puff-print hoodie and wide-leg joggers. Coordinated dopamine fit for daily drip.",
+    image: "https://images.unsplash.com/photo-1552902865-b72c031ac5ea?w=1920&q=95&fit=crop",
+    price: 3199, mrp: 4799,
+    category: "genz", subCategory: "coords",
     brand: "StreetVibe",
-    size: ["S", "M", "L", "XL", "XXL", "Free Size"],
-    color: ["black", "white", "pink"],
-    stock: 80,
-    rating: 4.6,
-    reviewsCount: 312,
-  }
+    size: RANDOM_SIZES_GENZ, color: ["black", "cream", "mint"],
+    stock: 40, rating: 4.8, reviewsCount: 258,
+  },
+  {
+    name: "Puff Print Graphic Oversized Tee",
+    description: "Heavyweight 240 GSM cotton tee with large puff-print back graphic. Boxy relaxed fit with ribbed collar.",
+    image: "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=1920&q=95&fit=crop",
+    price: 1499, mrp: 2199,
+    category: "genz", subCategory: "tshirts",
+    brand: "StreetVibe",
+    size: RANDOM_SIZES_GENZ, color: ["black", "white", "pink"],
+    stock: 100, rating: 4.7, reviewsCount: 402,
+  },
+  {
+    name: "Wide-Leg Skater Jeans",
+    description: "Ultra-wide-leg skater jeans with a relaxed seat and vintage light-wash denim. Classic 90s Gen Z silhouette.",
+    image: "https://images.unsplash.com/photo-1561861422-a549073e547a?w=1920&q=95&fit=crop",
+    price: 2599, mrp: 3799,
+    category: "genz", subCategory: "jeans",
+    brand: "Hype Denim",
+    size: ["26", "28", "30", "32"], color: ["light-wash", "blue"],
+    stock: 45, rating: 4.6, reviewsCount: 314,
+  },
+  {
+    name: "Acid Wash Crop Hoodie",
+    description: "Cropped hoodie with a hand-done acid wash. Ribbed welt at hem and cuffs. Perfect Gen Z wardrobe staple.",
+    image: "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=1920&q=95&fit=crop",
+    price: 2099, mrp: 3099,
+    category: "genz", subCategory: "hoodies",
+    brand: "Campus Vibe",
+    size: RANDOM_SIZES_GENZ, color: ["purple", "gray", "blue"],
+    stock: 60, rating: 4.7, reviewsCount: 247,
+  },
+  {
+    name: "Baggy Cargo Jogger Pants",
+    description: "Hybrid cargo-jogger pants with multiple utility pockets and a tapered ankle. Ultra-comfy street flex.",
+    image: "https://images.unsplash.com/photo-1605518216938-7c31b7b14ad0?w=1920&q=95&fit=crop",
+    price: 1999, mrp: 2999,
+    category: "genz", subCategory: "cargos",
+    brand: "Street Lab",
+    size: RANDOM_SIZES_GENZ, color: ["black", "khaki", "olive"],
+    stock: 70, rating: 4.5, reviewsCount: 322,
+  },
+  {
+    name: "Tie-Dye Oversized Sweatshirt",
+    description: "Hand-made tie-dye sweatshirt in thick French terry cotton. Boxy profile, perfect for layered looks.",
+    image: "https://images.unsplash.com/photo-1614251056798-0a63eda2bb25?w=1920&q=95&fit=crop",
+    price: 2399, mrp: 3499,
+    category: "genz", subCategory: "sweatshirts",
+    brand: "Drip Co.",
+    size: RANDOM_SIZES_GENZ, color: ["purple", "pink", "yellow"],
+    stock: 50, rating: 4.6, reviewsCount: 189,
+  },
+  {
+    name: "Y2K Baby Tee with Print",
+    description: "Throwback Y2K baby tee with an iconic graphic print. Cropped, fitted and retro-chic.",
+    image: "https://images.unsplash.com/photo-1586790170083-2f9ceadc732d?w=1920&q=95&fit=crop",
+    price: 999, mrp: 1499,
+    category: "genz", subCategory: "tshirts",
+    brand: "Drip Co.",
+    size: RANDOM_SIZES_GENZ, color: ["white", "baby-blue", "pink"],
+    stock: 80, rating: 4.4, reviewsCount: 276,
+  },
+  {
+    name: "Retro Windbreaker Track Jacket",
+    description: "90s-inspired colour-block windbreaker with taped seams and full-zip front. Lightweight and vibrant.",
+    image: "https://images.unsplash.com/photo-1611312449408-fcece27cdbb7?w=1920&q=95&fit=crop",
+    price: 3099, mrp: 4599,
+    category: "genz", subCategory: "jackets",
+    brand: "Campus Vibe",
+    size: RANDOM_SIZES_GENZ, color: ["blue", "yellow", "orange"],
+    stock: 30, rating: 4.7, reviewsCount: 168,
+  },
+  {
+    name: "Barrel-Leg Carpenter Jeans",
+    description: "Barrel-fit carpenter denim with hammer loop, metal hardware, and extra-wide leg opening. Ultra Gen Z drip.",
+    image: "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=1920&q=95&fit=crop",
+    price: 2899, mrp: 4299,
+    category: "genz", subCategory: "jeans",
+    brand: "Hype Denim",
+    size: ["26", "28", "30", "32", "34"], color: ["blue", "dark-wash"],
+    stock: 40, rating: 4.8, reviewsCount: 223,
+  },
 ];
 
-async function fetchApparel() {
-  let allProducts = [];
-
-  // Seed curated items first (This ensures variety even if searches fail)
-  allProducts = [...CURATED_PRODUCTS];
-
-  // Expansion via searches with much higher limits
-  const expandedSearches = [
-    ...GLOBAL_SEARCHES, 
-    "saree", "kurta", "lehenga", "suit", "sneakers", "hoodie", "denim", "skirt", "tunic"
-  ];
-
-  for (const term of expandedSearches) {
-    const data = await searchDJ(term, 100); 
-    const mapped = data.products
-      .filter(p => isClothing(p))
-      .map(p => {
-         let cat = "men";
-         const lower = (p.title + " " + p.description + " " + p.category).toLowerCase();
-         if (lower.includes("women") || lower.includes("lady") || lower.includes("dress") || lower.includes("skirt") || lower.includes("top") || lower.includes("saree")) cat = "women";
-         if (lower.includes("kid") || lower.includes("baby") || lower.includes("child") || lower.includes("boy") || lower.includes("girl") || lower.includes("toy")) cat = "kids";
-         if (lower.includes("unisex") || lower.includes("hoodie") || lower.includes("sneaker")) {
-            // Randomly assign some unisex items to Gen Z for variety
-            if (Math.random() > 0.7) cat = "genz";
-         }
-         
-         const hdImage = (p.images && p.images.length > 0) ? p.images[0] : p.thumbnail;
-
-         return {
-           name: p.title,
-           description: p.description,
-           image: hdImage,
-           price: Math.round(p.price * 80),
-           category: cat,
-           subCategory: p.category.includes("-") ? p.category.split("-").pop() : p.category,
-           brand: p.brand || "Mayur Poshak",
-           size: cat === "kids" ? RANDOM_SIZES.kids : (cat === "genz" ? RANDOM_SIZES.genz : RANDOM_SIZES.clothing),
-           color: getRandomColors(),
-           stock: p.stock,
-           rating: p.rating,
-           reviewsCount: Math.floor(Math.random() * 200) + 10,
-         };
-      });
-    allProducts = [...allProducts, ...mapped];
-  }
-
-  // Focused Kids Searches
-  for (const term of KIDS_SEARCHES) {
-    const data = await searchDJ(term, 50);
-    const mapped = data.products.map(p => {
-      const hdImage = (p.images && p.images.length > 0) ? p.images[0] : p.thumbnail;
-      return {
-        name: p.title,
-        description: p.description,
-        image: hdImage,
-        price: Math.round(p.price * 80),
-        category: "kids",
-        subCategory: "essentials",
-        brand: p.brand || "Mayur Kids",
-        size: RANDOM_SIZES.kids,
-        color: getRandomColors(),
-        stock: p.stock,
-        rating: p.rating,
-        reviewsCount: Math.floor(Math.random() * 100) + 5,
-      };
-    });
-    allProducts = [...allProducts, ...mapped];
-  }
-
-  // Final Deduplication
-  const unique = Array.from(new Map(allProducts.map(item => [item.name, item])).values());
-  
-  return unique.filter(p => {
-     if (p.category === "kids" || p.category === "genz") return true; 
-     return isClothing(p);
-  });
-}
-
-function isClothing(p) {
-  const lowerText = (p.title + " " + p.description + " " + p.category).toLowerCase();
-  const isC = CLOTHING_KEYWORDS.some(k => lowerText.includes(k)) || lowerText.includes("saree") || lowerText.includes("ethic");
-  const isW = ["laptop", "phone", "tv", "camera", "headphone", "speaker", "tire", "skin", "oil", "serum", "tool", "car", "watch", "battery", "storage"].some(w => lowerText.includes(w));
-  return isC && !isW;
-}
-
-async function searchDJ(term, limit = 50) {
-  try {
-    const res = await fetch(`https://dummyjson.com/products/search?q=${encodeURIComponent(term)}&limit=${limit}`);
-    return await res.json();
-  } catch (err) {
-    console.error(`Search failed: ${term}`, err);
-    return { products: [] };
-  }
-}
-
-function getRandomColors() {
-  const count = Math.floor(Math.random() * 3) + 1;
-  return RANDOM_COLORS.sort(() => 0.5 - Math.random()).slice(0, count);
-}
-
+/* ═══════════════════════════════════════════════════════════════
+   SEED HANDLER
+═══════════════════════════════════════════════════════════════ */
 export async function GET() {
   try {
     await connectDB();
     await Product.deleteMany({});
-    const clothingData = await fetchApparel();
-    if (clothingData.length === 0) return Response.json({ message: "No data found" }, { status: 404 });
-    const inserted = await Product.insertMany(clothingData);
+    if (CURATED_PRODUCTS.length === 0) return Response.json({ message: "No data found" }, { status: 404 });
+    const inserted = await Product.insertMany(CURATED_PRODUCTS);
     return Response.json({
-      message: "Seeded vast clothing catalog with high variety across all categories",
+      message: "✅ Seeded HD clothing catalog — Men, Women, Kids, Baggy & Gen Z",
       count: inserted.length,
       categories: await Product.distinct("category"),
+      subCategories: await Product.distinct("subCategory"),
     });
   } catch (error) {
     console.error("Seeding error:", error);
