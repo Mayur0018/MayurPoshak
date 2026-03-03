@@ -2,7 +2,7 @@
 import { cookies } from "next/headers";
 import { jwtVerify } from "jose";
 import { connectDB } from "@/lib/mongodb";
-import User from "@/models/User";
+import User, { IUser } from "@/models/User";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your_super_secret_jwt_key_123456";
 
