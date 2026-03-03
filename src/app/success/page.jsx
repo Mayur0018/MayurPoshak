@@ -3,7 +3,7 @@ import React, { useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
-import { FiCheckCircle, FiArrowRight, FiPackage, FiLoader } from "react-icons/fi";
+import { FiCheckCircle, FiPackage } from "react-icons/fi";
 import confetti from "canvas-confetti";
 import { useDispatch } from "react-redux";
 import { clearCart } from "@/features/cart/cartSlice";
@@ -57,7 +57,7 @@ function SuccessContent() {
         transition={{ delay: 0.2 }}
         className="text-4xl md:text-5xl font-black text-gray-900 mb-4"
       >
-        Payment Successful
+        Payment Successful 🎉
       </motion.h1>
 
       <motion.p
@@ -66,38 +66,29 @@ function SuccessContent() {
         transition={{ delay: 0.3 }}
         className="text-gray-500 max-w-md text-lg mb-12"
       >
-        Thank you for your purchase. Your order has been received and is being processed by our artisans.
+        Thank you for your purchase! Your payment has been processed successfully.
       </motion.p>
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
-        className="flex flex-col md:flex-row gap-4 w-full max-w-md"
+        className="flex flex-col gap-4 w-full max-w-xs"
       >
         <Link
-          href="/orders"
-          className="flex-1 bg-black text-white px-8 py-4 rounded-full font-bold flex items-center justify-center gap-2 hover:bg-gray-800 transition shadow-lg"
+          href="/"
+          className="bg-[#00b050] text-white px-8 py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-[#009040] transition shadow-lg text-lg"
         >
-          <FiPackage /> View Orders
+          Back to Home
         </Link>
         <Link
-          href="/"
-          className="flex-1 border border-gray-200 text-gray-900 px-8 py-4 rounded-full font-bold flex items-center justify-center gap-2 hover:bg-gray-50 transition"
+          href="/orders"
+          className="text-gray-500 font-bold flex items-center justify-center gap-2 hover:text-black transition text-sm"
         >
-          Back to Home <FiArrowRight />
+          <FiPackage /> View Order History
         </Link>
       </motion.div>
 
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.6 }}
-        className="mt-16 p-6 bg-gray-50 rounded-3xl border border-gray-100 max-w-sm"
-      >
-        <p className="text-xs text-gray-400 font-bold uppercase tracking-widest mb-2">Confirmation</p>
-        <p className="text-sm text-gray-600">A confirmation email has been sent to your registered address with all order details.</p>
-      </motion.div>
     </div>
   );
 }
