@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { FiPackage, FiTruck, FiMapPin, FiCreditCard, FiArrowLeft, FiCheckCircle, FiClock, FiPhone } from "react-icons/fi";
-import supabase from "@/lib/supabaseClient";
 
 export default function OrderDetailPage() {
   const { id } = useParams();
@@ -15,8 +14,17 @@ export default function OrderDetailPage() {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
+      try {
+        const res = await fetch("/api/auth/me");
+        if (res.ok) {
+          const data = await res.json();
+          setUser(data);
+        } else {
+          setUser(null);
+        }
+      } catch (err) {
+        setUser(null);
+      }
     };
     fetchUser();
   }, []);
@@ -75,7 +83,7 @@ export default function OrderDetailPage() {
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
             <div>
               <p className="text-[10px] uppercase tracking-[0.3em] text-gray-400 font-bold mb-1">Order Details</p>
-              <h1 className="text-2xl font-black text-gray-900">#{order._id.toUpperCase()}</h1>
+              <h1 className="text-2xl font-black text-gray-900">#{order._id?.toUpperCase() || 'N/A'}</h1>
               <p className="text-sm text-gray-500 mt-1">Placed on {new Date(order.createdAt).toLocaleDateString("en-IN", { day: 'numeric', month: 'long', year: 'numeric' })}</p>
             </div>
             <div className={`px-4 py-2 rounded-full border text-[11px] font-bold uppercase tracking-widest flex items-center gap-2 ${
@@ -129,7 +137,7 @@ export default function OrderDetailPage() {
                     <div className="flex-1 min-w-0">
                       <h3 className="text-sm font-bold text-gray-900 truncate">{item.name}</h3>
                       <p className="text-xs text-gray-400 mt-1">Quantity: {item.quantity}</p>
-                      <p className="text-sm font-black mt-2">₹{item.price.toLocaleString("en-IN")}</p>
+                      <p className="text-sm font-black mt-2">₹{(Number(item.price) || 0).toLocaleString("en-IN")}</p>
                     </div>
                   </div>
                 ))}
@@ -161,7 +169,7 @@ export default function OrderDetailPage() {
                 <div className="space-y-2 border-t border-gray-50 pt-4">
                   <div className="flex justify-between text-xs text-gray-500">
                     <span>Items Subtotal</span>
-                    <span>₹{order.itemsPrice.toLocaleString("en-IN")}</span>
+                    <span>₹{(Number(order.itemsPrice) || 0).toLocaleString("en-IN")}</span>
                   </div>
                   <div className="flex justify-between text-xs text-gray-500">
                     <span>Shipping</span>
@@ -169,7 +177,7 @@ export default function OrderDetailPage() {
                   </div>
                   <div className="flex justify-between text-sm font-black text-gray-900 pt-2 border-t border-gray-50">
                     <span>Total Paid</span>
-                    <span>₹{order.totalPrice.toLocaleString("en-IN")}</span>
+                    <span>₹{(Number(order.totalPrice) || 0).toLocaleString("en-IN")}</span>
                   </div>
                 </div>
               </div>

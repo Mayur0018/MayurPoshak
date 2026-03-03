@@ -1,5 +1,5 @@
 import Stripe from 'stripe';
-import { getSupabaseServer } from "@/lib/supabase/server";
+import { getUserFromRequest } from "@/lib/auth";
 
 export async function POST(request) {
   try {
@@ -11,8 +11,7 @@ export async function POST(request) {
 
     const stripe = new Stripe(stripeSecret);
 
-    const supabase = await getSupabaseServer();
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getUserFromRequest();
 
     if (!user) {
       return Response.json({ error: "Unauthorized" }, { status: 401 });

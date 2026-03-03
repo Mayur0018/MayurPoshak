@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useSelector, useDispatch } from "react-redux";
 import { motion, AnimatePresence } from "framer-motion";
-import { decrementQty, incrementQty, removeFromCart } from "@/redux/cartSlice";
+import { decrementQty, incrementQty, removeFromCart } from "@/features/cart/cartSlice";
 import { loadStripe } from "@stripe/stripe-js";
 import { RxCross1 } from "react-icons/rx";
 import { FiShoppingCart, FiArrowRight } from "react-icons/fi";

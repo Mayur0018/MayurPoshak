@@ -18,30 +18,31 @@ export default function Signin() {
     setError("");
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) {
-        setError(error.message);
-        toast.error(error.message);
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.message || "Sign in failed");
+        toast.error(data.message || "Sign in failed");
         return;
       }
 
-      // If sign-in returns a session, redirect to profile
-      if (data?.session) {
-        // Trigger WhatsApp Notification for Login
-        await fetch("/api/notify", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ messageType: "login", userEmail: email }),
-        });
+      // Trigger WhatsApp Notification for Login
+      fetch("/api/notify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messageType: "login", userEmail: email }),
+      }).catch(err => console.error("Notification failed:", err));
 
-        toast.success("Signed in");
-        router.push("/profile");
-      } else {
-        // For magiclink or other flows
-        toast.success("Check your email for sign-in link");
-      }
+      toast.success("Signed in");
+      window.location.href = "/profile"; // Hard redirect to refresh auth state
     } catch (err) {
-      const msg = err?.message || "Sign in failed";
+      const msg = "Sign in failed";
       setError(msg);
       toast.error(msg);
     }

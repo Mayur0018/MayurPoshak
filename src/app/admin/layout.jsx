@@ -1,5 +1,8 @@
-import { getSupabaseServer } from "@/lib/supabase/server";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { jwtVerify } from "jose";
+
+const JWT_SECRET = process.env.JWT_SECRET || "your_super_secret_jwt_key_123456";
 
 export const metadata = {
   title: "Admin • Mayur Poshak",
@@ -7,11 +10,25 @@ export const metadata = {
 };
 
 export default async function AdminLayout({ children }) {
-  const supabase = await getSupabaseServer();
-  const { data: { user } } = await supabase.auth.getUser();
+  const cookieStore = await cookies();
+  const token = cookieStore.get("token")?.value;
 
-  if (!user || user.user_metadata?.role !== 'admin') {
-    redirect('/');
+  let isAdmin = false;
+
+  if (token) {
+    try {
+      const secret = new TextEncoder().encode(JWT_SECRET);
+      const { payload } = await jwtVerify(token, secret);
+      if (payload && payload.role === 'admin') {
+        isAdmin = true;
+      }
+    } catch (error) {
+      console.error("Admin layout auth error:", error);
+    }
+  }
+
+  if (!isAdmin) {
+    redirect('/Signin');
   }
   return (
     <div className="min-h-screen bg-gray-50">

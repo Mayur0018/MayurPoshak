@@ -4,13 +4,14 @@ import { CiMenuFries, CiUser } from "react-icons/ci";
 import { IoSearchOutline, IoLogOutOutline } from "react-icons/io5";
 import { TbShoppingBag } from "react-icons/tb";
 import { RxCross1 } from "react-icons/rx";
+import { MdAdminPanelSettings } from "react-icons/md";
 import { FaFacebookF, FaHeart, FaRegHeart } from "react-icons/fa";
 import { FaInstagram } from "react-icons/fa6";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { useSelector, useDispatch } from "react-redux";
-import { openCartSidebar } from "@/redux/cartSlice";
+import { openCartSidebar } from "@/features/cart/cartSlice";
 import supabase from "@/lib/supabaseClient";
 import SearchOverlay from "../features/SearchOverlay";
 
@@ -82,38 +83,38 @@ const Header = () => {
   /* ---------------- auth ---------------- */
   useEffect(() => {
     const getUser = async () => {
-      const { data } = await supabase.auth.getUser();
-      setUser(data?.user || null);
+      try {
+        const res = await fetch("/api/auth/me");
+        if (res.ok) {
+          const data = await res.json();
+          setUser(data);
+        } else {
+          setUser(null);
+        }
+      } catch (err) {
+        setUser(null);
+      }
     };
 
     getUser();
-    const { data: authListener } = supabase.auth.onAuthStateChange(getUser);
-
-    return () => authListener?.subscription?.unsubscribe();
+    // Polling or event based updates could be added here, 
+    // but for now we'll rely on hard redirects on login/logout
   }, []);
 
   /* ---------------- logout ---------------- */
   const handleLogout = async () => {
-    // Immediate feedback could be added here if needed, but Header logout usually redirects directly
-    const logoutActions = async () => {
-      try {
-        await Promise.allSettled([
-          supabase.auth.signOut(),
-          fetch("/api/auth/signout", { method: "POST" })
-        ]);
-        window.localStorage.clear();
-      } catch (err) {
-        console.error("Logout cleanup error:", err);
-      } finally {
-        window.location.replace("/");
-      }
-    };
-
-    logoutActions();
-    // Fail-safe redirect for consistency
-    setTimeout(() => {
-      window.location.replace("/");
-    }, 1500);
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+      // Also sign out from supabase if session exists (backward compatibility)
+      try { await supabase.auth.signOut(); } catch(e) {}
+      
+      window.localStorage.clear();
+      toast.success("Logged out successfully");
+      window.location.href = "/";
+    } catch (err) {
+      console.error("Logout error:", err);
+      window.location.href = "/";
+    }
   };
   // Lively Logout handling 
 
@@ -157,6 +158,15 @@ const Header = () => {
           <div className="flex items-center gap-4 lg:gap-6">
             {user ? (
               <div className="flex items-center gap-4">
+                {user.role === 'admin' && (
+                  <Link 
+                    href="/admin" 
+                    className="hidden xl:flex items-center gap-1.5 px-3 py-1.5 bg-black text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-full hover:bg-gray-800 transition shadow-sm"
+                  >
+                    <MdAdminPanelSettings className="text-xs" />
+                    Admin
+                  </Link>
+                )}
                 <Link
                   href="/profile"
                   className="flex items-center gap-2 hover:opacity-70 transition"
@@ -363,10 +373,26 @@ const Header = () => {
                         className="w-8 h-8 rounded-full"
                         alt="user"
                       />
-                      <span className="text-sm font-medium truncate">
-                        {user.email.split("@")[0]}
-                      </span>
+                      <div className="flex flex-col min-w-0">
+                        <span className="text-sm font-medium truncate">
+                          {user.email.split("@")[0]}
+                        </span>
+                        {user.role === 'admin' && (
+                          <span className="text-[10px] font-black uppercase text-blue-600 tracking-widest">Administrator</span>
+                        )}
+                      </div>
                     </Link>
+
+                    {user.role === 'admin' && (
+                      <Link
+                        href="/admin"
+                        onClick={() => setMenuopen(false)}
+                        className="flex items-center gap-2 p-3 bg-blue-50 text-blue-700 font-bold text-sm w-full rounded-lg hover:bg-blue-100 transition"
+                      >
+                        <MdAdminPanelSettings className="text-xl" />
+                        Admin Dashboard
+                      </Link>
+                    )}
                     <button
                       onClick={handleLogout}
                       className="flex items-center gap-2 p-3 text-red-600 font-bold text-sm w-full justify-center bg-red-50 rounded-lg hover:bg-red-100 transition active:scale-95"

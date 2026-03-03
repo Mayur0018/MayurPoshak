@@ -4,10 +4,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { useDispatch } from "react-redux";
 import { motion, AnimatePresence } from "framer-motion";
-import { addToCart } from "@/redux/cartSlice";
+import { addToCart } from "@/features/cart/cartSlice";
 import { FiHeart, FiShoppingCart, FiTrash2, FiArrowRight } from "react-icons/fi";
 import toast, { Toaster } from "react-hot-toast";
-import supabase from "@/lib/supabaseClient";
 
 export default function WishlistPage() {
   const [wishlist, setWishlist] = useState([]);
@@ -17,8 +16,17 @@ export default function WishlistPage() {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
+      try {
+        const res = await fetch("/api/auth/me");
+        if (res.ok) {
+          const data = await res.json();
+          setUser(data);
+        } else {
+          setUser(null);
+        }
+      } catch (err) {
+        setUser(null);
+      }
     };
     fetchUser();
   }, []);
@@ -164,7 +172,7 @@ export default function WishlistPage() {
                         </h3>
                       </div>
                       <p className="text-sm font-black text-gray-900">
-                        ₹{item.productId.price.toLocaleString("en-IN")}
+                        ₹{(Number(item.productId?.price) || 0).toLocaleString("en-IN")}
                       </p>
                     </div>
 

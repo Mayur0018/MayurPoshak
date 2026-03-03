@@ -3,7 +3,6 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { AiFillStar, AiOutlineStar, AiOutlineCamera, AiOutlineClose } from "react-icons/ai";
 import { motion, AnimatePresence } from "framer-motion";
-import supabase from "@/lib/supabaseClient";
 import toast from "react-hot-toast";
 
 const ReviewSection = ({ productId }) => {
@@ -23,22 +22,28 @@ const ReviewSection = ({ productId }) => {
   }, [productId]);
 
   const checkUser = async () => {
-    const { data } = await supabase.auth.getUser();
-    setUser(data?.user || null);
+    try {
+      const res = await fetch("/api/auth/me");
+      if (res.ok) {
+        const data = await res.json();
+        setUser(data);
+      } else {
+        setUser(null);
+      }
+    } catch (err) {
+      setUser(null);
+    }
   };
 
   const fetchReviews = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/reviews?product_id=${productId}`);
+      const res = await fetch(`/api/reviews?productId=${productId}`);
       const data = await res.json();
       if (res.ok) {
         setReviews(data);
       } else {
-        console.error("Failed to fetch reviews:", data.error);
-        if (data.error?.includes("bigint")) {
-           toast.error("Database error: Product ID mismatch. Please check Supabase schema.");
-        }
+        console.error("Failed to fetch reviews:", data.message);
       }
     } catch (error) {
       console.error("Error fetching reviews:", error);
@@ -88,7 +93,7 @@ const ReviewSection = ({ productId }) => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          product_id: productId,
+          productId: productId,
           rating,
           title,
           comment,
@@ -106,7 +111,7 @@ const ReviewSection = ({ productId }) => {
         setComment("");
         setImages([]);
       } else {
-        toast.error(data.error || "Failed to submit review");
+        toast.error(data.message || "Failed to submit review");
       }
     } catch (error) {
       toast.error("Submission failed");
@@ -245,13 +250,13 @@ const ReviewSection = ({ productId }) => {
             <div key={rev.id} className="border-b pb-8 last:border-0">
               <div className="flex items-center gap-3 mb-4">
                 <img
-                  src={rev.users?.avatar_url || `https://ui-avatars.com/api/?name=${rev.users?.full_name || 'User'}`}
+                  src={`https://ui-avatars.com/api/?name=${rev.user?.name || 'User'}`}
                   className="w-10 h-10 rounded-full object-cover"
                   alt="avatar"
                 />
                 <div>
                   <h4 className="text-sm font-bold text-slate-900">
-                    {rev.users?.full_name || rev.users?.email?.split('@')[0] || "Verified Customer"}
+                    {rev.user?.name || rev.user?.email?.split('@')[0] || "Verified Customer"}
                   </h4>
                   <div className="flex items-center gap-2">
                     <div className="flex text-yellow-400 text-xs">
@@ -279,7 +284,7 @@ const ReviewSection = ({ productId }) => {
               )}
               
               <p className="text-[10px] text-slate-400 mt-2">
-                Reviewed on {new Date(rev.created_at).toLocaleDateString()}
+                Reviewed on {new Date(rev.createdAt).toLocaleDateString()}
               </p>
             </div>
           ))

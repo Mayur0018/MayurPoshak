@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useDispatch } from "react-redux";
-import { addToCart } from "@/redux/cartSlice";
+import { addToCart } from "@/features/cart/cartSlice";
 import Link from "next/link";
 import { useEffect, useState, useRef } from "react";
 import ReviewSection from "./ReviewSection";
@@ -10,7 +10,6 @@ import { FiHeart, FiShare2, FiShield, FiRotateCcw, FiTruck, FiInfo, FiChevronDow
 import { FaHeart, FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import supabase from "@/lib/supabaseClient";
 import RecentlyViewed from "./RecentlyViewed";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -91,14 +90,19 @@ export default function ProductDetails({ product, relatedProducts = [] }) {
 
   useEffect(() => {
     const checkWishlist = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user && product) {
-        const id = product._id || product.id;
-        const res = await fetch("/api/wishlist");
-        const data = await res.json();
-        if (Array.isArray(data)) {
-          setIsWishlisted(data.some((w) => w.productId?._id === id || w.productId === id));
+      try {
+        const res = await fetch("/api/auth/me");
+        if (res.ok) {
+          const user = await res.json();
+          const id = product._id || product.id;
+          const wishlistRes = await fetch("/api/wishlist");
+          const data = await wishlistRes.json();
+          if (Array.isArray(data)) {
+            setIsWishlisted(data.some((w) => w.productId?._id === id || w.productId === id));
+          }
         }
+      } catch (err) {
+        console.error("Wishlist check error:", err);
       }
     };
     checkWishlist();
@@ -125,24 +129,34 @@ export default function ProductDetails({ product, relatedProducts = [] }) {
   }, [product, loading]);
 
   const toggleWishlist = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      toast.error("Please sign in to add to wishlist");
-      router.push("/Signin");
-      return;
-    }
-    const productId = product._id || product.id;
     try {
+      const res = await fetch("/api/auth/me");
+      if (!res.ok) {
+        toast.error("Please sign in to add to wishlist");
+        router.push("/Signin");
+        return;
+      }
+      const productId = product._id || product.id;
       if (isWishlisted) {
-        await fetch("/api/wishlist", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ productId }) });
+        await fetch("/api/wishlist", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ productId }),
+        });
         setIsWishlisted(false);
         toast.success("Removed from wishlist");
       } else {
-        await fetch("/api/wishlist", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ productId }) });
+        await fetch("/api/wishlist", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ productId }),
+        });
         setIsWishlisted(true);
         toast.success("Added to wishlist");
       }
-    } catch (err) { toast.error("Wishlist operation failed"); }
+    } catch (err) {
+      toast.error("Wishlist operation failed");
+    }
   };
 
   const handleAddtoCart = () => {
@@ -262,6 +276,31 @@ export default function ProductDetails({ product, relatedProducts = [] }) {
              </div>
              
              <StarRating rating={product.rating || 4.5} count={product.reviewsCount || 12} />
+
+             {/* SKU & Stock Status */}
+             <div className="flex flex-wrap items-center gap-3 mt-1">
+               {product.sku && (
+                 <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest bg-gray-50 px-3 py-1 rounded-full border border-gray-100">
+                   SKU: {product.sku}
+                 </span>
+               )}
+               <span className={`text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full border flex items-center gap-1.5 ${
+                 product.stock > 5
+                   ? 'bg-green-50 text-green-600 border-green-100'
+                   : product.stock > 0
+                     ? 'bg-amber-50 text-amber-600 border-amber-100'
+                     : 'bg-red-50 text-red-500 border-red-100'
+               }`}>
+                 <span className={`w-1.5 h-1.5 rounded-full ${
+                   product.stock > 5 ? 'bg-green-500' : product.stock > 0 ? 'bg-amber-500' : 'bg-red-500'
+                 }`} />
+                 {product.stock > 5
+                   ? 'In Stock'
+                   : product.stock > 0
+                     ? `Only ${product.stock} left`
+                     : 'Out of Stock'}
+               </span>
+             </div>
           </header>
 
           <div className="space-y-1">

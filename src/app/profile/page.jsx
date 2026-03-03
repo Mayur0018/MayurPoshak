@@ -25,22 +25,32 @@ export default function ProfilePage() {
   useEffect(() => {
     let mounted = true;
     async function init() {
-      const { data, error } = await supabase.auth.getUser();
-      if (!mounted) return;
-      if (error || !data?.user) {
-        router.push("/Signin");
-        return;
+      try {
+        const res = await fetch("/api/auth/me");
+        if (!mounted) return;
+        
+        if (!res.ok) {
+          router.push("/Signin");
+          return;
+        }
+
+        const userData = await res.json();
+        setUser(userData);
+
+        // Fetch orders from existing API
+        const ordsRes = await fetch("/api/orders").then(res => res.json());
+        if (mounted) {
+          setOrders(Array.isArray(ordsRes) ? ordsRes : []);
+          
+          // Legacy: Fetch addresses from Supabase if still available
+          const { data: addrs } = await supabase.from("addresses").select("*").eq("user_id", userData._id).order("is_default", { ascending: false });
+          setAddresses(addrs ?? []);
+          
+          setLoading(false);
+        }
+      } catch (err) {
+        if (mounted) router.push("/Signin");
       }
-      setUser(data.user);
-      const uid = data.user.id;
-      const [{ data: addrs }, ordsRes] = await Promise.all([
-        supabase.from("addresses").select("*").eq("user_id", uid).order("is_default", { ascending: false }),
-        fetch("/api/orders").then(res => res.json())
-      ]);
-      
-      setOrders(Array.isArray(ordsRes) ? ordsRes : []);
-      setAddresses(addrs ?? []);
-      setLoading(false);
     }
     init();
     return () => { mounted = false; };
@@ -48,27 +58,15 @@ export default function ProfilePage() {
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
-    
-    // Non-blocking logout flow
-    const logoutActions = async () => {
-      try {
-        await Promise.allSettled([
-          supabase.auth.signOut(),
-          fetch("/api/auth/signout", { method: "POST" })
-        ]);
-        window.localStorage.clear();
-      } catch (err) {
-        console.error("Logout cleanup error:", err);
-      } finally {
-        window.location.replace("/");
-      }
-    };
-
-    // Trigger logout and ensure a fail-safe redirect after 1.5s max
-    logoutActions();
-    setTimeout(() => {
-      window.location.replace("/");
-    }, 1500);
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+      try { await supabase.auth.signOut(); } catch (e) {} // Compatibility
+      window.localStorage.clear();
+      window.location.href = "/";
+    } catch (err) {
+      console.error("Logout error:", err);
+      window.location.href = "/";
+    }
   };
 
   if (isLoggingOut) {
@@ -88,8 +86,8 @@ export default function ProfilePage() {
     );
   }
 
-  const avatar = user.user_metadata?.avatar_url || `https://ui-avatars.com/api/?name=${user.email}&background=000&color=fff`;
-  const fullName = user.user_metadata?.full_name || user.email.split('@')[0];
+  const avatar = `https://ui-avatars.com/api/?name=${user.name || user.email}&background=000&color=fff`;
+  const fullName = user.name || user.email.split('@')[0];
 
   const MenuItems = [
     { id: "overview", label: "Dashboard", icon: TfiUser },
@@ -188,18 +186,25 @@ export default function ProfilePage() {
                    <div className="mt-12">
                       <h3 className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-400 mb-6">Recent Activity</h3>
                       {orders.slice(0, 1).map((order) => (
-                        <div key={order._id || Math.random()} className="flex items-center justify-between p-6 border border-gray-100 rounded-2xl">
+                        <Link 
+                          key={order._id || Math.random()} 
+                          href={`/orders/${order._id}`}
+                          className="flex items-center justify-between p-6 border border-gray-100 rounded-2xl hover:border-black transition-all group block shadow-sm hover:shadow-md"
+                        >
                            <div className="flex items-center gap-4">
-                              <div className="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center">
-                                 <TfiPackage className="text-gray-900" />
+                              <div className="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center group-hover:bg-black transition-colors">
+                                 <TfiPackage className="text-gray-900 group-hover:text-white transition-colors" />
                               </div>
                               <div>
                                  <p className="text-xs font-bold uppercase tracking-widest">Order #{order._id?.slice(-6) || 'N/A'}</p>
                                  <p className="text-[10px] text-gray-400 mt-0.5">{new Date(order.createdAt || order.created_at).toLocaleDateString()}</p>
                               </div>
                            </div>
-                           <p className="text-xs font-black tracking-widest uppercase text-indigo-600">{order.status}</p>
-                        </div>
+                           <div className="flex items-center gap-4">
+                             <p className="text-xs font-black tracking-widest uppercase text-indigo-600">{order.status}</p>
+                             <TfiAngleRight className="text-[10px] text-gray-300 group-hover:translate-x-1 transition-transform" />
+                           </div>
+                        </Link>
                       ))}
                    </div>
                 </div>
@@ -226,7 +231,7 @@ export default function ProfilePage() {
                            </div>
                            <div className="flex items-center justify-between md:flex-col md:items-end gap-2 pr-4">
                               <p className="text-2xl font-extralight tracking-tighter">₹{Number(order.totalPrice).toLocaleString('en-IN')}</p>
-                              <button className="text-[10px] font-black uppercase tracking-widest text-black underline underline-offset-4 hover:text-gray-400 transition">View Details</button>
+                              <Link href={`/orders/${order._id}`} className="text-[10px] font-black uppercase tracking-widest text-black underline underline-offset-4 hover:text-gray-400 transition">View Details</Link>
                            </div>
                         </div>
                       )) : (

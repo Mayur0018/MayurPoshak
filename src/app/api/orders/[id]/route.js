@@ -1,17 +1,16 @@
 import { connectDB } from "@/lib/mongodb";
 import Order from "@/models/Order";
-import { getSupabaseServer } from "@/lib/supabase/server";
+import { getUserFromRequest } from "@/lib/auth";
 
 export async function GET(request, context) {
   try {
-    await connectDB();
-    const supabase = await getSupabaseServer();
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getUserFromRequest();
     
     if (!user) {
       return Response.json({ message: "Unauthorized" }, { status: 401 });
     }
 
+    await connectDB();
     const { id } = await context.params;
     const order = await Order.findById(id).populate("orderItems.product");
 
@@ -33,14 +32,13 @@ export async function GET(request, context) {
 // For Order Cancellation
 export async function PUT(request, context) {
   try {
-    await connectDB();
-    const supabase = await getSupabaseServer();
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getUserFromRequest();
     
     if (!user) {
       return Response.json({ message: "Unauthorized" }, { status: 401 });
     }
 
+    await connectDB();
     const { id } = await context.params;
     const { status } = await request.json(); // Usually "Cancelled"
 

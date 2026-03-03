@@ -17,36 +17,35 @@ export default function Register() {
     e.preventDefault();
 
     try {
-      const { data, error } = await supabase.auth.signUp({ 
-        email, 
-        password,
-        options: {
-          data: {
-            full_name: fullName,
-            phone: phoneNumber, // Added
-          }
-        }
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          name: fullName, 
+          email, 
+          password, 
+          phone: phoneNumber 
+        }),
       });
-      if (error) {
-        toast.error(error.message);
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        toast.error(data.message || "Registration failed");
         return;
       }
 
       // Trigger WhatsApp Notification for New User
-      await fetch("/api/notify", {
+      fetch("/api/notify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ messageType: "register", userEmail: email }),
-      });
+      }).catch(err => console.error("Notification failed:", err));
 
-      if (data?.user || data?.session) {
-        toast.success("Signup successful — redirecting...");
-        router.push("/profile");
-      } else {
-        toast.success("Signup successful — check your email to confirm");
-      }
+      toast.success("Signup successful — redirecting...");
+      window.location.href = "/profile";
     } catch (err) {
-      toast.error(err?.message || "Registration failed");
+      toast.error("Registration failed");
     }
   };
 

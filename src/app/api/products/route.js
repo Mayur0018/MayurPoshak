@@ -30,8 +30,9 @@ export async function GET(request) {
     if (subCategories.length === 1) query.subCategory = subCategories[0];
     else if (subCategories.length > 1) query.subCategory = { $in: subCategories };
 
-    const brand = searchParams.get("brand");
-    if (brand) query.brand = brand;
+    const brands = searchParams.getAll("brand");
+    if (brands.length === 1) query.brand = brands[0];
+    else if (brands.length > 1) query.brand = { $in: brands };
 
     const color = searchParams.getAll("color");
     if (color.length > 0) query.color = { $in: color };
@@ -53,6 +54,12 @@ export async function GET(request) {
       query.stock = { $gt: 0 };
     } else if (availability === "out-of-stock") {
       query.stock = { $lte: 0 };
+    }
+
+    // Rating
+    const minRating = searchParams.get("minRating");
+    if (minRating) {
+      query.rating = { $gte: Number(minRating) };
     }
 
     // Sorting

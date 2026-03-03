@@ -6,7 +6,6 @@ import { useSelector } from "react-redux";
 import { motion } from "framer-motion";
 import { loadStripe } from "@stripe/stripe-js";
 import { FiArrowLeft, FiLock, FiTruck, FiMapPin, FiPhone } from "react-icons/fi";
-import supabase from "@/lib/supabaseClient";
 
 export default function CheckoutPage() {
   const cartItems = useSelector((state) => state.cart.cartItems);
@@ -59,8 +58,17 @@ export default function CheckoutPage() {
   useEffect(() => {
     setMounted(true);
     const fetchUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
+      try {
+        const res = await fetch("/api/auth/me");
+        if (res.ok) {
+          const data = await res.json();
+          setUser(data);
+        } else {
+          setUser(null);
+        }
+      } catch (err) {
+        setUser(null);
+      }
     };
     fetchUser();
   }, []);
@@ -93,7 +101,7 @@ export default function CheckoutPage() {
         body: JSON.stringify({ 
           cartItems, 
           shippingDetails,
-          userId: user.id,
+          userId: user._id,
           couponId: appliedCoupon?.couponId
         }),
       });

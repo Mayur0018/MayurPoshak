@@ -5,7 +5,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Partnership } from "@/Data/Partnership";
 import { summerimg } from "@/Data/summerimg";
-import { addToCart } from "@/redux/cartSlice";
+import { addToCart } from "@/features/cart/cartSlice";
 import { useDispatch } from "react-redux";
 import toast, { Toaster } from "react-hot-toast";
 import supabase from "@/lib/supabaseClient";

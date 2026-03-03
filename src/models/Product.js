@@ -17,6 +17,7 @@ const productSchema = new mongoose.Schema({
   }, // Dynamic key-value pairs (e.g., Fabric: Silk, Work: Zari)
   size: [String],
   color: [String],
+  sku: { type: String, default: function() { return 'MP-' + Math.random().toString(36).substring(2, 8).toUpperCase(); } },
   stock: { type: Number, default: 10 },
   rating: { type: Number, default: 4.5 },
   reviewsCount: { type: Number, default: 12 },

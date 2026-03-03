@@ -1,18 +1,16 @@
 import { connectDB } from "@/lib/mongodb";
 import Wishlist from "@/models/Wishlist";
-import Product from "@/models/Product";
-import { getSupabaseServer } from "@/lib/supabase/server";
+import { getUserFromRequest } from "@/lib/auth";
 
 export async function GET(request) {
   try {
-    await connectDB();
-    const supabase = await getSupabaseServer();
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getUserFromRequest();
     
     if (!user) {
       return Response.json({ message: "Unauthorized" }, { status: 401 });
     }
 
+    await connectDB();
     const wishlistItems = await Wishlist.find({ userId: user.id }).populate("productId");
     return Response.json(wishlistItems);
   } catch (error) {
@@ -22,9 +20,7 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
-    await connectDB();
-    const supabase = await getSupabaseServer();
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getUserFromRequest();
     
     if (!user) {
       return Response.json({ message: "Unauthorized" }, { status: 401 });
@@ -35,6 +31,7 @@ export async function POST(request) {
       return Response.json({ message: "Product ID is required" }, { status: 400 });
     }
 
+    await connectDB();
     const wishlistItem = await Wishlist.create({ userId: user.id, productId });
     return Response.json(wishlistItem, { status: 201 });
   } catch (error) {
@@ -47,9 +44,7 @@ export async function POST(request) {
 
 export async function DELETE(request) {
   try {
-    await connectDB();
-    const supabase = await getSupabaseServer();
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getUserFromRequest();
     
     if (!user) {
       return Response.json({ message: "Unauthorized" }, { status: 401 });
@@ -60,6 +55,7 @@ export async function DELETE(request) {
       return Response.json({ message: "Product ID is required" }, { status: 400 });
     }
 
+    await connectDB();
     await Wishlist.findOneAndDelete({ userId: user.id, productId });
     return Response.json({ message: "Removed from wishlist" });
   } catch (error) {

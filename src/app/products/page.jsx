@@ -62,6 +62,23 @@ const filters = [
       { value: "pink", label: "Pink" },
     ],
   },
+  {
+    id: "brand",
+    name: "Brand",
+    options: [
+      { value: "Mayur Poshak", label: "Mayur Poshak" },
+      { value: "Raymond", label: "Raymond" },
+      { value: "Peter England", label: "Peter England" },
+      { value: "Van Heusen", label: "Van Heusen" },
+      { value: "Allen Solly", label: "Allen Solly" },
+    ],
+  },
+];
+
+const ratingOptions = [
+  { value: 4, label: "4★ & above" },
+  { value: 3, label: "3★ & above" },
+  { value: 2, label: "2★ & above" },
 ];
 
 function classNames(...classes) {
@@ -84,8 +101,10 @@ function ProductsContent() {
     category: [],
     size: [],
     color: [],
+    brand: [],
     sort: "createdAt"
   });
+  const [minRating, setMinRating] = useState(0);
 
   const handleFilterChange = (sectionId, value) => {
     setSelectedFilters((prev) => {
@@ -105,6 +124,7 @@ function ProductsContent() {
         if (searchTerm) url += `&search=${encodeURIComponent(searchTerm)}`;
         if (priceRange < 25000) url += `&maxPrice=${priceRange}`;
         if (availability !== "all") url += `&availability=${availability}`;
+        if (minRating > 0) url += `&minRating=${minRating}`;
         
         if (selectedFilters.category.length > 0) {
            selectedFilters.category.forEach(c => url += `&category=${c}`);
@@ -114,6 +134,9 @@ function ProductsContent() {
         }
         if (selectedFilters.color.length > 0) {
           selectedFilters.color.forEach(c => url += `&color=${encodeURIComponent(c)}`);
+        }
+        if (selectedFilters.brand.length > 0) {
+          selectedFilters.brand.forEach(b => url += `&brand=${encodeURIComponent(b)}`);
         }
         
         const res = await fetch(url);
@@ -126,7 +149,7 @@ function ProductsContent() {
       }
     };
     fetchProducts();
-  }, [selectedFilters, searchTerm, priceRange, availability]);
+  }, [selectedFilters, searchTerm, priceRange, availability, minRating]);
 
   // Sync searchTerm when URL param changes
   useEffect(() => {
@@ -134,16 +157,18 @@ function ProductsContent() {
   }, [searchParams]);
 
   const clearFilters = () => {
-    setSelectedFilters({ category: [], size: [], color: [], sort: "createdAt" });
+    setSelectedFilters({ category: [], size: [], color: [], brand: [], sort: "createdAt" });
     setSearchTerm("");
     setPriceRange(25000);
     setAvailability("all");
+    setMinRating(0);
   };
 
   const removeFilter = (key, value) => {
     if (key === 'search') setSearchTerm("");
     else if (key === 'maxPrice') setPriceRange(25000);
     else if (key === 'availability') setAvailability("all");
+    else if (key === 'rating') setMinRating(0);
     else {
       setSelectedFilters(prev => ({
         ...prev,
@@ -152,7 +177,7 @@ function ProductsContent() {
     }
   };
 
-  const hasActiveFilters = searchTerm || priceRange < 25000 || availability !== "all" || Object.values(selectedFilters).some(v => Array.isArray(v) ? v.length > 0 : false);
+  const hasActiveFilters = searchTerm || priceRange < 25000 || availability !== "all" || minRating > 0 || Object.values(selectedFilters).some(v => Array.isArray(v) ? v.length > 0 : false);
 
 
   return (
@@ -364,6 +389,14 @@ function ProductsContent() {
               </div>
             )}
 
+            {minRating > 0 && (
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 border border-gray-100 rounded-full group hover:border-black transition cursor-pointer" onClick={() => removeFilter('rating')}>
+                <span className="text-[10px] text-gray-400 font-bold uppercase">Rating:</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest">{minRating}★ & above</span>
+                <XMarkIcon className="h-3 w-3 text-gray-300 group-hover:text-black" />
+              </div>
+            )}
+
             {Object.entries(selectedFilters).map(([key, vals]) => 
               Array.isArray(vals) && vals.map(val => (
                 <div key={`${key}-${val}`} className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 border border-gray-100 rounded-full group hover:border-black transition cursor-pointer" onClick={() => removeFilter(key, val)}>
@@ -484,6 +517,27 @@ function ProductsContent() {
                   </DisclosurePanel>
                 </Disclosure>
               ))}
+
+              {/* Rating Filter */}
+              <div className="border-b border-gray-100 py-6">
+                <h3 className="text-[10px] font-bold text-gray-900 uppercase tracking-[0.2em] mb-4">Rating</h3>
+                <div className="space-y-3">
+                  {ratingOptions.map((opt) => (
+                    <div key={opt.value} className="flex items-center group cursor-pointer" onClick={() => setMinRating(minRating === opt.value ? 0 : opt.value)}>
+                      <div className={classNames(
+                        minRating === opt.value ? "bg-black border-black" : "border-gray-200 bg-white",
+                        "w-4 h-4 rounded border flex items-center justify-center transition-all duration-300"
+                      )}>
+                        {minRating === opt.value && <CheckIcon className="h-3 w-3 text-white" />}
+                      </div>
+                      <span className={classNames(
+                        minRating === opt.value ? "text-black font-bold" : "text-gray-500",
+                        "ml-3 text-xs uppercase tracking-widest transition-all group-hover:text-black"
+                      )}>{opt.label}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
               
               <button 
                 onClick={clearFilters}

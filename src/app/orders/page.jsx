@@ -4,7 +4,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiPackage, FiTruck, FiChevronRight, FiClock, FiShoppingBag } from "react-icons/fi";
-import supabase from "@/lib/supabaseClient";
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState([]);
@@ -13,8 +12,17 @@ export default function OrdersPage() {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
+      try {
+        const res = await fetch("/api/auth/me");
+        if (res.ok) {
+          const data = await res.json();
+          setUser(data);
+        } else {
+          setUser(null);
+        }
+      } catch (err) {
+        setUser(null);
+      }
     };
     fetchUser();
   }, []);
@@ -112,7 +120,7 @@ export default function OrdersPage() {
                     <div className="w-full md:w-1/4 space-y-4">
                       <div className="flex flex-col gap-1">
                         <span className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Order ID</span>
-                        <span className="text-sm font-mono text-gray-600">#{order._id.slice(-8).toUpperCase()}</span>
+                        <span className="text-sm font-mono text-gray-600">#{order._id?.slice(-8).toUpperCase() || 'N/A'}</span>
                       </div>
                       <div className="flex flex-col gap-1">
                         <span className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Placed On</span>
@@ -122,7 +130,7 @@ export default function OrdersPage() {
                       </div>
                       <div className="flex flex-col gap-1">
                         <span className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Total Amount</span>
-                        <span className="text-lg font-black text-gray-900">₹{order.totalPrice.toLocaleString("en-IN")}</span>
+                        <span className="text-lg font-black text-gray-900">₹{(Number(order.totalPrice) || 0).toLocaleString("en-IN")}</span>
                       </div>
                       <div className={`px-3 py-1 rounded-full border text-[10px] font-bold uppercase tracking-widest w-fit inline-flex items-center gap-1.5 ${getStatusColor(order.status)}`}>
                         <div className="w-1.5 h-1.5 rounded-full bg-current" />

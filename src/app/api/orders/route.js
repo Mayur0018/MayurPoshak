@@ -1,17 +1,16 @@
 import { connectDB } from "@/lib/mongodb";
 import Order from "@/models/Order";
-import { getSupabaseServer } from "@/lib/supabase/server";
+import { getUserFromRequest } from "@/lib/auth";
 
 export async function GET(request) {
   try {
-    await connectDB();
-    const supabase = await getSupabaseServer();
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getUserFromRequest();
     
     if (!user) {
       return Response.json({ message: "Unauthorized" }, { status: 401 });
     }
 
+    await connectDB();
     const orders = await Order.find({ userId: user.id }).sort({ createdAt: -1 });
     return Response.json(orders);
   } catch (error) {
@@ -21,9 +20,7 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
-    await connectDB();
-    const supabase = await getSupabaseServer();
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getUserFromRequest();
     
     if (!user) {
       return Response.json({ message: "Unauthorized" }, { status: 401 });
@@ -42,6 +39,7 @@ export async function POST(request) {
       return Response.json({ message: "No order items" }, { status: 400 });
     }
 
+    await connectDB();
     const order = new Order({
       userId: user.id,
       orderItems,

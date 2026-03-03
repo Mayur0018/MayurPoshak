@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
-import supabase from "@/lib/supabaseClient";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 
@@ -10,14 +9,13 @@ export const useWishlist = () => {
   const router = useRouter();
 
   const fetchWishlist = useCallback(async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      setWishlist([]);
-      setLoading(false);
-      return;
-    }
-
     try {
+      const authRes = await fetch("/api/auth/me");
+      if (!authRes.ok) {
+        setWishlist([]);
+        setLoading(false);
+        return;
+      }
       const res = await fetch("/api/wishlist");
       const data = await res.json();
       if (Array.isArray(data)) {
@@ -35,17 +33,17 @@ export const useWishlist = () => {
   }, [fetchWishlist]);
 
   const toggleWishlist = async (product) => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      toast.error("Please sign in to add to wishlist");
-      router.push("/Signin");
-      return;
-    }
-
-    const productId = product._id;
-    const isAlreadyInWishlist = wishlist.some((item) => item.productId?._id === productId);
-
     try {
+      const authRes = await fetch("/api/auth/me");
+      if (!authRes.ok) {
+        toast.error("Please sign in to add to wishlist");
+        router.push("/Signin");
+        return;
+      }
+
+      const productId = product._id;
+      const isAlreadyInWishlist = wishlist.some((item) => item.productId?._id === productId);
+
       if (isAlreadyInWishlist) {
         await fetch("/api/wishlist", {
           method: "DELETE",
@@ -60,8 +58,6 @@ export const useWishlist = () => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ productId }),
         });
-        // We add local optimistic update or just refetch
-        // For simplicity, refetch or add manually
         setWishlist((prev) => [...prev, { productId: { _id: productId } }]);
         toast.success("Added to wishlist");
       }
