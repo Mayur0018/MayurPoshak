@@ -37,7 +37,7 @@ export default async function CategoryPage({ params }) {
               alt={categoryData.text}
               width={800}
               height={600}
-              className="w-full h-auto object-cover"
+              className="w-full h-auto object-cover bg-red-50"
               priority
               quality={85}
             />
