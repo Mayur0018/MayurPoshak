@@ -188,14 +188,14 @@ export default function ProfilePage() {
                    <div className="mt-12">
                       <h3 className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-400 mb-6">Recent Activity</h3>
                       {orders.slice(0, 1).map((order) => (
-                        <div key={order.id} className="flex items-center justify-between p-6 border border-gray-100 rounded-2xl">
+                        <div key={order._id || Math.random()} className="flex items-center justify-between p-6 border border-gray-100 rounded-2xl">
                            <div className="flex items-center gap-4">
                               <div className="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center">
                                  <TfiPackage className="text-gray-900" />
                               </div>
                               <div>
-                                 <p className="text-xs font-bold uppercase tracking-widest">Order #{order.id.slice(-6)}</p>
-                                 <p className="text-[10px] text-gray-400 mt-0.5">{new Date(order.created_at).toLocaleDateString()}</p>
+                                 <p className="text-xs font-bold uppercase tracking-widest">Order #{order._id?.slice(-6) || 'N/A'}</p>
+                                 <p className="text-[10px] text-gray-400 mt-0.5">{new Date(order.createdAt || order.created_at).toLocaleDateString()}</p>
                               </div>
                            </div>
                            <p className="text-xs font-black tracking-widest uppercase text-indigo-600">{order.status}</p>
@@ -216,7 +216,7 @@ export default function ProfilePage() {
                                  <img src={order.orderItems?.[0]?.image || "/mayurposhak.png"} className="w-full h-full object-cover" alt="product" />
                               </div>
                               <div>
-                                 <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-1">REFERENCE #{order._id.slice(-8).toUpperCase()}</p>
+                                 <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-1">REFERENCE #{order._id?.slice(-8).toUpperCase() || 'N/A'}</p>
                                  <h4 className="text-sm font-bold text-gray-900 uppercase tracking-widest">{new Date(order.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</h4>
                                  <div className="flex items-center gap-2 mt-2">
                                     <span className={`w-2 h-2 rounded-full ${order.isPaid ? 'bg-green-400' : 'bg-yellow-400'}`} />

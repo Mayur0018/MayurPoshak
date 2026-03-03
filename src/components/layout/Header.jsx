@@ -19,8 +19,13 @@ const Header = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [wishlistCount, setWishlistCount] = useState(0);
+  const [mounted, setMounted] = useState(false);
   const cartCount = useSelector((state) => state.cart.cartItems.length);
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const fetchWishlistCount = async () => {
@@ -177,7 +182,7 @@ const Header = () => {
               className="relative hover:opacity-70 transition border-none bg-transparent cursor-pointer"
             >
               <FaRegHeart className="text-xl lg:text-2xl" />
-              {wishlistCount > 0 && (
+              {mounted && wishlistCount > 0 && (
                 <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-bold">
                   {wishlistCount}
                 </span>
@@ -189,7 +194,7 @@ const Header = () => {
               className="relative hover:opacity-70 transition border-none bg-transparent cursor-pointer"
             >
               <TbShoppingBag className="text-xl lg:text-2xl" />
-              {cartCount > 0 && (
+              {mounted && cartCount > 0 && (
                 <span className="absolute -top-2 -right-2 bg-black text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                   {cartCount}
                 </span>
@@ -264,7 +269,7 @@ const Header = () => {
               className="relative flex-shrink-0 p-1 hover:bg-gray-100 rounded transition border-none bg-transparent"
             >
               <FaRegHeart className="text-2xl sm:text-3xl" />
-              {wishlistCount > 0 && (
+              {mounted && wishlistCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-bold">
                   {wishlistCount}
                 </span>
@@ -275,7 +280,7 @@ const Header = () => {
               className="relative flex-shrink-0 p-1 hover:bg-gray-100 rounded transition border-none bg-transparent"
             >
               <TbShoppingBag className="text-2xl sm:text-3xl" />
-              {cartCount > 0 && (
+              {mounted && cartCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-black text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
                   {cartCount}
                 </span>

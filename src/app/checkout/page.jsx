@@ -10,6 +10,7 @@ import supabase from "@/lib/supabaseClient";
 
 export default function CheckoutPage() {
   const cartItems = useSelector((state) => state.cart.cartItems);
+  const [mounted, setMounted] = useState(false);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -25,7 +26,7 @@ export default function CheckoutPage() {
   const [couponError, setCouponError] = useState(null);
 
   const subtotal = cartItems.reduce(
-    (sum, item) => sum + Number(item.price ?? 0) * item.quantity,
+    (sum, item) => sum + (Number(item.price) || 0) * (Number(item.quantity) || 1),
     0
   );
   
@@ -56,6 +57,7 @@ export default function CheckoutPage() {
   };
 
   useEffect(() => {
+    setMounted(true);
     const fetchUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
@@ -105,6 +107,8 @@ export default function CheckoutPage() {
       setLoading(false);
     }
   };
+
+  if (!mounted) return null;
 
   if (cartItems.length === 0) {
     return (
@@ -245,8 +249,10 @@ export default function CheckoutPage() {
           <h2 className="text-xl font-bold mb-6">Order Summary</h2>
           
           <div className="space-y-4 mb-8 max-h-[400px] overflow-y-auto pr-2">
-            {cartItems.map((item) => (
-              <div key={item._id} className="flex gap-4">
+            {cartItems.map((item, idx) => {
+              const displaySize = item.selectedSize || (Array.isArray(item.size) ? null : item.size);
+              return (
+              <div key={`${item._id || item.product}-${item.selectedSize || idx}`} className="flex gap-4">
                 <div className="relative w-20 h-24 rounded-xl overflow-hidden bg-white shadow-sm border border-gray-100 flex-shrink-0">
                   <Image src={item.image} alt={item.name} fill className="object-cover" />
                   <span className="absolute top-1 right-1 bg-black text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold">
@@ -255,11 +261,11 @@ export default function CheckoutPage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="text-sm font-semibold truncate">{item.name}</h3>
-                  <p className="text-xs text-gray-400 mt-1">Size: {item.size || item.selectedSize || "N/A"}</p>
-                  <p className="text-sm font-bold mt-2">₹{(item.price * item.quantity).toLocaleString("en-IN")}</p>
+                  <p className="text-xs text-gray-400 mt-1">Size: {displaySize || "N/A"}</p>
+                  <p className="text-sm font-bold mt-2">₹{((Number(item.price) || 0) * (Number(item.quantity) || 1)).toLocaleString("en-IN")}</p>
                 </div>
               </div>
-            ))}
+            )})}
           </div>
 
           <div className="border-t border-gray-200 pt-6 space-y-4">

@@ -24,7 +24,7 @@ const CartSidebar = () => {
   const [loading, setLoading] = useState(false);
 
   const subtotal = cartItems.reduce(
-    (sum, item) => sum + Number(item.price ?? 0) * item.quantity,
+    (sum, item) => sum + (Number(item.price) || 0) * (Number(item.quantity) || 1),
     0
   );
   const remaining = FREE_SHIPPING_THRESHOLD - subtotal;
@@ -131,11 +131,11 @@ const CartSidebar = () => {
                   </button>
                 </div>
               ) : (
-                cartItems.map((item) => (
-                  <div key={item._id} className="flex gap-4">
+                cartItems.map((item, idx) => (
+                  <div key={`${item._id || item.product}-${item.selectedSize || (Array.isArray(item.size) ? null : item.size) || idx}`} className="flex gap-4">
                     {/* Image */}
                     <Link
-                      href={`/product/${item._id}`}
+                      href={`/product/${item._id || item.product}`}
                       onClick={() => dispatch(closeCartSidebar())}
                       className="shrink-0"
                     >
@@ -160,16 +160,16 @@ const CartSidebar = () => {
                           {item.name}
                         </Link>
                         <button
-                          onClick={() => dispatch(removeFromCart(item._id))}
+                          onClick={() => dispatch(removeFromCart({ id: item._id || item.product, sku: item.variant?.sku, size: item.selectedSize || (Array.isArray(item.size) ? null : item.size) }))}
                           className="shrink-0 text-gray-300 hover:text-red-500 transition"
                         >
                           <RxCross1 className="text-xs" />
                         </button>
                       </div>
 
-                      {item.size && (
+                      {(item.selectedSize || (Array.isArray(item.size) ? null : item.size)) && (
                         <p className="text-xs text-gray-400 mt-0.5">
-                          Size: {item.size}
+                          Size: {item.selectedSize || (Array.isArray(item.size) ? null : item.size)}
                         </p>
                       )}
 
@@ -178,7 +178,7 @@ const CartSidebar = () => {
                         {/* Qty controls */}
                         <div className="flex items-center gap-2 border border-gray-200 rounded-full px-3 py-1">
                           <button
-                            onClick={() => dispatch(decrementQty(item._id))}
+                            onClick={() => dispatch(decrementQty({ id: item._id || item.product, sku: item.variant?.sku, size: item.selectedSize || (Array.isArray(item.size) ? null : item.size) }))}
                             className="text-gray-600 hover:text-black transition w-5 text-center font-medium"
                           >
                             −
@@ -187,7 +187,7 @@ const CartSidebar = () => {
                             {item.quantity}
                           </span>
                           <button
-                            onClick={() => dispatch(incrementQty(item._id))}
+                            onClick={() => dispatch(incrementQty({ id: item._id || item.product, sku: item.variant?.sku, size: item.selectedSize || (Array.isArray(item.size) ? null : item.size) }))}
                             className="text-gray-600 hover:text-black transition w-5 text-center font-medium"
                           >
                             +
@@ -198,7 +198,7 @@ const CartSidebar = () => {
                         <p className="text-sm font-bold text-gray-900">
                           ₹
                           {(
-                            Number(item.price) * item.quantity
+                            (Number(item.price) || 0) * (Number(item.quantity) || 1)
                           ).toLocaleString("en-IN")}
                         </p>
                       </div>

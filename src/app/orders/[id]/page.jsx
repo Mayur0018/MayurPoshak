@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { motion } from "framer-motion";
-import { FiPackage, FiTruck, FiMapPin, FiCreditCard, FiArrowLeft, FiCheckCircle, FiClock } from "react-icons/fi";
+import { FiPackage, FiTruck, FiMapPin, FiCreditCard, FiArrowLeft, FiCheckCircle, FiClock, FiPhone } from "react-icons/fi";
 import supabase from "@/lib/supabaseClient";
 
 export default function OrderDetailPage() {

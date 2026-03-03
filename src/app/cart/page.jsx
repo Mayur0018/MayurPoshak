@@ -17,11 +17,12 @@ export default function CartPage() {
   const cartItems = useSelector((state) => state.cart.cartItems);
   const dispatch = useDispatch();
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const subtotal = cartItems.reduce(
-    (sum, item) => sum + Number(item.price ?? 0) * item.quantity,
+    (sum, item) => sum + (Number(item.price) || 0) * (Number(item.quantity) || 1),
     0
   );
   const remaining = FREE_SHIPPING_THRESHOLD - subtotal;
@@ -35,6 +36,12 @@ export default function CartPage() {
     }
     router.push("/checkout");
   };
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
 
   if (cartItems.length === 0) {
     return (
@@ -88,9 +95,11 @@ export default function CartPage() {
           {/* LEFT — Cart Items */}
           <div className="lg:col-span-2 flex flex-col gap-4">
             <AnimatePresence>
-              {cartItems.map((item) => (
+              {cartItems.map((item, idx) => {
+                const displaySize = item.selectedSize || (Array.isArray(item.size) ? null : item.size);
+                return (
                 <motion.div
-                  key={item._id}
+                  key={`${item._id || item.product}-${displaySize || idx}`}
                   layout
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -119,8 +128,8 @@ export default function CartPage() {
                             {item.name}
                           </h3>
                         </Link>
-                        {item.size && (
-                          <p className="text-xs text-gray-400 mt-0.5">Size: {item.size}</p>
+                        {displaySize && (
+                          <p className="text-xs text-gray-400 mt-0.5">Size: {displaySize}</p>
                         )}
                         {item.color && (
                           <div className="flex items-center gap-1.5 mt-1">
@@ -133,7 +142,7 @@ export default function CartPage() {
                         )}
                       </div>
                       <button
-                        onClick={() => dispatch(removeFromCart(item._id))}
+                        onClick={() => dispatch(removeFromCart({ id: item._id || item.product, sku: item.variant?.sku, size: item.selectedSize || (Array.isArray(item.size) ? null : item.size) }))}
                         className="text-gray-300 hover:text-red-500 transition shrink-0"
                       >
                         <RxCross1 />
@@ -144,26 +153,27 @@ export default function CartPage() {
                     <div className="flex items-center justify-between mt-4">
                       <div className="flex items-center gap-2 border border-gray-200 rounded-full px-4 py-1.5">
                         <button
-                          onClick={() => dispatch(decrementQty(item._id))}
+                          onClick={() => dispatch(decrementQty({ id: item._id || item.product, sku: item.variant?.sku, size: item.selectedSize || (Array.isArray(item.size) ? null : item.size) }))}
                           className="text-gray-600 hover:text-black font-bold transition w-4 text-center"
                         >
                           −
                         </button>
                         <span className="text-sm font-bold w-6 text-center">{item.quantity}</span>
                         <button
-                          onClick={() => dispatch(incrementQty(item._id))}
+                          onClick={() => dispatch(incrementQty({ id: item._id || item.product, sku: item.variant?.sku, size: item.selectedSize || (Array.isArray(item.size) ? null : item.size) }))}
                           className="text-gray-600 hover:text-black font-bold transition w-4 text-center"
                         >
                           +
                         </button>
                       </div>
                       <p className="text-base font-bold text-gray-900">
-                        ₹{(Number(item.price) * item.quantity).toLocaleString("en-IN")}
+                        ₹{((Number(item.price) || 0) * (Number(item.quantity) || 1)).toLocaleString("en-IN")}
                       </p>
                     </div>
                   </div>
                 </motion.div>
-              ))}
+                );
+              })}
             </AnimatePresence>
           </div>
 

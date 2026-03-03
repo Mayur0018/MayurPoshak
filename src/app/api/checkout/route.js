@@ -52,6 +52,7 @@ export async function POST(request) {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       mode: 'payment',
+      invoice_creation: { enabled: true },
       line_items: lineItems,
       metadata: {
         userId: user.id,
@@ -62,7 +63,7 @@ export async function POST(request) {
         phone: (shippingDetails?.phone || "").substring(0, 20),
         couponId: couponId || "",
       },
-      success_url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/success`,
+      success_url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/checkout`,
     });
 

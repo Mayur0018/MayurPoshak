@@ -8,12 +8,14 @@ const montserrat = Montserrat({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
   variable: "--font-montserrat",
+  display: "swap",
 });
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
   weight: ["400", "600", "700", "900"],
   variable: "--font-playfair",
+  display: "swap",
 });
 
 export const metadata = {
@@ -23,11 +25,12 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${montserrat.variable} ${playfair.variable} antialiased font-sans`}>
+    <html lang="en" className={`${montserrat.variable} ${playfair.variable}`} suppressHydrationWarning>
+      <body className="antialiased font-sans" suppressHydrationWarning>
         <ReduxProvider>
-          <ClientLayout>{children}
-               <Toaster position="top-right" />
+          <ClientLayout>
+            {children}
+            <Toaster position="top-right" />
           </ClientLayout>
         </ReduxProvider>
       </body>
