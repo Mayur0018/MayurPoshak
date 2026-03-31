@@ -83,8 +83,8 @@ export default function ContactPage() {
                 <div>
                   <h3 className="text-lg font-semibold text-black mb-1">Phone</h3>
                   <p className="font-medium">
-                    <a href="tel:+918800870709" className="hover:text-gray-500 transition">
-                      +91 88008 70709
+                    <a href="tel:9106481092" className="hover:text-gray-500 transition">
+                      9106481092
                     </a>
                   </p>
                 </div>
@@ -92,8 +92,8 @@ export default function ContactPage() {
                 <div>
                   <h3 className="text-lg font-semibold text-black mb-1">Email</h3>
                   <p className="font-medium">
-                    <a href="mailto:mayurposhak.in@gmail.com" className="hover:text-gray-500 transition">
-                      mayurposhak.in@gmail.com
+                    <a href="mailto:mayurnish18@gmail.com" className="hover:text-gray-500 transition">
+                      mayurnish18@gmail.com
                     </a>
                   </p>
                 </div>
@@ -121,7 +121,7 @@ export default function ContactPage() {
 
               <div className="space-y-4">
                 <Link
-                  href="mailto:mayurposhak.in@gmail.com"
+                  href="mailto:mayurnish18@gmail.com"
                   className="inline-flex items-center justify-center w-full md:w-auto bg-black text-white px-8 py-4 rounded-full font-medium hover:bg-gray-800 transition"
                 >
                   Send Email →

@@ -4,9 +4,9 @@ import { FaTrash, FaEdit } from "react-icons/fa";
 
 export default function AdminProducts() {
   const [products, setProducts] = useState([]);
-  const [form, setForm] = useState({ name: "", image: null, price: "" });
+  const [form, setForm] = useState({ name: "", image: null, price: "", stock: "" });
   const [editingId, setEditingId] = useState(null);
-  const [editForm, setEditForm] = useState({ name: "", image: null, price: "", imageUrl: "" });
+  const [editForm, setEditForm] = useState({ name: "", image: null, price: "", imageUrl: "", stock: "" });
   const [loading, setLoading] = useState(false);
 
   /* =========================
@@ -62,6 +62,7 @@ export default function AdminProducts() {
           name: form.name,
           image: imageLink,
           price: Number(form.price),
+          stock: Number(form.stock || 10),
         }),
       });
 
@@ -72,7 +73,7 @@ export default function AdminProducts() {
       }
       const newProduct = await res.json();
       setProducts((prev) => [...prev, newProduct]);
-      setForm({ name: "", image: null, price: "" });
+      setForm({ name: "", image: null, price: "", stock: "" });
     } catch (err) {
       alert("Failed to add product");
       console.error(err);
@@ -91,6 +92,7 @@ export default function AdminProducts() {
       image: null,
       price: product.price,
       imageUrl: product.image,
+      stock: product.stock,
     });
   };
 
@@ -113,6 +115,7 @@ export default function AdminProducts() {
           name: editForm.name,
           image: imageLink,
           price: Number(editForm.price),
+          stock: Number(editForm.stock),
         }),
       });
 
@@ -130,7 +133,7 @@ export default function AdminProducts() {
       );
 
       setEditingId(null);
-      setEditForm({ name: "", image: null, price: "", imageUrl: "" });
+      setEditForm({ name: "", image: null, price: "", imageUrl: "", stock: "" });
     } catch (err) {
       alert("Failed to update product");
       console.error(err);
@@ -141,7 +144,7 @@ export default function AdminProducts() {
 
   const handleCancelEdit = () => {
     setEditingId(null);
-    setEditForm({ name: "", image: null, price: "", imageUrl: "" });
+    setEditForm({ name: "", image: null, price: "", imageUrl: "", stock: "" });
   };
 
   /* =========================
@@ -209,6 +212,15 @@ export default function AdminProducts() {
               required
             />
 
+            <input
+              className="p-2 border"
+              placeholder="Stock Level"
+              type="number"
+              value={editForm.stock}
+              onChange={(e) => setEditForm({ ...editForm, stock: e.target.value })}
+              required
+            />
+
             <div className="flex gap-2">
               <button
                 disabled={loading}
@@ -259,6 +271,15 @@ export default function AdminProducts() {
           required
         />
 
+        <input
+          className="p-2 border"
+          placeholder="Initial Stock"
+          type="number"
+          value={form.stock}
+          onChange={(e) => setForm({ ...form, stock: e.target.value })}
+          required
+        />
+
         <button
           disabled={loading}
           className="bg-black text-white p-2 disabled:opacity-60"
@@ -284,7 +305,12 @@ export default function AdminProducts() {
                 <div className="w-full h-96 bg-gray-100 mb-2" />
               )}
               <h2 className="font-medium">{p.name}</h2>
-              <p>₹{Number(p.price ?? 0)}</p>
+              <div className="flex justify-between items-center mt-1">
+                <p className="font-bold">₹{Number(p.price ?? 0)}</p>
+                <p className={`text-[10px] uppercase font-black tracking-widest ${p.stock < 10 ? 'text-red-500' : 'text-slate-400'}`}>
+                  Stock: {p.stock ?? 0}
+                </p>
+              </div>
 
               <div className="flex gap-2 absolute top-2 right-2">
                 <button

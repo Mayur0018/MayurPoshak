@@ -48,8 +48,9 @@ export default function OrderDetailPage() {
   }, [user, id]);
 
   const getStatusStep = (status) => {
-    const steps = ["Processing", "Shipped", "Delivered"];
-    return steps.indexOf(status) + 1;
+    const steps = ["Pending", "Processing", "Packed", "Shipped", "Out for Delivery", "Delivered"];
+    const idx = steps.indexOf(status);
+    return idx === -1 ? 1 : idx + 1;
   };
 
   if (loading) {
@@ -99,20 +100,23 @@ export default function OrderDetailPage() {
             <div className="absolute top-1/2 left-0 w-full h-1 bg-gray-100 -translate-y-1/2 rounded-full"></div>
             <div 
               className="absolute top-1/2 left-0 h-1 bg-black -translate-y-1/2 rounded-full transition-all duration-1000"
-              style={{ width: `${((currentStep - 1) / 2) * 100}%` }}
+              style={{ width: `${((currentStep - 1) / 5) * 100}%` }}
             ></div>
             
             <div className="relative flex justify-between">
-              {["Processing", "Shipped", "Delivered"].map((step, idx) => (
+              {["Pending", "Processing", "Packed", "Shipped", "Out for Delivery", "Delivered"].map((step, idx) => (
                 <div key={step} className="flex flex-col items-center gap-3">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center border-4 transition-all duration-500 z-10 ${
-                    currentStep > idx ? "bg-black border-black text-white" : "bg-white border-gray-200 text-gray-300"
+                  <div className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center border-4 transition-all duration-500 z-10 ${
+                    currentStep > idx ? "bg-black border-black text-white" : "bg-white border-gray-100 text-gray-200"
                   }`}>
-                    {idx === 0 && <FiPackage />}
-                    {idx === 1 && <FiTruck />}
-                    {idx === 2 && <FiCheckCircle />}
+                    {idx === 0 && <FiClock className="text-xs md:text-base" />}
+                    {idx === 1 && <FiPackage className="text-xs md:text-base" />}
+                    {idx === 2 && <FiPackage className="text-xs md:text-base" style={{ transform: 'rotate(45deg)' }} />}
+                    {idx === 3 && <FiTruck className="text-xs md:text-base" />}
+                    {idx === 4 && <FiMapPin className="text-xs md:text-base" />}
+                    {idx === 5 && <FiCheckCircle className="text-xs md:text-base" />}
                   </div>
-                  <span className={`text-[10px] font-bold uppercase tracking-widest ${currentStep > idx ? "text-black" : "text-gray-300"}`}>
+                  <span className={`text-[7px] md:text-[8px] font-black uppercase tracking-widest text-center max-w-[50px] md:max-w-[80px] ${currentStep > idx ? "text-black" : "text-gray-300"}`}>
                     {step}
                   </span>
                 </div>

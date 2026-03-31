@@ -31,7 +31,9 @@ export async function GET() {
       totalUsers,
       totalOrders,
       revenueData,
-      recentOrders
+      recentOrders,
+      topProducts,
+      lowStockProducts
     ] = await Promise.all([
       Product.countDocuments(),
       User.countDocuments({ role: "user" }),
@@ -40,7 +42,14 @@ export async function GET() {
         { $match: { isPaid: true } },
         { $group: { _id: null, totalRevenue: { $sum: "$totalPrice" } } }
       ]),
-      Order.find().sort({ createdAt: -1 }).limit(5)
+      Order.find().sort({ createdAt: -1 }).limit(5),
+      Order.aggregate([
+        { $unwind: "$orderItems" },
+        { $group: { _id: "$orderItems.product", name: { $first: "$orderItems.name" }, totalSold: { $sum: "$orderItems.quantity" } } },
+        { $sort: { totalSold: -1 } },
+        { $limit: 5 }
+      ]),
+      Product.find({ stock: { $lt: 10 } }).limit(5)
     ]);
 
     const totalRevenue = revenueData.length > 0 ? revenueData[0].totalRevenue : 0;
@@ -63,7 +72,9 @@ export async function GET() {
       totalOrders,
       totalRevenue,
       recentOrders,
-      monthlyRevenue
+      monthlyRevenue,
+      topProducts,
+      lowStockProducts
     }, { status: 200 });
   } catch (error) {
     console.error("Admin stats error:", error);

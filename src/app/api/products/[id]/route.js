@@ -40,7 +40,7 @@ export async function PUT(request, context) {
   if (!id || typeof id !== "string" || !/^[0-9a-fA-F]{24}$/.test(id)) {
     return Response.json({ message: "Invalid ID" }, { status: 400 });
   }
-  const { name, image, price } = await request.json();
+  const { name, image, price, stock } = await request.json();
 
   try {
     if (!name || !image || !price) {
@@ -50,7 +50,7 @@ export async function PUT(request, context) {
       );
     }
 
-    const updatedProduct = await Product.findByIdAndUpdate(id, { name, image, price }, { new: true });
+    const updatedProduct = await Product.findByIdAndUpdate(id, { name, image, price, stock: Number(stock) }, { new: true });
 
     if (!updatedProduct) {
       return Response.json(

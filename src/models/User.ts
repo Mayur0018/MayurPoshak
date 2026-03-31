@@ -7,13 +7,8 @@ export interface IUser extends Document {
   password?: string;
   role: "user" | "admin";
   isBlocked: boolean;
-  address: {
-    street?: string;
-    city?: string;
-    state?: string;
-    zipCode?: string;
-    country: string;
-  };
+  points: number;
+  addresses: mongoose.Types.ObjectId[];
   phone?: string;
   matchPassword: (enteredPassword: string) => Promise<boolean>;
 }
@@ -46,13 +41,11 @@ const userSchema = new Schema<IUser>(
       type: Boolean,
       default: false,
     },
-    address: {
-      street: String,
-      city: String,
-      state: String,
-      zipCode: String,
-      country: { type: String, default: "India" },
+    points: {
+      type: Number,
+      default: 0,
     },
+    addresses: [{ type: Schema.Types.ObjectId, ref: "Address" }],
     phone: String,
   },
   { timestamps: true }

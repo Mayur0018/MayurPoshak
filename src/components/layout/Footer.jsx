@@ -50,7 +50,6 @@ const Footer = () => {
     >
       {/* Main footer grid */}
       <div className="max-w-7xl mx-auto px-6 lg:px-8 py-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12">
-
         {/* Brand Column */}
         <div className="flex flex-col gap-5">
           <Link href="/">
@@ -63,7 +62,9 @@ const Footer = () => {
             />
           </Link>
           <p className="text-gray-400 text-sm leading-relaxed">
-            Step into the world of Mayur Poshak — where tradition meets style. Explore exquisite sarees and contemporary fashion, crafted for every occasion.
+            Step into the world of Mayur Poshak — where tradition meets style.
+            Explore exquisite sarees and contemporary fashion, crafted for every
+            occasion.
           </p>
           <div className="flex gap-4 mt-2">
             <a
@@ -168,11 +169,31 @@ const Footer = () => {
           transition={{ duration: 0.4 }}
         >
           {[
-            { icon: <AiFillHome className="text-2xl" />, label: "Home", href: "/" },
-            { icon: <CiMenuFries className="text-2xl" />, label: "Menu", href: "/" },
-            { icon: <IoSearchOutline className="text-2xl" />, label: "Search", href: "/" },
-            { icon: <TbShoppingBag className="text-2xl" />, label: "Cart", href: "/cart" },
-            { icon: <RiContactsLine className="text-2xl" />, label: "Contact", href: "/Contact" },
+            {
+              icon: <AiFillHome className="text-2xl" />,
+              label: "Home",
+              href: "/",
+            },
+            {
+              icon: <CiMenuFries className="text-2xl" />,
+              label: "Menu",
+              href: "/",
+            },
+            {
+              icon: <IoSearchOutline className="text-2xl" />,
+              label: "Search",
+              href: "/",
+            },
+            {
+              icon: <TbShoppingBag className="text-2xl" />,
+              label: "Cart",
+              href: "/cart",
+            },
+            {
+              icon: <RiContactsLine className="text-2xl" />,
+              label: "Contact",
+              href: "/Contact",
+            },
           ].map((item, idx) => (
             <Link
               href={item.href}

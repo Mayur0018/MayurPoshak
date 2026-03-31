@@ -13,7 +13,8 @@ export const category = [
   },
   {
     id: 3,
-    Image: "https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?w=800&q=90&fit=crop",
+    Image:
+      "https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?w=800&q=90&fit=crop",
     text: "KIDS",
     slug: "kids",
   },

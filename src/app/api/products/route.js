@@ -79,12 +79,12 @@ export async function GET(request) {
 
 export async function POST(request) {
   await connectDB();
-  const { name, image, price } = await request.json();
+  const { name, image, price, stock } = await request.json();
 
   if (!name || !image || !price) {
     return Response.json({ message: "All fields are required" }, { status: 400 });
   }
 
-  const product = await Product.create({ name, image, price });
+  const product = await Product.create({ name, image, price, stock: Number(stock ?? 10) });
   return Response.json(product);
-}   
+}

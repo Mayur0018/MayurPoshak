@@ -45,7 +45,10 @@ const ProductCard = ({ item, index, isWishlisted, toggleWishlist }) => {
       viewport={{ once: true }}
       transition={{ duration: 0.5, delay: index * 0.07 }}
       onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => { setHovered(false); setSelectedSize(null); }}
+      onMouseLeave={() => {
+        setHovered(false);
+        setSelectedSize(null);
+      }}
     >
       <Link href={`/product/${item._id}`}>
         {/* Product Image */}
@@ -151,7 +154,9 @@ export default function MostTrending() {
         viewport={{ once: true }}
         transition={{ duration: 0.7 }}
       >
-        <h1 className="text-3xl font-bold tracking-tight luxury-serif">Most Trending</h1>
+        <h1 className="text-3xl font-bold tracking-tight luxury-serif">
+          Most Trending
+        </h1>
         <Link
           href="/products"
           className="text-xs font-semibold uppercase tracking-widest border-b border-black hover:text-gray-500 hover:border-gray-500 transition"
@@ -164,17 +169,23 @@ export default function MostTrending() {
       <div className="py-8 flex overflow-x-auto hide-scrollbar snap-x snap-mandatory gap-4 md:gap-6 px-5 md:px-9 pb-12">
         {loading
           ? [...Array(8)].map((_, index) => (
-              <div key={index} className="w-[160px] md:w-[280px] shrink-0 snap-center">
+              <div
+                key={index}
+                className="w-[160px] md:w-[280px] shrink-0 snap-center"
+              >
                 <SkeletonCard />
               </div>
             ))
           : product.slice(0, 8).map((item, index) => (
-              <div key={item._id || index} className="w-[160px] md:w-[280px] shrink-0 snap-center">
-                <ProductCard 
-                  item={item} 
-                  index={index} 
-                  isWishlisted={isInWishlist(item._id)} 
-                  toggleWishlist={toggleWishlist} 
+              <div
+                key={item._id || index}
+                className="w-[160px] md:w-[280px] shrink-0 snap-center"
+              >
+                <ProductCard
+                  item={item}
+                  index={index}
+                  isWishlisted={isInWishlist(item._id)}
+                  toggleWishlist={toggleWishlist}
                 />
               </div>
             ))}
@@ -216,7 +227,9 @@ export default function MostTrending() {
       >
         <h1 className="text-2xl md:text-3xl font-bold text-center luxury-serif">
           SUMMER ESSENTIALS 🎇
-          <p className="text-[12px] text-gray-500 font-normal mt-1 font-sans">Hot Picks For The Season</p>
+          <p className="text-[12px] text-gray-500 font-normal mt-1 font-sans">
+            Hot Picks For The Season
+          </p>
         </h1>
         <div className="px-3 md:px-10 md:gap-6 grid grid-cols-3 gap-2 mt-6">
           {summerimg.map((item, index) => (
@@ -250,7 +263,9 @@ export default function MostTrending() {
       >
         <h1 className="text-2xl md:text-3xl font-bold text-center luxury-serif">
           NEW TRENDS TO TRY 👓
-          <p className="text-[12px] text-gray-500 font-normal mt-1 font-sans">Hot Picks For The Season</p>
+          <p className="text-[12px] text-gray-500 font-normal mt-1 font-sans">
+            Hot Picks For The Season
+          </p>
         </h1>
 
         <motion.div

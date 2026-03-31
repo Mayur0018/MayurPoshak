@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import supabase from "@/lib/supabaseClient";
+import toast from "react-hot-toast";
 import Link from "next/link";
 import { 
   TfiPackage, 
@@ -21,6 +21,17 @@ export default function ProfilePage() {
   const [addresses, setAddresses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [showAddressModal, setShowAddressModal] = useState(false);
+  const [editingAddress, setEditingAddress] = useState(null);
+  const [addressForm, setAddressForm] = useState({
+    fullName: "",
+    phone: "",
+    street: "",
+    city: "",
+    state: "",
+    pincode: "",
+    isDefault: false
+  });
 
   useEffect(() => {
     let mounted = true;
@@ -37,14 +48,14 @@ export default function ProfilePage() {
         const userData = await res.json();
         setUser(userData);
 
-        // Fetch orders from existing API
+        // Fetch orders
         const ordsRes = await fetch("/api/orders").then(res => res.json());
         if (mounted) {
           setOrders(Array.isArray(ordsRes) ? ordsRes : []);
           
-          // Legacy: Fetch addresses from Supabase if still available
-          const { data: addrs } = await supabase.from("addresses").select("*").eq("user_id", userData._id).order("is_default", { ascending: false });
-          setAddresses(addrs ?? []);
+          // Fetch addresses from new API
+          const addrsRes = await fetch("/api/address").then(res => res.json());
+          setAddresses(Array.isArray(addrsRes) ? addrsRes : []);
           
           setLoading(false);
         }
@@ -60,13 +71,63 @@ export default function ProfilePage() {
     setIsLoggingOut(true);
     try {
       await fetch("/api/auth/logout", { method: "POST" });
-      try { await supabase.auth.signOut(); } catch (e) {} // Compatibility
       window.localStorage.clear();
       window.location.href = "/";
     } catch (err) {
       console.error("Logout error:", err);
       window.location.href = "/";
     }
+  };
+
+  const handleAddressSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const url = editingAddress ? `/api/address/${editingAddress._id}` : "/api/address";
+      const method = editingAddress ? "PATCH" : "POST";
+      const res = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(addressForm)
+      });
+      if (res.ok) {
+        toast.success(editingAddress ? "Address updated" : "Address added");
+        setShowAddressModal(false);
+        setEditingAddress(null);
+        setAddressForm({ fullName: "", phone: "", street: "", city: "", state: "", pincode: "", isDefault: false });
+        // Refresh addresses
+        const addrs = await fetch("/api/address").then(res => res.json());
+        setAddresses(addrs);
+      }
+    } catch (err) {
+      toast.error("Operation failed");
+    }
+  };
+
+  const deleteAddress = async (id) => {
+    if (!confirm("Are you sure?")) return;
+    try {
+      const res = await fetch(`/api/address/${id}`, { method: "DELETE" });
+      if (res.ok) {
+        toast.success("Address deleted");
+        setAddresses(addresses.filter(a => a._id !== id));
+      }
+    } catch (err) {
+      toast.error("Delete failed");
+    }
+  };
+
+  const openEditModal = (addr) => {
+    setEditingAddress(addr);
+    setAddressForm({
+      fullName: addr.fullName,
+      phone: addr.phone,
+      street: addr.street,
+      city: addr.city,
+      state: addr.state,
+      pincode: addr.pincode,
+      isDefault: addr.isDefault
+    });
+    setShowAddressModal(true);
   };
 
   if (isLoggingOut) {
@@ -172,8 +233,8 @@ export default function ProfilePage() {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {[
                       { label: "Total Orders", value: orders.length, icon: TfiPackage },
-                      { label: "Saved Points", value: "250", icon: TfiUser },
-                      { label: "Concierge Status", value: "Gold", icon: TfiSettings }
+                      { label: "Loyalty Points", value: user.points || 0, icon: TfiUser },
+                      { label: "Concierge Status", value: user.points > 1000 ? "Platinum" : user.points > 500 ? "Gold" : "Silver", icon: TfiSettings }
                     ].map((stat, i) => (
                       <div key={i} className="p-8 bg-[#fafafa] rounded-3xl border border-gray-50 group hover:bg-black transition-all duration-500">
                         <stat.icon className="text-2xl mb-6 text-gray-400 group-hover:text-white transition-colors" />
@@ -248,25 +309,30 @@ export default function ProfilePage() {
                 <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                    <div className="flex items-center justify-between mb-10">
                       <h2 className="text-[11px] font-black uppercase tracking-[0.4em] text-gray-400">Saved Addresses</h2>
-                      <button className="px-6 py-2 bg-black text-white text-[9px] font-black uppercase tracking-[0.2em] rounded-full hover:scale-95 transition">Add New</button>
+                      <button 
+                        onClick={() => { setEditingAddress(null); setAddressForm({ fullName: "", phone: "", street: "", city: "", state: "", pincode: "", isDefault: false }); setShowAddressModal(true); }}
+                        className="px-6 py-2 bg-black text-white text-[9px] font-black uppercase tracking-[0.2em] rounded-full hover:scale-95 transition"
+                      >
+                        Add New
+                      </button>
                    </div>
                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       {addresses.length > 0 ? addresses.map((addr) => (
-                        <div key={addr.id} className="relative p-8 rounded-[2rem] border border-gray-100 hover:shadow-xl transition-all duration-300 group">
-                           {addr.is_default && (
+                        <div key={addr._id} className="relative p-8 rounded-[2rem] border border-gray-100 hover:shadow-xl transition-all duration-300 group">
+                           {addr.isDefault && (
                              <div className="absolute top-6 right-8 px-3 py-1 bg-black text-white text-[8px] font-black uppercase tracking-widest rounded-full">Default</div>
                            )}
                            <TfiLocationPin className="text-2xl mb-6 text-gray-300 group-hover:text-black transition-colors" />
-                           <h4 className="text-xs font-bold uppercase tracking-widest mb-3">{addr.name || 'Resident'}</h4>
+                           <h4 className="text-xs font-bold uppercase tracking-widest mb-3">{addr.fullName}</h4>
                            <div className="text-[11px] text-gray-500 space-y-1 font-medium leading-relaxed">
-                              <p>{addr.line1}</p>
-                              {addr.line2 && <p>{addr.line2}</p>}
-                              <p className="text-black">{addr.city}, {addr.state} - {addr.postal_code}</p>
-                              <p className="uppercase tracking-widest text-[9px] mt-2 block">{addr.country}</p>
+                              <p>{addr.street}</p>
+                              <p className="text-black">{addr.city}, {addr.state} - {addr.pincode}</p>
+                              <p className="uppercase tracking-widest text-[9px] mt-2 block">{addr.country || 'India'}</p>
+                              <p className="mt-2 text-[10px] font-bold">Contact: {addr.phone}</p>
                            </div>
                            <div className="mt-8 flex gap-4 pt-6 border-t border-gray-50">
-                              <button className="text-[9px] font-black uppercase tracking-widest text-gray-400 hover:text-black transition">Edit</button>
-                              <button className="text-[9px] font-black uppercase tracking-widest text-red-300 hover:text-red-600 transition">Remove</button>
+                              <button onClick={() => openEditModal(addr)} className="text-[9px] font-black uppercase tracking-widest text-gray-400 hover:text-black transition">Edit</button>
+                              <button onClick={() => deleteAddress(addr._id)} className="text-[9px] font-black uppercase tracking-widest text-red-300 hover:text-red-600 transition">Remove</button>
                            </div>
                         </div>
                       )) : (
@@ -316,6 +382,90 @@ export default function ProfilePage() {
           </div>
         </div>
       </div>
+
+      {/* Address Modal */}
+      {showAddressModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-300">
+           <div className="bg-white w-full max-w-lg rounded-[2.5rem] p-8 md:p-12 shadow-2xl relative overflow-hidden">
+              <button 
+                onClick={() => setShowAddressModal(false)}
+                className="absolute top-8 right-8 text-gray-400 hover:text-black"
+              >
+                ✕
+              </button>
+              <h2 className="text-2xl font-light uppercase tracking-widest mb-8">{editingAddress ? 'Update' : 'New'} Address</h2>
+              
+              <form onSubmit={handleAddressSubmit} className="space-y-6">
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                       <label className="text-[9px] font-bold uppercase text-gray-400 tracking-widest">Full Name</label>
+                       <input 
+                         required
+                         className="w-full bg-[#fafafa] border border-gray-50 rounded-xl px-5 py-3 text-xs font-bold focus:outline-none focus:border-black transition"
+                         value={addressForm.fullName}
+                         onChange={e => setAddressForm({...addressForm, fullName: e.target.value})}
+                       />
+                    </div>
+                    <div className="space-y-2">
+                       <label className="text-[9px] font-bold uppercase text-gray-400 tracking-widest">Phone</label>
+                       <input 
+                         required
+                         className="w-full bg-[#fafafa] border border-gray-50 rounded-xl px-5 py-3 text-xs font-bold focus:outline-none focus:border-black transition"
+                         value={addressForm.phone}
+                         onChange={e => setAddressForm({...addressForm, phone: e.target.value})}
+                       />
+                    </div>
+                 </div>
+                 
+                 <div className="space-y-2">
+                    <label className="text-[9px] font-bold uppercase text-gray-400 tracking-widest">Street Address</label>
+                    <input 
+                      required
+                      className="w-full bg-[#fafafa] border border-gray-50 rounded-xl px-5 py-3 text-xs font-bold focus:outline-none focus:border-black transition"
+                      value={addressForm.street}
+                      onChange={e => setAddressForm({...addressForm, street: e.target.value})}
+                    />
+                 </div>
+
+                 <div className="grid grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                       <label className="text-[9px] font-bold uppercase text-gray-400 tracking-widest">City</label>
+                       <input 
+                         required
+                         className="w-full bg-[#fafafa] border border-gray-50 rounded-xl px-5 py-3 text-xs font-bold focus:outline-none focus:border-black transition"
+                         value={addressForm.city}
+                         onChange={e => setAddressForm({...addressForm, city: e.target.value})}
+                       />
+                    </div>
+                    <div className="space-y-2">
+                       <label className="text-[9px] font-bold uppercase text-gray-400 tracking-widest">Pincode</label>
+                       <input 
+                         required
+                         className="w-full bg-[#fafafa] border border-gray-50 rounded-xl px-5 py-3 text-xs font-bold focus:outline-none focus:border-black transition"
+                         value={addressForm.pincode}
+                         onChange={e => setAddressForm({...addressForm, pincode: e.target.value})}
+                       />
+                    </div>
+                 </div>
+
+                 <div className="flex items-center gap-3 py-2">
+                    <input 
+                      type="checkbox" 
+                      id="isDefault" 
+                      className="w-4 h-4 rounded border-gray-200" 
+                      checked={addressForm.isDefault}
+                      onChange={e => setAddressForm({...addressForm, isDefault: e.target.checked})}
+                    />
+                    <label htmlFor="isDefault" className="text-[10px] font-bold uppercase text-gray-500 cursor-pointer">Set as default address</label>
+                 </div>
+
+                 <button type="submit" className="w-full py-4 bg-black text-white text-[10px] font-black tracking-[0.2em] rounded-2xl hover:scale-[0.98] transition shadow-xl mt-4">
+                    {editingAddress ? 'SAVE CHANGES' : 'CREATE ADDRESS'}
+                 </button>
+              </form>
+           </div>
+        </div>
+      )}
     </div>
   );
 }

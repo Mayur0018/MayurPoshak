@@ -55,6 +55,7 @@ const authRouter = require('./routes/authRoutes');
 const productRouter = require('./routes/productRoutes');
 const orderRouter = require('./routes/orderRoutes');
 const paymentRouter = require('./routes/paymentRoutes');
+const addressRouter = require('./routes/addressRoutes');
 
 // 2) ROUTES
 app.get('/health', (req, res) => {
@@ -65,6 +66,7 @@ app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/products', productRouter);
 app.use('/api/v1/orders', orderRouter);
 app.use('/api/v1/payments', paymentRouter);
+app.use('/api/v1/addresses', addressRouter);
 
 // Handle undefined routes
 app.all('*', (req, res, next) => {

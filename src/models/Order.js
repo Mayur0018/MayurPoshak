@@ -35,7 +35,8 @@ const orderSchema = new mongoose.Schema({
   paidAt: { type: Date },
   isDelivered: { type: Boolean, required: true, default: false },
   deliveredAt: { type: Date },
-  status: { type: String, default: "Processing" }, // Processing, Shipped, Delivered, Cancelled
+  status: { type: String, default: "Pending" }, // Pending, Processing, Packed, Shipped, Out for Delivery, Delivered, Cancelled
+  pointsEarned: { type: Number, default: 0 },
 }, {
   timestamps: true,
 });

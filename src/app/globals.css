@@ -3,12 +3,12 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --luxury-gold: #C5A021;
-  --luxury-black: #0A0A0A;
-  --luxury-beige: #F9F9FB;
+  --luxury-gold: #c5a021;
+  --luxury-black: #0a0a0a;
+  --luxury-beige: #f9f9fb;
   --text-main: #111111;
   --text-muted: #565959;
-  
+
   --font-serif: var(--font-playfair), serif;
   --font-sans: var(--font-montserrat), sans-serif;
 }
@@ -18,7 +18,13 @@
   scroll-behavior: smooth;
 }
 
-h1, h2, h3, h4, h5, h6, .luxury-serif {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.luxury-serif {
   font-family: var(--font-serif);
   letter-spacing: -0.01em;
 }

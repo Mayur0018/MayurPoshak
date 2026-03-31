@@ -78,8 +78,6 @@ const Header = () => {
     }
   };
 
-
-
   /* ---------------- auth ---------------- */
   useEffect(() => {
     const getUser = async () => {
@@ -97,7 +95,7 @@ const Header = () => {
     };
 
     getUser();
-    // Polling or event based updates could be added here, 
+    // Polling or event based updates could be added here,
     // but for now we'll rely on hard redirects on login/logout
   }, []);
 
@@ -106,8 +104,10 @@ const Header = () => {
     try {
       await fetch("/api/auth/logout", { method: "POST" });
       // Also sign out from supabase if session exists (backward compatibility)
-      try { await supabase.auth.signOut(); } catch(e) {}
-      
+      try {
+        await supabase.auth.signOut();
+      } catch (e) {}
+
       window.localStorage.clear();
       toast.success("Logged out successfully");
       window.location.href = "/";
@@ -116,7 +116,7 @@ const Header = () => {
       window.location.href = "/";
     }
   };
-  // Lively Logout handling 
+  // Lively Logout handling
 
   const sidebarVariants = {
     hidden: { x: "-100%" },
@@ -126,7 +126,10 @@ const Header = () => {
 
   return (
     <>
-      <SearchOverlay open={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
+      <SearchOverlay
+        open={isSearchOpen}
+        onClose={() => setIsSearchOpen(false)}
+      />
 
       {/* ================= Desktop Header ================= */}
       <div className="hidden lg:block sticky top-0 bg-white/80 backdrop-blur-md z-40 shadow-sm border-b border-gray-100">
@@ -158,9 +161,9 @@ const Header = () => {
           <div className="flex items-center gap-4 lg:gap-6">
             {user ? (
               <div className="flex items-center gap-4">
-                {user.role === 'admin' && (
-                  <Link 
-                    href="/admin" 
+                {user.role === "admin" && (
+                  <Link
+                    href="/admin"
                     className="hidden xl:flex items-center gap-1.5 px-3 py-1.5 bg-black text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-full hover:bg-gray-800 transition shadow-sm"
                   >
                     <MdAdminPanelSettings className="text-xs" />
@@ -298,8 +301,6 @@ const Header = () => {
             </button>
           </div>
         </div>
-
-
       </div>
 
       {/* Space for fixed mobile header */}
@@ -377,13 +378,15 @@ const Header = () => {
                         <span className="text-sm font-medium truncate">
                           {user.email.split("@")[0]}
                         </span>
-                        {user.role === 'admin' && (
-                          <span className="text-[10px] font-black uppercase text-blue-600 tracking-widest">Administrator</span>
+                        {user.role === "admin" && (
+                          <span className="text-[10px] font-black uppercase text-blue-600 tracking-widest">
+                            Administrator
+                          </span>
                         )}
                       </div>
                     </Link>
 
-                    {user.role === 'admin' && (
+                    {user.role === "admin" && (
                       <Link
                         href="/admin"
                         onClick={() => setMenuopen(false)}

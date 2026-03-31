@@ -19,9 +19,11 @@ const NewsletterCTA = () => {
   return (
     <section className="relative overflow-hidden bg-black py-20 px-6">
       {/* Subtle background texture */}
-      <div className="absolute inset-0 opacity-5"
+      <div
+        className="absolute inset-0 opacity-5"
         style={{
-          backgroundImage: "radial-gradient(circle at 20% 50%, white 1px, transparent 1px), radial-gradient(circle at 80% 20%, white 1px, transparent 1px)",
+          backgroundImage:
+            "radial-gradient(circle at 20% 50%, white 1px, transparent 1px), radial-gradient(circle at 80% 20%, white 1px, transparent 1px)",
           backgroundSize: "50px 50px",
         }}
       />
@@ -37,10 +39,13 @@ const NewsletterCTA = () => {
             Stay in the Loop
           </p>
           <h2 className="text-3xl md:text-5xl font-bold text-white mb-4 leading-tight">
-            Join the Mayur Poshak<br />Movement
+            Join the Mayur Poshak
+            <br />
+            Movement
           </h2>
           <p className="text-gray-400 mb-10 text-sm md:text-base max-w-md mx-auto">
-            Get exclusive offers, early access to new collections, and styling tips delivered straight to your inbox.
+            Get exclusive offers, early access to new collections, and styling
+            tips delivered straight to your inbox.
           </p>
 
           <form

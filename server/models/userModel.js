@@ -34,16 +34,11 @@ const userSchema = new mongoose.Schema({
   passwordResetToken: String,
   passwordResetExpires: Date,
   refreshToken: [String], // Array to store multiple refresh tokens for multi-device login
-  addresses: [
-    {
-      street: String,
-      city: String,
-      state: String,
-      zipCode: String,
-      country: String,
-      isDefault: { type: Boolean, default: false },
-    }
-  ],
+  points: {
+    type: Number,
+    default: 0,
+  },
+  addresses: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Address' }],
   wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
   createdAt: {
     type: Date,

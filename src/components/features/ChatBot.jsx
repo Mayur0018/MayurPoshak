@@ -60,7 +60,7 @@ export default function ChatBot() {
         {
           id: Date.now() + 2,
           text:
-            "Sorry, something went wrong 😕 Please call +91 88008 70709 📞",
+            "Sorry, something went wrong 😕 Please call 9106481092 📞",
           sender: "bot",
           timestamp: new Date(),
         },

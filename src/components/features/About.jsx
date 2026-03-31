@@ -31,14 +31,17 @@ const About = () => {
         viewport={{ once: true }}
         transition={{ duration: 0.8 }}
       >
-        <h1 className="text-1xl md:text-2xl font-semibold text-center">About Mayur Poshak💁‍♂️</h1>
-          <Slider4 />
+        <h1 className="text-1xl md:text-2xl font-semibold text-center">
+          About Mayur Poshak💁‍♂️
+        </h1>
+        <Slider4 />
         <p className="text-center max-w-3xl mt-6 mx-auto px-4 md:px-6 text-[14px] md:text-[16px] leading-relaxed font-medium">
           Step into the world of bumchiq, where fashion gets a funky twist.
           Unleash your inner trendsetter with our one-of-a-kind, offbeat prints.
-          We're not just a clothing brand; we're a statement, and you're the voice. Explore the extraordinary!
+          We're not just a clothing brand; we're a statement, and you're the
+          voice. Explore the extraordinary!
         </p>
- 
+
         <div className="py-4 justify-center md:gap-8 gap-2 flex px-2 mt-6 flex-wrap">
           {loading
             ? Array.from({ length: 4 }).map((_, i) => (
@@ -59,7 +62,9 @@ const About = () => {
                     transition={{ delay: index * 0.2, duration: 0.5 }}
                   >
                     <Logos className="md:text-5xl text-3xl text-black mb-2" />
-                    <p className="font-medium md:text-sm text-[8px]">{item.name}</p>
+                    <p className="font-medium md:text-sm text-[8px]">
+                      {item.name}
+                    </p>
                   </motion.div>
                 );
               })}
@@ -73,7 +78,9 @@ const About = () => {
         viewport={{ once: true }}
         transition={{ duration: 0.8 }}
       >
-        <h1 className="text-1xl md:text-2xl font-semibold text-center">Mayur Poshak is on insta!</h1>
+        <h1 className="text-1xl md:text-2xl font-semibold text-center">
+          Mayur Poshak is on insta!
+        </h1>
         {loading ? (
           <div className="w-full md:w-[1100px] h-60 bg-gray-300 animate-pulse rounded-xl block mx-auto py-6" />
         ) : (
@@ -96,7 +103,9 @@ const About = () => {
         transition={{ duration: 1 }}
       >
         <p className="font-semibold text-[10px]">Founded: 2024</p>
-        <p className="text-gray-500 text-[10px]">Born in India, for global stage</p>
+        <p className="text-gray-500 text-[10px]">
+          Born in India, for global stage
+        </p>
 
         <div className="grid grid-cols-1 md:flex md:justify-center md:items-center md:gap-32 md:py-6">
           <div>
@@ -165,7 +174,6 @@ const About = () => {
           </button>
         </motion.div>
       </motion.div>
-     
     </>
   );
 };

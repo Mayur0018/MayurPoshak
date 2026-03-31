@@ -18,12 +18,12 @@ export const items = [
     title: "MAXX PHAM",
   },
   {
-  id: 2, 
-  url: "https://images.unsplash.com/photo-1582461420964-9e1ecbbbd138?auto=format&fit=crop&q=80&w=2400",
-  title: "People Walking in Luxury Store",
-},
- {
-    id: 3,  // or any unique ID
+    id: 2,
+    url: "https://images.unsplash.com/photo-1582461420964-9e1ecbbbd138?auto=format&fit=crop&q=80&w=2400",
+    title: "People Walking in Luxury Store",
+  },
+  {
+    id: 3, // or any unique ID
     url: "https://images.unsplash.com/photo-1603802199870-ac76f5733c11?auto=format&fit=crop&q=80&w=2400",
     title: "Urban Street Crowd – Hong Kong",
   },
@@ -33,10 +33,10 @@ export const items = [
     title: "People Walking by Store – Chennai",
   },
   {
-  id: 5, 
-  url: "https://images.unsplash.com/photo-1667551437470-4e872b132867?auto=format&fit=crop&q=80&w=2400",
-  title: "Lonely Boy at Night Storefront",
-},
+    id: 5,
+    url: "https://images.unsplash.com/photo-1667551437470-4e872b132867?auto=format&fit=crop&q=80&w=2400",
+    title: "Lonely Boy at Night Storefront",
+  },
 ];
 
 const FULL_ASPECT_RATIO = 16 / 9;
