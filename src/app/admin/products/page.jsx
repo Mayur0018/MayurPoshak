@@ -1,6 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
-import { FaTrash, FaEdit } from "react-icons/fa";
+import { FaTrash, FaEdit, FaPlus, FaBox, FaExclamationTriangle, FaSearch } from "react-icons/fa";
+import Image from "next/image";
+import toast, { Toaster } from "react-hot-toast";
 
 export default function AdminProducts() {
   const [products, setProducts] = useState([]);
@@ -8,6 +10,8 @@ export default function AdminProducts() {
   const [editingId, setEditingId] = useState(null);
   const [editForm, setEditForm] = useState({ name: "", image: null, price: "", imageUrl: "", stock: "" });
   const [loading, setLoading] = useState(false);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   /* =========================
      FETCH PRODUCTS
@@ -68,14 +72,16 @@ export default function AdminProducts() {
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        alert(err?.message || "Failed to add product");
+        toast.error(err?.message || "Failed to add product");
         return;
       }
       const newProduct = await res.json();
-      setProducts((prev) => [...prev, newProduct]);
+      setProducts((prev) => [newProduct, ...prev]);
       setForm({ name: "", image: null, price: "", stock: "" });
+      setShowAddForm(false);
+      toast.success("Product added successfully!");
     } catch (err) {
-      alert("Failed to add product");
+      toast.error("Failed to add product");
       console.error(err);
     } finally {
       setLoading(false);
@@ -121,21 +127,21 @@ export default function AdminProducts() {
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        alert(err?.message || "Failed to update product");
+        toast.error(err?.message || "Failed to update product");
         return;
       }
 
       const updatedProduct = await res.json();
 
-      // ✅ Update product in list
       setProducts((prev) =>
         prev.map((item) => (item._id === editingId ? updatedProduct : item))
       );
 
       setEditingId(null);
       setEditForm({ name: "", image: null, price: "", imageUrl: "", stock: "" });
+      toast.success("Product updated successfully!");
     } catch (err) {
-      alert("Failed to update product");
+      toast.error("Failed to update product");
       console.error(err);
     } finally {
       setLoading(false);
@@ -168,165 +174,179 @@ export default function AdminProducts() {
     }
   };
 
-  /* =========================
-     UI
-  ========================= */
+  const filteredProducts = products.filter(p => 
+    p.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const lowStockCount = products.filter(p => (p.stock || 0) < 10).length;
+
   return (
-    <div className="p-6">
-      <h1 className="text-3xl font-bold mb-4">Admin Dashboard</h1>
+    <div className="space-y-8 animate-in fade-in duration-700">
+      <Toaster position="top-right" />
+      
+      {/* Header & Stats */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
+        <div>
+          <h1 className="text-3xl font-black uppercase tracking-tighter italic">Inventory Management</h1>
+          <div className="flex gap-4 mt-3">
+             <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-xl border border-slate-100 shadow-sm">
+                <FaBox className="text-slate-400 text-xs" />
+                <span className="text-[10px] font-black uppercase tracking-widest">{products.length} Products</span>
+             </div>
+             <div className={`flex items-center gap-2 px-4 py-2 rounded-xl border shadow-sm ${lowStockCount > 0 ? 'bg-rose-50 border-rose-100 text-rose-600' : 'bg-white border-slate-100 text-slate-400'}`}>
+                <FaExclamationTriangle className="text-xs" />
+                <span className="text-[10px] font-black uppercase tracking-widest">{lowStockCount} Low Stock</span>
+             </div>
+          </div>
+        </div>
 
-      {/* EDIT PRODUCT FORM */}
-      {editingId && (
-        <div className="bg-blue-50 p-6 mb-6 rounded-lg border border-blue-300">
-          <h2 className="text-2xl font-bold mb-4">Edit Product</h2>
+        <div className="flex gap-3 w-full md:w-auto">
+           <div className="relative flex-1 md:w-64">
+              <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xs" />
+              <input 
+                type="text" 
+                placeholder="Search collection..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-white border-slate-100 rounded-2xl py-3 pl-10 pr-4 text-xs font-medium focus:ring-black focus:border-black transition-all shadow-sm"
+              />
+           </div>
+           <button 
+             onClick={() => setShowAddForm(!showAddForm)}
+             className="bg-black text-white p-3 rounded-2xl hover:bg-slate-800 transition shadow-lg shrink-0"
+           >
+             <FaPlus />
+           </button>
+        </div>
+      </div>
+
+      {/* ADD/EDIT FORM SECTION */}
+      {(showAddForm || editingId) && (
+        <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-xl animate-in slide-in-from-top-4 duration-500">
+          <h2 className="text-sm font-black uppercase tracking-[0.2em] mb-6">
+            {editingId ? "Modify Masterpiece" : "Add to Collection"}
+          </h2>
           <form
-            onSubmit={handleEditSubmit}
-            className="flex flex-col gap-2 max-w-sm"
+            onSubmit={editingId ? handleEditSubmit : handleSubmit}
+            className="grid grid-cols-1 md:grid-cols-4 gap-6"
           >
-            <input
-              className="p-2 border"
-              placeholder="Product Name"
-              value={editForm.name}
-              onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-              required
-            />
+            <div className="space-y-1.5">
+              <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 ml-1">Product Identity</label>
+              <input
+                className="w-full p-4 bg-slate-50 border-none rounded-2xl text-xs font-bold focus:ring-2 focus:ring-black/5"
+                placeholder="e.g. Royal Banarasi Silk"
+                value={editingId ? editForm.name : form.name}
+                onChange={(e) => editingId ? setEditForm({ ...editForm, name: e.target.value }) : setForm({ ...form, name: e.target.value })}
+                required
+              />
+            </div>
 
-            <input
-              className="p-2 border"
-              type="file"
-              accept="image/*"
-              onChange={(e) => setEditForm({ ...editForm, image: e.target.files[0] })}
-            />
-            {editForm.imageUrl && (
-              <p className="text-sm text-gray-600">
-                Current image: {editForm.imageUrl.split("/").pop()}
-              </p>
-            )}
+            <div className="space-y-1.5">
+              <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 ml-1">Imagery</label>
+              <input
+                className="w-full p-3.5 bg-slate-50 border-none rounded-2xl text-[10px] font-bold file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-[10px] file:font-black file:bg-black file:text-white hover:file:bg-slate-800"
+                type="file"
+                accept="image/*"
+                onChange={(e) => editingId ? setEditForm({ ...editForm, image: e.target.files[0] }) : setForm({ ...form, image: e.target.files[0] })}
+                required={!editingId}
+              />
+            </div>
 
-            <input
-              className="p-2 border"
-              placeholder="Price"
-              type="number"
-              value={editForm.price}
-              onChange={(e) => setEditForm({ ...editForm, price: e.target.value })}
-              required
-            />
+            <div className="space-y-1.5">
+              <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 ml-1">Valuation (₹)</label>
+              <input
+                className="w-full p-4 bg-slate-50 border-none rounded-2xl text-xs font-bold focus:ring-2 focus:ring-black/5"
+                placeholder="4999"
+                type="number"
+                value={editingId ? editForm.price : form.price}
+                onChange={(e) => editingId ? setEditForm({ ...editForm, price: e.target.value }) : setForm({ ...form, price: e.target.value })}
+                required
+              />
+            </div>
 
-            <input
-              className="p-2 border"
-              placeholder="Stock Level"
-              type="number"
-              value={editForm.stock}
-              onChange={(e) => setEditForm({ ...editForm, stock: e.target.value })}
-              required
-            />
-
-            <div className="flex gap-2">
-              <button
-                disabled={loading}
-                type="submit"
-                className="bg-blue-500 text-white p-2 disabled:opacity-60 flex-1"
-              >
-                {loading ? "Updating..." : "Update Product"}
-              </button>
-              <button
-                type="button"
-                onClick={handleCancelEdit}
-                className="bg-gray-500 text-white p-2 flex-1"
-              >
-                Cancel
-              </button>
+            <div className="space-y-1.5">
+              <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 ml-1">Stock Level</label>
+              <div className="flex gap-2">
+                <input
+                  className="flex-1 p-4 bg-slate-50 border-none rounded-2xl text-xs font-bold focus:ring-2 focus:ring-black/5"
+                  placeholder="25"
+                  type="number"
+                  value={editingId ? editForm.stock : form.stock}
+                  onChange={(e) => editingId ? setEditForm({ ...editForm, stock: e.target.value }) : setForm({ ...form, stock: e.target.value })}
+                  required
+                />
+                <button
+                  disabled={loading}
+                  type="submit"
+                  className="bg-black text-white px-8 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-800 disabled:opacity-50 transition shadow-lg"
+                >
+                  {loading ? "..." : (editingId ? "Save" : "Add")}
+                </button>
+                <button
+                  type="button"
+                  onClick={editingId ? handleCancelEdit : () => setShowAddForm(false)}
+                  className="bg-slate-100 text-slate-500 px-4 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-200 transition"
+                >
+                  ✕
+                </button>
+              </div>
             </div>
           </form>
         </div>
       )}
 
-      {/* ADD PRODUCT FORM */}
-      <form
-        onSubmit={handleSubmit}
-        className="flex flex-col gap-2 mb-6 max-w-sm"
-      >
-        <input
-          className="p-2 border"
-          placeholder="Product Name"
-          value={form.name}
-          onChange={(e) => setForm({ ...form, name: e.target.value })}
-          required
-        />
-
-        <input
-          className="p-2 border"
-          type="file"
-          accept="image/*"
-          onChange={(e) => setForm({ ...form, image: e.target.files[0] })}
-          required
-        />
-
-        <input
-          className="p-2 border"
-          placeholder="Price"
-          type="number"
-          value={form.price}
-          onChange={(e) => setForm({ ...form, price: e.target.value })}
-          required
-        />
-
-        <input
-          className="p-2 border"
-          placeholder="Initial Stock"
-          type="number"
-          value={form.stock}
-          onChange={(e) => setForm({ ...form, stock: e.target.value })}
-          required
-        />
-
-        <button
-          disabled={loading}
-          className="bg-black text-white p-2 disabled:opacity-60"
-        >
-          {loading ? "Adding..." : "Add Product"}
-        </button>
-      </form>
-
       {/* PRODUCTS GRID */}
-      {products.length === 0 ? (
-        <p>No Products Found</p>
+      {filteredProducts.length === 0 ? (
+        <div className="text-center py-24 bg-white rounded-[2.5rem] border border-dashed border-slate-200">
+           <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-300">No Masterpieces Found</p>
+        </div>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {products.map((p, idx) => (
-            <div key={p._id || p.id || `${p.name}-${p.price}-${idx}`} className="border p-4 relative">
-              {p.image ? (
-                <img
-                  src={p.image}
-                  alt={p.name}
-                  className="w-full h-96 object-cover mb-2"
-                />
-              ) : (
-                <div className="w-full h-96 bg-gray-100 mb-2" />
-              )}
-              <h2 className="font-medium">{p.name}</h2>
-              <div className="flex justify-between items-center mt-1">
-                <p className="font-bold">₹{Number(p.price ?? 0)}</p>
-                <p className={`text-[10px] uppercase font-black tracking-widest ${p.stock < 10 ? 'text-red-500' : 'text-slate-400'}`}>
-                  Stock: {p.stock ?? 0}
-                </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          {filteredProducts.map((p) => (
+            <div key={p._id} className="group bg-white rounded-[2rem] overflow-hidden border border-slate-100 shadow-sm hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
+              <div className="relative aspect-[4/5] overflow-hidden bg-slate-50">
+                {p.image ? (
+                  <img
+                    src={p.image}
+                    alt={p.name}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-slate-200">
+                    <FaBox className="text-4xl" />
+                  </div>
+                )}
+                
+                {/* Actions Overlay */}
+                <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-4">
+                  <button
+                    onClick={() => handleEditClick(p)}
+                    className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-black hover:scale-110 hover:bg-indigo-600 hover:text-white transition-all shadow-xl"
+                  >
+                    <FaEdit />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(p._id)}
+                    className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-rose-600 hover:scale-110 hover:bg-rose-600 hover:text-white transition-all shadow-xl"
+                  >
+                    <FaTrash />
+                  </button>
+                </div>
+
+                {/* Stock Badge */}
+                <div className={`absolute top-4 left-4 px-3 py-1.5 rounded-full text-[8px] font-black uppercase tracking-widest backdrop-blur-md ${
+                  (p.stock || 0) < 10 ? 'bg-rose-500/90 text-white' : 'bg-black/60 text-white border border-white/20'
+                }`}>
+                  {p.stock ?? 0} In Stock
+                </div>
               </div>
 
-              <div className="flex gap-2 absolute top-2 right-2">
-                <button
-                  onClick={() => handleEditClick(p)}
-                  className="bg-blue-500 p-2 rounded-full text-white hover:bg-blue-600 transition"
-                  title="Edit Product"
-                >
-                  <FaEdit />
-                </button>
-                <button
-                  onClick={() => handleDelete(p._id)}
-                  className="bg-red-500 p-2 rounded-full text-white hover:bg-red-600 transition"
-                  title="Delete Product"
-                >
-                  <FaTrash />
-                </button>
+              <div className="p-6">
+                <h2 className="text-xs font-black uppercase tracking-tight text-slate-900 group-hover:text-black transition-colors truncate">{p.name}</h2>
+                <div className="flex justify-between items-center mt-3">
+                  <p className="text-lg font-black tracking-tighter italic">₹{Number(p.price ?? 0).toLocaleString()}</p>
+                  <div className="h-1.5 w-1.5 rounded-full bg-slate-200 group-hover:bg-indigo-500 transition-colors" />
+                </div>
               </div>
             </div>
           ))}

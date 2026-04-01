@@ -14,6 +14,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { openCartSidebar } from "@/features/cart/cartSlice";
 import supabase from "@/lib/supabaseClient";
 import SearchOverlay from "../features/SearchOverlay";
+import toast from "react-hot-toast";
 
 const Header = () => {
   const [menuOpen, setMenuopen] = useState(false);
@@ -172,16 +173,21 @@ const Header = () => {
                 )}
                 <Link
                   href="/profile"
-                  className="flex items-center gap-2 hover:opacity-70 transition"
+                  className="flex items-center gap-2 hover:opacity-70 transition border border-gray-100 rounded-full pr-3 pl-1 py-1"
                 >
                   <img
-                    src="https://ui-avatars.com/api/?name=User"
-                    className="w-8 h-8 rounded-full"
+                    src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || user.email)}&background=000&color=fff&bold=true`}
+                    className="w-7 h-7 rounded-full shadow-sm"
                     alt="user"
                   />
-                  <span className="text-xs lg:text-sm font-medium truncate">
-                    {user.email.split("@")[0]}
-                  </span>
+                  <div className="flex flex-col">
+                    <span className="text-[10px] font-black uppercase tracking-widest leading-none">
+                      {user.name?.split(" ")[0] || user.email.split("@")[0]}
+                    </span>
+                    <span className="text-[8px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">
+                      {user.role === "admin" ? "Admin" : "Points: " + (user.points || 0)}
+                    </span>
+                  </div>
                 </Link>
               </div>
             ) : (
@@ -367,22 +373,20 @@ const Header = () => {
                     <Link
                       href="/profile"
                       onClick={() => setMenuopen(false)}
-                      className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition"
+                      className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition border border-gray-100"
                     >
                       <img
-                        src="https://ui-avatars.com/api/?name=User"
-                        className="w-8 h-8 rounded-full"
-                        alt="user"
+                        src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || user.email)}&background=000&color=fff&bold=true`}
+                        className="w-10 h-10 rounded-full"
+                        alt="user avatar"
                       />
                       <div className="flex flex-col min-w-0">
-                        <span className="text-sm font-medium truncate">
-                          {user.email.split("@")[0]}
+                        <span className="text-xs font-black uppercase tracking-widest truncate">
+                          {user.name || user.email.split("@")[0]}
                         </span>
-                        {user.role === "admin" && (
-                          <span className="text-[10px] font-black uppercase text-blue-600 tracking-widest">
-                            Administrator
-                          </span>
-                        )}
+                        <span className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">
+                          {user.role === "admin" ? "System Administrator" : `Member • ${user.points || 0} Points`}
+                        </span>
                       </div>
                     </Link>
 

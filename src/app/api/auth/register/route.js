@@ -22,12 +22,13 @@ export async function POST(request) {
       return Response.json({ message: "User already exists" }, { status: 400 });
     }
 
-    // Create user
+    // Create user with welcome points
     const user = await User.create({
       name,
       email,
       password,
       phone,
+      points: 100, // Reward for joining Mayur Poshak
     });
 
     if (user) {

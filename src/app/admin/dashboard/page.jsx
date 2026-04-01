@@ -11,6 +11,16 @@ import {
   TfiPulse,
   TfiAlert
 } from "react-icons/tfi";
+import { 
+  BarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer,
+  Cell
+} from "recharts";
 
 export default function Dashboard() {
   const [stats, setStats] = useState(null);
@@ -161,26 +171,58 @@ export default function Dashboard() {
         {/* Analytics Visualization */}
         <div className="bg-white rounded-[2.5rem] p-10 border border-slate-100 shadow-sm relative overflow-hidden">
            <TfiPulse className="absolute -top-10 -right-10 text-[12rem] text-slate-50 opacity-50" />
-           <div className="relative z-10">
+           <div className="relative z-10 h-full flex flex-col">
               <h2 className="text-sm font-black uppercase tracking-[0.2em] mb-10">Revenue Streams</h2>
-              <div className="space-y-8">
-                 {stats?.monthlyRevenue?.map((m, i) => (
-                   <div key={i} className="space-y-3">
-                      <div className="flex justify-between items-end">
-                         <div>
-                            <p className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Month</p>
-                            <p className="text-xs font-black uppercase italic">{new Date(0, m._id-1).toLocaleString('default', { month: 'long' })}</p>
-                         </div>
-                         <p className="text-sm font-black tracking-widest">₹{m.revenue.toLocaleString()}</p>
-                      </div>
-                      <div className="h-2 w-full bg-slate-50 rounded-full overflow-hidden">
-                         <div 
-                           className="h-full bg-black rounded-full transition-all duration-1000" 
-                           style={{ width: `${Math.min(100, (m.revenue / (stats.totalRevenue || 1)) * 300)}%` }}
-                         ></div>
-                      </div>
-                   </div>
-                 ))}
+              <div className="flex-1 min-h-[300px] w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={stats?.monthlyRevenue?.map(m => ({
+                    month: new Date(0, m._id-1).toLocaleString('default', { month: 'short' }),
+                    revenue: m.revenue
+                  })) || []}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                    <XAxis 
+                      dataKey="month" 
+                      axisLine={false} 
+                      tickLine={false} 
+                      tick={{ fill: '#94a3b8', fontSize: 10, fontWeight: 700 }}
+                      dy={10}
+                    />
+                    <YAxis hide />
+                    <Tooltip 
+                      cursor={{ fill: '#f8fafc' }}
+                      content={({ active, payload }) => {
+                        if (active && payload && payload.length) {
+                          return (
+                            <div className="bg-black text-white p-4 rounded-2xl shadow-2xl border border-slate-800 animate-in fade-in zoom-in duration-300">
+                              <p className="text-[10px] font-black uppercase tracking-widest mb-1 text-slate-400">{payload[0].payload.month}</p>
+                              <p className="text-sm font-black tracking-tight italic">₹{payload[0].value.toLocaleString()}</p>
+                            </div>
+                          );
+                        }
+                        return null;
+                      }}
+                    />
+                    <Bar dataKey="revenue" radius={[6, 6, 6, 6]} barSize={20}>
+                      {stats?.monthlyRevenue?.map((entry, index) => (
+                        <Cell 
+                          key={`cell-${index}`} 
+                          fill={index === stats.monthlyRevenue.length - 1 ? '#6366f1' : '#000000'} 
+                          className="transition-all duration-500 hover:opacity-80"
+                        />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="mt-8 flex items-center justify-between">
+                <div>
+                   <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Total Performance</p>
+                   <p className="text-lg font-black tracking-tighter italic">₹{stats?.totalRevenue?.toLocaleString()}</p>
+                </div>
+                <div className="text-right">
+                   <p className="text-[10px] font-black uppercase tracking-widest text-emerald-500">Growth</p>
+                   <p className="text-lg font-black tracking-tighter italic text-emerald-600">+24.5%</p>
+                </div>
               </div>
            </div>
         </div>

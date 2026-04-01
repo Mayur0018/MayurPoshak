@@ -1,21 +1,25 @@
-import { getServerSupabase } from "@/lib/supabaseServer";
+import { connectDB } from "@/lib/mongodb";
+import Order from "@/models/Order";
+import Product from "@/models/Product";
 
 function aggregateMonthly(orders: any[]) {
   const map = new Map<string, number>();
   for (const o of orders) {
-    if (o.status !== "paid" && o.status !== "delivered" && o.status !== "shipped" && o.status !== "confirmed") continue;
-    const d = new Date(o.created_at);
+    if (o.status === "Cancelled") continue;
+    const d = new Date(o.createdAt);
     const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-    map.set(key, (map.get(key) ?? 0) + Number(o.total_amount ?? 0));
+    map.set(key, (map.get(key) ?? 0) + Number(o.totalPrice ?? 0));
   }
   return Array.from(map.entries()).sort((a, b) => a[0].localeCompare(b[0]));
 }
 
 export default async function AdminAnalytics() {
-  const supabase = await getServerSupabase();
-  const [{ data: orders }, { data: products }] = await Promise.all([
-    supabase.from("orders").select("id,total_amount,status,created_at").order("created_at", { ascending: true }),
-    supabase.from("products").select("id,name,category_id,base_price,discount_percentage"),
+  await connectDB();
+  const [orders, products] = await Promise.all([
+    // @ts-ignore
+    Order.find().sort({ createdAt: 1 }).lean(),
+    // @ts-ignore
+    Product.find().lean()
   ]);
   const monthly = aggregateMonthly(orders ?? []);
 

@@ -32,6 +32,8 @@ export default function ProfilePage() {
     pincode: "",
     isDefault: false
   });
+  const [passForm, setPassForm] = useState({ currentPassword: "", newPassword: "" });
+  const [updatingPass, setUpdatingPass] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -113,6 +115,29 @@ export default function ProfilePage() {
       }
     } catch (err) {
       toast.error("Delete failed");
+    }
+  };
+
+  const handlePasswordUpdate = async (e) => {
+    e.preventDefault();
+    setUpdatingPass(true);
+    try {
+      const res = await fetch("/api/auth/update-password", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(passForm)
+      });
+      const data = await res.json();
+      if (res.ok) {
+        toast.success("Security credentials updated");
+        setPassForm({ currentPassword: "", newPassword: "" });
+      } else {
+        toast.error(data.message || "Credential update failed");
+      }
+    } catch (err) {
+      toast.error("A system error occurred");
+    } finally {
+      setUpdatingPass(false);
     }
   };
 
@@ -234,7 +259,7 @@ export default function ProfilePage() {
                     {[
                       { label: "Total Orders", value: orders.length, icon: TfiPackage },
                       { label: "Loyalty Points", value: user.points || 0, icon: TfiUser },
-                      { label: "Concierge Status", value: user.points > 1000 ? "Platinum" : user.points > 500 ? "Gold" : "Silver", icon: TfiSettings }
+                      { label: "Concierge Status", value: (user.points >= 1500) ? "Platinum" : (user.points >= 500) ? "Gold" : "Silver", icon: TfiSettings }
                     ].map((stat, i) => (
                       <div key={i} className="p-8 bg-[#fafafa] rounded-3xl border border-gray-50 group hover:bg-black transition-all duration-500">
                         <stat.icon className="text-2xl mb-6 text-gray-400 group-hover:text-white transition-colors" />
@@ -347,38 +372,59 @@ export default function ProfilePage() {
 
              {tab === "settings" && (
                 <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                   <h2 className="text-[11px] font-black uppercase tracking-[0.4em] text-gray-400 mb-10">Account Settings</h2>
+                   <h2 className="text-[11px] font-black uppercase tracking-[0.4em] text-gray-400 mb-10">Account Security</h2>
                    <div className="max-w-xl space-y-10">
-                      <div>
-                         <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 block mb-4">Contact Information</label>
-                         <div className="space-y-4">
-                            <div className="p-5 bg-[#fafafa] rounded-2xl flex items-center justify-between border border-gray-50">
-                               <div>
-                                  <p className="text-[9px] font-bold uppercase text-gray-400 mb-1">Email Address</p>
-                                  <p className="text-sm font-medium">{user.email}</p>
-                               </div>
-                               <button className="text-[10px] font-black uppercase text-indigo-600">Modify</button>
+                      <div className="space-y-6">
+                         <div className="p-6 bg-[#fafafa] rounded-[2rem] border border-gray-50 flex items-center justify-between">
+                            <div>
+                               <p className="text-[9px] font-bold uppercase text-gray-400 mb-1">Authenticated Account</p>
+                               <p className="text-sm font-bold tracking-tight">{user.email}</p>
                             </div>
+                            <div className="px-3 py-1 bg-green-50 text-green-600 rounded-full text-[8px] font-black uppercase tracking-widest">Verified</div>
                          </div>
+                         
+                         <form onSubmit={handlePasswordUpdate} className="space-y-6 bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm">
+                            <h3 className="text-xs font-black uppercase tracking-widest mb-6">Modify Access Key</h3>
+                            <div className="space-y-4">
+                               <div className="space-y-1.5">
+                                  <label className="text-[9px] font-bold uppercase text-gray-400 tracking-widest">Current Password</label>
+                                  <input 
+                                    type="password"
+                                    required
+                                    className="w-full bg-[#fafafa] border border-gray-50 rounded-xl px-5 py-3 text-xs font-bold focus:outline-none focus:border-black transition"
+                                    value={passForm.currentPassword}
+                                    onChange={e => setPassForm({...passForm, currentPassword: e.target.value})}
+                                  />
+                               </div>
+                               <div className="space-y-1.5">
+                                  <label className="text-[9px] font-bold uppercase text-gray-400 tracking-widest">New Secure Password</label>
+                                  <input 
+                                    type="password"
+                                    required
+                                    className="w-full bg-[#fafafa] border border-gray-50 rounded-xl px-5 py-3 text-xs font-bold focus:outline-none focus:border-black transition"
+                                    value={passForm.newPassword}
+                                    onChange={e => setPassForm({...passForm, newPassword: e.target.value})}
+                                  />
+                               </div>
+                            </div>
+                            <button 
+                              disabled={updatingPass}
+                              className="w-full py-4 bg-black text-white text-[10px] font-black tracking-[0.2em] rounded-2xl hover:scale-[0.98] transition shadow-xl disabled:opacity-50 mt-4 uppercase"
+                            >
+                               {updatingPass ? "Verifying..." : "Update Security Credentials"}
+                            </button>
+                         </form>
                       </div>
 
-                      <div>
-                         <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 block mb-4">Security</label>
-                         <button className="w-full text-left p-5 bg-[#fafafa] rounded-2xl flex items-center justify-between border border-gray-50 group hover:border-black transition">
-                            <span className="text-sm font-medium uppercase tracking-widest">Update Password</span>
-                            <TfiAngleRight className="text-xs text-gray-300 group-hover:translate-x-1 transition" />
-                         </button>
-                      </div>
-
-                      <div className="pt-10">
-                         <button className="text-[10px] font-black uppercase tracking-widest text-red-500 hover:text-red-700 transition">Request Account Deletion</button>
+                      <div className="pt-10 border-t border-gray-50">
+                         <button className="text-[10px] font-black uppercase tracking-widest text-red-400 hover:text-red-700 transition">Request Privacy Data Erasure</button>
                          <p className="text-[10px] text-gray-400 mt-4 leading-relaxed font-light">
-                           Closing your account is permanent. All orders, points, and saved addresses will be discarded.
+                           Data erasure is irreversible and will purge your history and points.
                          </p>
                       </div>
                    </div>
                 </div>
-             )}
+              )}
           </div>
         </div>
       </div>

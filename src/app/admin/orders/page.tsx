@@ -1,38 +1,36 @@
-import { getServerSupabase } from "@/lib/supabaseServer";
+import { connectDB } from "@/lib/mongodb";
+import Order from "@/models/Order";
 import { updateOrderStatus } from "@/actions/orders";
 
 export default async function AdminOrders() {
-  const supabase = await getServerSupabase();
-  const { data: orders } = await supabase
-    .from("orders")
-    .select("id,status,total_amount,created_at,user_id")
-    .order("created_at", { ascending: false })
-    .limit(50);
+  await connectDB();
+  // @ts-ignore
+  const orders = await Order.find().sort({ createdAt: -1 }).limit(50).lean();
 
   async function changeStatus(formData: FormData) {
     "use server";
-    const id = Number(formData.get("id"));
+    const id = String(formData.get("id"));
     const status = String(formData.get("status"));
     await updateOrderStatus(id, status);
   }
 
-  const statuses = ["pending","confirmed","paid","shipped","delivered","cancelled"];
+  const statuses = ["Pending", "Processing", "Packed", "Shipped", "Out for Delivery", "Delivered", "Cancelled"];
 
   return (
     <div className="bg-white border rounded p-4">
       <h2 className="text-lg font-semibold mb-3">Orders</h2>
       <div className="divide-y">
         {(orders ?? []).map((o: any) => (
-          <div key={o.id} className="py-3 flex items-center justify-between">
+          <div key={o._id.toString()} className="py-3 flex items-center justify-between">
             <div>
-              <div className="font-medium">Order #{o.id}</div>
+              <div className="font-medium">Order #{o._id.toString()}</div>
               <div className="text-xs text-gray-500">
-                ₹{Number(o.total_amount ?? 0).toFixed(2)} • {new Date(o.created_at).toLocaleString()}
+                ₹{Number(o.totalPrice ?? 0).toFixed(2)} • {new Date(o.createdAt).toLocaleString()}
               </div>
-              <div className="text-xs">User: {o.user_id ?? "—"}</div>
+              <div className="text-xs">User: {o.userId ?? "—"}</div>
             </div>
             <form action={changeStatus} className="flex items-center gap-2">
-              <input type="hidden" name="id" value={o.id} />
+              <input type="hidden" name="id" value={o._id.toString()} />
               <select name="status" defaultValue={o.status} className="border px-2 py-1 text-sm">
                 {statuses.map((s) => <option key={s} value={s}>{s}</option>)}
               </select>

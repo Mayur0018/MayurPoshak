@@ -1,17 +1,28 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import supabase from "@/lib/supabaseClient";
 import toast, { Toaster } from "react-hot-toast";
 
 export default function Signin() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-gray-50"><div className="w-12 h-12 border-2 border-slate-100 border-t-black rounded-full animate-spin"></div></div>}>
+      <SigninContent />
+    </Suspense>
+  )
+}
+
+function SigninContent() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const nextParam = searchParams.get("next") || "/profile";
 
   const handleSignin = async (e) => {
     e.preventDefault();
@@ -40,7 +51,7 @@ export default function Signin() {
       }).catch(err => console.error("Notification failed:", err));
 
       toast.success("Signed in");
-      window.location.href = "/profile"; // Hard redirect to refresh auth state
+      window.location.href = nextParam; // Hard redirect to refresh auth state
     } catch (err) {
       const msg = "Sign in failed";
       setError(msg);

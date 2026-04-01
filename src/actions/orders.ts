@@ -1,12 +1,13 @@
-import { getServerSupabase } from "@/lib/supabaseServer";
+import { connectDB } from "@/lib/mongodb";
+import Order from "@/models/Order";
 import { revalidatePath } from "next/cache";
 import { checkAdmin } from "./auth";
 
-export async function updateOrderStatus(id: number, status: string) {
+export async function updateOrderStatus(id: string, status: string) {
   await checkAdmin();
-  const supabase = await getServerSupabase();
-  const { error } = await supabase.from("orders").update({ status }).eq("id", id);
-  if (error) return { ok: false };
+  await connectDB();
+  // @ts-ignore
+  await Order.findByIdAndUpdate(id, { status });
   revalidatePath("/admin/orders");
   return { ok: true };
 }

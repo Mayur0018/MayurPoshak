@@ -1,82 +1,26 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { TfiSearch, TfiBell } from "react-icons/tfi";
-import Link from "next/link";
+import { TfiBell, TfiMenu } from "react-icons/tfi";
 import toast from "react-hot-toast";
 
-export default function AdminHeader() {
-  const [query, setQuery] = useState("");
-  const [results, setResults] = useState([]);
-  const [showResults, setShowResults] = useState(false);
-  const searchRef = useRef(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (searchRef.current && !searchRef.current.contains(event.target)) {
-        setShowResults(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  useEffect(() => {
-    const delayDebounceFn = setTimeout(async () => {
-      if (query.trim()) {
-        const res = await fetch(`/api/admin/search?q=${query}`);
-        if (res.ok) {
-          const data = await res.json();
-          setResults(data);
-          setShowResults(true);
-        }
-      } else {
-        setResults([]);
-        setShowResults(false);
-      }
-    }, 300);
-
-    return () => clearTimeout(delayDebounceFn);
-  }, [query]);
-
+export default function AdminHeader({ onMenuClick }) {
   return (
-    <header className="px-8 mb-8 sticky top-0 z-40 bg-[#f8fafc]/80 backdrop-blur-xl py-6">
-      <div className="max-w-7xl mx-auto flex items-center justify-between bg-white/40 border border-white/60 rounded-3xl p-3 pl-8 pr-6 shadow-sm">
-        <div className="flex items-center gap-4 flex-1 relative" ref={searchRef}>
-          <TfiSearch className="text-slate-400 text-sm" />
-          <input
-            placeholder="Search products, orders, users..."
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onFocus={() => query.trim() && setShowResults(true)}
-            className="bg-transparent border-none focus:ring-0 text-sm font-medium w-full max-w-md placeholder:text-slate-300"
-          />
-
-          {showResults && results.length > 0 && (
-            <div className="absolute top-14 left-0 w-full max-w-md bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden z-50">
-              <div className="p-2 space-y-1">
-                {results.map((res) => (
-                  <Link
-                    key={res.id}
-                    href={res.href}
-                    onClick={() => setShowResults(false)}
-                    className="flex items-center justify-between px-4 py-3 hover:bg-slate-50 rounded-xl transition-colors group"
-                  >
-                    <div>
-                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">{res.type}</p>
-                      <p className="text-sm font-bold text-slate-900">{res.label}</p>
-                    </div>
-                    <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                      <TfiSearch className="text-[10px]" />
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          )}
+    <header className="px-4 md:px-8 mb-8 sticky top-0 z-40 bg-[#f8fafc]/80 backdrop-blur-xl py-4 md:py-6 w-full">
+      <div className="max-w-7xl mx-auto flex items-center justify-between bg-white border border-slate-100 rounded-2xl md:rounded-3xl p-2 md:p-3 pl-4 md:pl-8 pr-4 md:pr-6 shadow-sm">
+        <div className="flex items-center gap-4">
+          <button 
+            onClick={onMenuClick}
+            className="lg:hidden p-2 -ml-2 text-slate-500 hover:bg-slate-50 rounded-xl transition"
+          >
+            <TfiMenu className="text-lg" />
+          </button>
+          
+          <h2 className="hidden lg:block text-xs font-black uppercase tracking-[0.3em] text-slate-300">
+            System Administration
+          </h2>
         </div>
 
-        <div className="flex items-center gap-8">
+        <div className="flex items-center gap-6 md:gap-8">
           <button 
             onClick={() => toast("You have 3 new system alerts.", { icon: "🔔" })}
             className="relative p-2 text-slate-400 hover:text-black transition"
@@ -87,12 +31,12 @@ export default function AdminHeader() {
 
           <div className="h-8 w-px bg-slate-200" />
 
-          <div className="flex items-center gap-4">
-            <div className="text-right">
-              <p className="text-[10px] font-black uppercase tracking-widest">Administrator</p>
-              <p className="text-[11px] text-slate-400 font-medium whitespace-nowrap">Verified System Account</p>
+          <div className="flex items-center gap-3 md:gap-4 ml-2 md:ml-0">
+            <div className="text-right hidden sm:block">
+              <p className="text-[9px] md:text-[10px] font-black uppercase tracking-widest">Administrator</p>
+              <p className="text-[10px] md:text-[11px] text-slate-400 font-medium whitespace-nowrap">Verified Account</p>
             </div>
-            <div className="w-10 h-10 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center font-black italic">
+            <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center font-black italic text-sm text-slate-900 shadow-sm">
               A
             </div>
           </div>
