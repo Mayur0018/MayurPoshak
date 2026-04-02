@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import Marquee from "react-fast-marquee";
 import { motion } from "framer-motion";
-import { images, mobileimages, logoSliders } from "@/Data/HeroImages";
+import { images, mobileimages, logoSliders } from "@/data/HeroImages";
 const Hero = () => {
   const [index, setIndex] = React.useState(0);
   const [isLoading, setIsLoading] = React.useState(true); // Track image loading

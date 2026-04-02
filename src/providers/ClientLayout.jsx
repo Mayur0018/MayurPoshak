@@ -2,12 +2,12 @@
 import { usePathname } from "next/navigation";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import ChatBot from "@/components/features/ChatBot";
+import ChatBot from "@/components/shared/ChatBot";
 import AnnouncementBar from "@/components/layout/AnnouncementBar";
-import CartSidebar from "@/components/features/CartSidebar";
+import CartSidebar from "@/features/cart/components/CartSidebar";
 
-import SocialProof from "@/components/features/SocialProof";
-import ScratchCard from "@/components/features/ScratchCard";
+import SocialProof from "@/features/home/components/SocialProof";
+import ScratchCard from "@/features/cart/components/ScratchCard";
 
 export default function ClientLayout({ children }) {
   const pathname = usePathname();

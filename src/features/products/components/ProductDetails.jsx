@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useDispatch } from "react-redux";
-import { addToCart } from "@/features/cart/cartSlice";
+import { addToCart } from "@/redux/slices/cartSlice";
 import Link from "next/link";
 import { useEffect, useState, useRef } from "react";
 import ReviewSection from "./ReviewSection";
@@ -133,7 +133,7 @@ export default function ProductDetails({ product, relatedProducts = [] }) {
       const res = await fetch("/api/auth/me");
       if (!res.ok) {
         toast.error("Please sign in to add to wishlist");
-        router.push("/Signin");
+        router.push("/signin");
         return;
       }
       const productId = product._id || product.id;

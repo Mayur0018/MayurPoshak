@@ -3,8 +3,8 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { category } from "@/Data/Category";
-import Slider3 from "../ui/Slider3";
+import { category } from "@/data/Category";
+import Slider3 from "@/components/ui/Slider3";
 import Link from "next/link";
 
 const Categories = () => {

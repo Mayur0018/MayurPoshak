@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/router';
-import { addToCart } from '@/features/cart/cartSlice';
-import API from '@/api/api';
+import { addToCart } from '@/redux/slices/cartSlice';
+import API from '@/lib/api-client';
 import toast from 'react-hot-toast';
 
 const ProductDetail = () => {

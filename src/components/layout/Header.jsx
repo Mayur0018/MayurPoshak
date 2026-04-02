@@ -11,9 +11,9 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { useSelector, useDispatch } from "react-redux";
-import { openCartSidebar } from "@/features/cart/cartSlice";
+import { openCartSidebar } from "@/redux/slices/cartSlice";
 import supabase from "@/lib/supabaseClient";
-import SearchOverlay from "../features/SearchOverlay";
+import SearchOverlay from "@/components/shared/SearchOverlay";
 import toast from "react-hot-toast";
 
 const Header = () => {
@@ -69,9 +69,9 @@ const Header = () => {
       case "HOME":
         return "/";
       case "ABOUT US":
-        return "/About";
+        return "/about";
       case "CONTACT":
-        return "/Contact";
+        return "/contact";
       case "BLOGS":
         return "/blogs";
       default:
@@ -191,7 +191,7 @@ const Header = () => {
                 </Link>
               </div>
             ) : (
-              <Link href="/Signin" className="hover:opacity-70 transition">
+              <Link href="/signin" className="hover:opacity-70 transition">
                 <CiUser className="text-xl lg:text-2xl" />
               </Link>
             )}
@@ -410,7 +410,7 @@ const Header = () => {
                   </>
                 ) : (
                   <Link
-                    href="/Signin"
+                    href="/signin"
                     onClick={() => setMenuopen(false)}
                     className="flex items-center gap-2 p-3 bg-black text-white rounded-lg hover:bg-gray-800 transition font-medium text-sm w-full justify-center"
                   >

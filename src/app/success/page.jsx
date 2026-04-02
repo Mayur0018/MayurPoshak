@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { FiCheckCircle, FiPackage } from "react-icons/fi";
 import confetti from "canvas-confetti";
 import { useDispatch } from "react-redux";
-import { clearCart } from "@/features/cart/cartSlice";
+import { clearCart } from "@/redux/slices/cartSlice";
 
 function SuccessContent() {
   const dispatch = useDispatch();

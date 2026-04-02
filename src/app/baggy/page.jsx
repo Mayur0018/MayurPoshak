@@ -24,7 +24,7 @@ import {
 } from "@heroicons/react/20/solid";
 import { TfiLayoutGrid2, TfiLayoutGrid3, TfiLayoutGrid4 } from "react-icons/tfi";
 import { useDispatch } from "react-redux";
-import { addToCart } from "@/features/cart/cartSlice";
+import { addToCart } from "@/redux/slices/cartSlice";
 import toast, { Toaster } from "react-hot-toast";
 
 const sortOptions = [

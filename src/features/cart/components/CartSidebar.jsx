@@ -7,7 +7,7 @@ import {
   incrementQty,
   decrementQty,
   removeFromCart,
-} from "@/features/cart/cartSlice";
+} from "@/redux/slices/cartSlice";
 import Link from "next/link";
 import Image from "next/image";
 import { RxCross1 } from "react-icons/rx";

@@ -1,4 +1,4 @@
-import ProductDetails from "@/components/features/ProductDetails";
+import ProductDetails from "@/features/products/components/ProductDetails";
 import { FaShoppingCart } from "react-icons/fa";
 import { connectDB } from "@/lib/mongodb";
 import Product from "@/models/Product";

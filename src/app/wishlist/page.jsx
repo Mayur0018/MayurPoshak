@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useDispatch } from "react-redux";
 import { motion, AnimatePresence } from "framer-motion";
-import { addToCart } from "@/features/cart/cartSlice";
+import { addToCart } from "@/redux/slices/cartSlice";
 import { FiHeart, FiShoppingCart, FiTrash2, FiArrowRight } from "react-icons/fi";
 import toast, { Toaster } from "react-hot-toast";
 

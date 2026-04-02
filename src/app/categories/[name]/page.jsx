@@ -1,6 +1,6 @@
 // app/categories/[name]/page.jsx
 
-import { category } from "@/Data/Category";
+import { category } from "@/data/Category";
 import Image from "next/image";
 
 export default async function CategoryPage({ params }) {

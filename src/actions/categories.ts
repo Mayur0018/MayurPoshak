@@ -1,6 +1,6 @@
 "use server";
 import { getServerSupabase } from "@/lib/supabaseServer";
-import { category as staticCategories } from "@/Data/Category";
+import { category as staticCategories } from "@/data/Category";
 import { revalidatePath } from "next/cache";
 import { checkAdmin } from "./auth";
 

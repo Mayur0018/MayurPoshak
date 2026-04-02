@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { login } from '@/features/auth/authSlice';
+import { login } from '@/redux/slices/authSlice';
 import { useRouter } from 'next/router';
 import toast from 'react-hot-toast';
 
