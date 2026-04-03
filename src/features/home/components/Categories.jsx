@@ -37,7 +37,7 @@ const Categories = () => {
           : category.map((items, index) => (
               <Link
                 key={items.id}
-                href={`/categories/${items.slug}`}
+                href={`/${items.slug}`}
                 className="block group"
               >
                 <motion.div

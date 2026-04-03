@@ -35,14 +35,9 @@ const sortOptions = [
 ];
 
 const subCategories = [
-  { id: "hoodies", name: "Hoodies" },
-  { id: "pants", name: "Pants & Joggers" },
-  { id: "tshirts", name: "T-Shirts" },
-  { id: "jackets", name: "Jackets" },
-  { id: "jeans", name: "Jeans" },
-  { id: "sweatshirts", name: "Sweatshirts" },
-  { id: "shirts", name: "Shirts" },
-  { id: "shorts", name: "Shorts" },
+  { id: "jeans", name: "Baggy Jeans" },
+  { id: "tshirt", name: "Oversized Tees" },
+  { id: "hoodie", name: "Graphic Hoodies" },
 ];
 
 const filters = [
@@ -50,24 +45,23 @@ const filters = [
     id: "size",
     name: "Size",
     options: [
-      { value: "S", label: "S" },
-      { value: "M", label: "M" },
-      { value: "L", label: "L" },
-      { value: "XL", label: "XL" },
+      { value: "S", label: "Small" },
+      { value: "M", label: "Medium" },
+      { value: "L", label: "Large" },
+      { value: "XL", label: "Extra Large" },
       { value: "XXL", label: "XXL" },
-      { value: "Free Size", label: "Free Size" },
     ],
   },
   {
     id: "color",
     name: "Color",
     options: [
-      { value: "black", label: "Black" },
-      { value: "white", label: "White" },
-      { value: "blue", label: "Blue" },
-      { value: "beige", label: "Beige" },
-      { value: "gray", label: "Gray" },
-      { value: "green", label: "Green" },
+      { value: "Graphite", label: "Graphite" },
+      { value: "Acid Wash Grey", label: "Acid Wash" },
+      { value: "Electric Purple", label: "Cyber Neon" },
+      { value: "Black", label: "Black" },
+      { value: "Off-White", label: "Off-White" },
+      { value: "Stone", label: "Stone" },
     ],
   },
 ];

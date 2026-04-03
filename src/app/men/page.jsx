@@ -31,9 +31,10 @@ const sortOptions = [
 ];
 
 const subCategories = [
-  { name: "Classic Collection", id: "classicsarees" },
-  { name: "Cotton Wear", id: "cotton" },
-  { name: "Formal Wear", id: "formal" },
+  { name: "Oversized Tees", id: "tshirt" },
+  { name: "Cargo & Jeans", id: "jeans" },
+  { name: "Hoodies", id: "hoodie" },
+  { name: "Shirts", id: "shirt" },
 ];
 
 const filters = [
@@ -46,17 +47,21 @@ const filters = [
       { value: "L", label: "L" },
       { value: "XL", label: "XL" },
       { value: "XXL", label: "XXL" },
+      { value: "30", label: "30" },
+      { value: "32", label: "32" },
+      { value: "34", label: "34" },
     ],
   },
   {
     id: "color",
     name: "Color",
     options: [
-      { value: "black", label: "Black" },
-      { value: "white", label: "White" },
-      { value: "blue", label: "Blue" },
-      { value: "brown", label: "Brown" },
-      { value: "gray", label: "Gray" },
+      { value: "Black", label: "Black" },
+      { value: "White", label: "White" },
+      { value: "Vintage Blue", label: "Vintage Blue" },
+      { value: "Beige", label: "Beige" },
+      { value: "Charcoal", label: "Charcoal" },
+      { value: "Forest Green", label: "Forest Green" },
     ],
   },
 ];

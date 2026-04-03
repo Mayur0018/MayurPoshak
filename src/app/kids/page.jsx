@@ -31,9 +31,10 @@ const sortOptions = [
 ];
 
 const subCategories = [
-  { id: "boys", name: "Boys" },
-  { id: "girls", name: "Girls" },
-  { id: "infants", name: "Infants" },
+  { id: "tshirt", name: "T-Shirts" },
+  { id: "dress", name: "Dresses" },
+  { id: "hoodie", name: "Hoodies" },
+  { id: "jeans", name: "Jeans" },
 ];
 
 const filters = [
@@ -41,23 +42,22 @@ const filters = [
     id: "size",
     name: "Size",
     options: [
-      { value: "2-3Y", label: "2-3 Years" },
-      { value: "4-5Y", label: "4-5 Years" },
-      { value: "6-7Y", label: "6-7 Years" },
-      { value: "8-9Y", label: "8-9 Years" },
-      { value: "10-12Y", label: "10-12 Years" },
+      { value: "2Y", label: "2 Years" },
+      { value: "4Y", label: "4 Years" },
+      { value: "6Y", label: "6 Years" },
+      { value: "8Y", label: "8 Years" },
+      { value: "10Y", label: "10 Years" },
     ],
   },
   {
     id: "color",
     name: "Color",
     options: [
-      { value: "red", label: "Red" },
-      { value: "blue", label: "Blue" },
-      { value: "yellow", label: "Yellow" },
-      { value: "pink", label: "Pink" },
-      { value: "white", label: "White" },
-      { value: "black", label: "Black" },
+      { value: "Sky Blue", label: "Sky Blue" },
+      { value: "Lemon Yellow", label: "Lemon Yellow" },
+      { value: "Cloud White", label: "Cloud White" },
+      { value: "Baby Pink", label: "Baby Pink" },
+      { value: "Multicolor", label: "Multicolor" },
     ],
   },
 ];

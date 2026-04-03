@@ -28,7 +28,8 @@ export async function GET(request) {
     // Support multiple subCategory values for filtering (e.g. Gen Z style filter)
     const subCategories = searchParams.getAll("subCategory");
     if (subCategories.length === 1) query.subCategory = subCategories[0];
-    else if (subCategories.length > 1) query.subCategory = { $in: subCategories };
+    else if (subCategories.length > 1)
+      query.subCategory = { $in: subCategories };
 
     const brands = searchParams.getAll("brand");
     if (brands.length === 1) query.brand = brands[0];
@@ -73,7 +74,10 @@ export async function GET(request) {
     return Response.json(products);
   } catch (error) {
     console.error("API error:", error);
-    return Response.json({ message: "Failed to fetch products", error: error.message }, { status: 500 });
+    return Response.json(
+      { message: "Failed to fetch products", error: error.message },
+      { status: 500 },
+    );
   }
 }
 
@@ -82,9 +86,17 @@ export async function POST(request) {
   const { name, image, price, stock } = await request.json();
 
   if (!name || !image || !price) {
-    return Response.json({ message: "All fields are required" }, { status: 400 });
+    return Response.json(
+      { message: "All fields are required" },
+      { status: 400 },
+    );
   }
 
-  const product = await Product.create({ name, image, price, stock: Number(stock ?? 10) });
+  const product = await Product.create({
+    name,
+    image,
+    price,
+    stock: Number(stock ?? 10),
+  });
   return Response.json(product);
 }

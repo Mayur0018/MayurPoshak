@@ -31,9 +31,10 @@ const sortOptions = [
 ];
 
 const subCategories = [
-  { name: "Sarees", id: "sarees" },
-  { name: "Western Wear", id: "western" },
-  { name: "Casual Wear", id: "casual" },
+  { name: "Dresses", id: "dress" },
+  { name: "Denim & Jeans", id: "jeans" },
+  { name: "T-Shirts & Tops", id: "tshirt" },
+  { name: "Hoodies & Sweaters", id: "hoodie" },
 ];
 
 const filters = [
@@ -41,21 +42,29 @@ const filters = [
     id: "size",
     name: "Size",
     options: [
+      { value: "XS", label: "XS" },
       { value: "S", label: "S" },
       { value: "M", label: "M" },
       { value: "L", label: "L" },
       { value: "XL", label: "XL" },
+      { value: "26", label: "26" },
+      { value: "28", label: "28" },
+      { value: "30", label: "30" },
     ],
   },
   {
     id: "color",
     name: "Color",
     options: [
-      { value: "white", label: "White" },
-      { value: "black", label: "Black" },
-      { value: "blue", label: "Blue" },
-      { value: "red", label: "Red" },
-      { value: "pink", label: "Pink" },
+      { value: "White", label: "White" },
+      { value: "Black", label: "Black" },
+      { value: "Beige", label: "Beige" },
+      { value: "Sage", label: "Sage" },
+      { value: "Soft Pink", label: "Soft Pink" },
+      { value: "Cream", label: "Cream" },
+      { value: "Lavender/Mint", label: "Pastels" },
+      { value: "Midnight", label: "Midnight" },
+      { value: "Rust", label: "Rust" },
     ],
   },
 ];

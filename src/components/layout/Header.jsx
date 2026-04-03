@@ -185,7 +185,9 @@ const Header = () => {
                       {user.name?.split(" ")[0] || user.email.split("@")[0]}
                     </span>
                     <span className="text-[8px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">
-                      {user.role === "admin" ? "Admin" : "Points: " + (user.points || 0)}
+                      {user.role === "admin"
+                        ? "Admin"
+                        : "Points: " + (user.points || 0)}
                     </span>
                   </div>
                 </Link>
@@ -385,7 +387,9 @@ const Header = () => {
                           {user.name || user.email.split("@")[0]}
                         </span>
                         <span className="text-[9px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">
-                          {user.role === "admin" ? "System Administrator" : `Member • ${user.points || 0} Points`}
+                          {user.role === "admin"
+                            ? "System Administrator"
+                            : `Member • ${user.points || 0} Points`}
                         </span>
                       </div>
                     </Link>
