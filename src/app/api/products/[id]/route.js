@@ -40,17 +40,28 @@ export async function PUT(request, context) {
   if (!id || typeof id !== "string" || !/^[0-9a-fA-F]{24}$/.test(id)) {
     return Response.json({ message: "Invalid ID" }, { status: 400 });
   }
-  const { name, image, price, stock } = await request.json();
+  const { name, image, price, stock, category, subCategory } = await request.json();
 
   try {
-    if (!name || !image || !price) {
+    if (!name || !image || !price || !category) {
       return Response.json(
-        { message: "All fields are required" },
+        { message: "All required fields (Name, Image, Price, Category) are missing" },
         { status: 400 }
       );
     }
 
-    const updatedProduct = await Product.findByIdAndUpdate(id, { name, image, price, stock: Number(stock) }, { new: true });
+    const updatedProduct = await Product.findByIdAndUpdate(
+      id,
+      { 
+        name, 
+        image, 
+        price: Number(price), 
+        stock: Number(stock),
+        category,
+        subCategory
+      },
+      { new: true }
+    );
 
     if (!updatedProduct) {
       return Response.json(

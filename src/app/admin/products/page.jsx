@@ -55,7 +55,7 @@ export default function AdminProducts() {
     try {
       const imageLink = await handleImageUpload(form.image);
       if (!imageLink) {
-        alert("Image upload failed");
+        toast.error("Vibe Check: Image upload failed");
         return;
       }
 
@@ -173,10 +173,10 @@ export default function AdminProducts() {
     });
 
     if (res.ok) {
-      // ✅ correct way
+      toast.success("Product deleted successfully");
       setProducts((prev) => prev.filter((item) => item._id !== id));
     } else {
-      alert("Failed to delete product");
+      toast.error("Failed to delete product");
     }
   };
 
