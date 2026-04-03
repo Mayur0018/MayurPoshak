@@ -6,9 +6,9 @@ import toast, { Toaster } from "react-hot-toast";
 
 export default function AdminProducts() {
   const [products, setProducts] = useState([]);
-  const [form, setForm] = useState({ name: "", image: null, price: "", stock: "" });
+  const [form, setForm] = useState({ name: "", image: null, price: "", stock: "", category: "men", subCategory: "" });
   const [editingId, setEditingId] = useState(null);
-  const [editForm, setEditForm] = useState({ name: "", image: null, price: "", imageUrl: "", stock: "" });
+  const [editForm, setEditForm] = useState({ name: "", image: null, price: "", imageUrl: "", stock: "", category: "men", subCategory: "" });
   const [loading, setLoading] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -67,6 +67,8 @@ export default function AdminProducts() {
           image: imageLink,
           price: Number(form.price),
           stock: Number(form.stock || 10),
+          category: form.category,
+          subCategory: form.subCategory,
         }),
       });
 
@@ -77,7 +79,7 @@ export default function AdminProducts() {
       }
       const newProduct = await res.json();
       setProducts((prev) => [newProduct, ...prev]);
-      setForm({ name: "", image: null, price: "", stock: "" });
+      setForm({ name: "", image: null, price: "", stock: "", category: "men", subCategory: "" });
       setShowAddForm(false);
       toast.success("Product added successfully!");
     } catch (err) {
@@ -99,6 +101,8 @@ export default function AdminProducts() {
       price: product.price,
       imageUrl: product.image,
       stock: product.stock,
+      category: product.category || "men",
+      subCategory: product.subCategory || "",
     });
   };
 
@@ -122,6 +126,8 @@ export default function AdminProducts() {
           image: imageLink,
           price: Number(editForm.price),
           stock: Number(editForm.stock),
+          category: editForm.category,
+          subCategory: editForm.subCategory,
         }),
       });
 
@@ -138,7 +144,7 @@ export default function AdminProducts() {
       );
 
       setEditingId(null);
-      setEditForm({ name: "", image: null, price: "", imageUrl: "", stock: "" });
+      setEditForm({ name: "", image: null, price: "", imageUrl: "", stock: "", category: "men", subCategory: "" });
       toast.success("Product updated successfully!");
     } catch (err) {
       toast.error("Failed to update product");
@@ -150,7 +156,7 @@ export default function AdminProducts() {
 
   const handleCancelEdit = () => {
     setEditingId(null);
-    setEditForm({ name: "", image: null, price: "", imageUrl: "", stock: "" });
+    setEditForm({ name: "", image: null, price: "", imageUrl: "", stock: "", category: "men", subCategory: "" });
   };
 
   /* =========================
@@ -249,6 +255,31 @@ export default function AdminProducts() {
                 accept="image/*"
                 onChange={(e) => editingId ? setEditForm({ ...editForm, image: e.target.files[0] }) : setForm({ ...form, image: e.target.files[0] })}
                 required={!editingId}
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 ml-1">Category</label>
+              <select
+                className="w-full p-4 bg-slate-50 border-none rounded-2xl text-xs font-bold focus:ring-2 focus:ring-black/5"
+                value={editingId ? editForm.category : form.category}
+                onChange={(e) => editingId ? setEditForm({ ...editForm, category: e.target.value }) : setForm({ ...form, category: e.target.value })}
+                required
+              >
+                <option value="men">Men</option>
+                <option value="women">Women</option>
+                <option value="kids">Kids</option>
+                <option value="genz">Gen Z</option>
+              </select>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-[9px] font-black uppercase tracking-widest text-slate-400 ml-1">Subcategory</label>
+              <input
+                className="w-full p-4 bg-slate-50 border-none rounded-2xl text-xs font-bold focus:ring-2 focus:ring-black/5"
+                placeholder="e.g. tshirt, jeans"
+                value={editingId ? editForm.subCategory : form.subCategory}
+                onChange={(e) => editingId ? setEditForm({ ...editForm, subCategory: e.target.value }) : setForm({ ...form, subCategory: e.target.value })}
               />
             </div>
 

@@ -83,11 +83,11 @@ export async function GET(request) {
 
 export async function POST(request) {
   await connectDB();
-  const { name, image, price, stock } = await request.json();
+  const { name, image, price, stock, category, subCategory } = await request.json();
 
-  if (!name || !image || !price) {
+  if (!name || !image || !price || !category) {
     return Response.json(
-      { message: "All fields are required" },
+      { message: "All required fields (Name, Image, Price, Category) are missing" },
       { status: 400 },
     );
   }
@@ -95,7 +95,9 @@ export async function POST(request) {
   const product = await Product.create({
     name,
     image,
-    price,
+    price: Number(price),
+    category,
+    subCategory,
     stock: Number(stock ?? 10),
   });
   return Response.json(product);
