@@ -12,7 +12,13 @@ export async function GET(request) {
 
     await connectDB();
     const wishlistItems = await Wishlist.find({ userId: user.id }).populate("productId");
-    return Response.json(wishlistItems);
+    return new Response(JSON.stringify(wishlistItems), {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
+      },
+    });
   } catch (error) {
     return Response.json({ message: "Error fetching wishlist", error: error.message }, { status: 500 });
   }
@@ -50,12 +56,23 @@ export async function DELETE(request) {
       return Response.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const { productId } = await request.json();
-    if (!productId) {
-      return Response.json({ message: "Product ID is required" }, { status: 400 });
+    await connectDB();
+
+    let body = {};
+    try {
+      body = await request.json();
+    } catch (_) {
+      // no body — treat as clear-all
     }
 
-    await connectDB();
+    const { productId } = body;
+
+    if (!productId) {
+      // No productId → clear entire wishlist for this user
+      await Wishlist.deleteMany({ userId: user.id });
+      return Response.json({ message: "Wishlist cleared" });
+    }
+
     await Wishlist.findOneAndDelete({ userId: user.id, productId });
     return Response.json({ message: "Removed from wishlist" });
   } catch (error) {

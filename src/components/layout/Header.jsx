@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { CiMenuFries, CiUser } from "react-icons/ci";
 import { IoSearchOutline, IoLogOutOutline } from "react-icons/io5";
 import { TbShoppingBag } from "react-icons/tb";
@@ -29,24 +29,27 @@ const Header = () => {
     setMounted(true);
   }, []);
 
-  useEffect(() => {
-    const fetchWishlistCount = async () => {
-      if (user) {
-        try {
-          const res = await fetch("/api/wishlist");
-          const data = await res.json();
-          if (Array.isArray(data)) {
-            setWishlistCount(data.length);
-          }
-        } catch (err) {
-          console.error("Error fetching wishlist count:", err);
-        }
-      } else {
-        setWishlistCount(0);
+  const fetchWishlistCount = useCallback(async () => {
+    if (!user) {
+      setWishlistCount(0);
+      return;
+    }
+    try {
+      const res = await fetch("/api/wishlist", { cache: "no-store" });
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        setWishlistCount(data.filter((item) => item.productId != null).length);
       }
-    };
-    fetchWishlistCount();
+    } catch (err) {
+      console.error("Error fetching wishlist count:", err);
+    }
   }, [user]);
+
+  useEffect(() => {
+    fetchWishlistCount();
+    window.addEventListener("wishlistUpdated", fetchWishlistCount);
+    return () => window.removeEventListener("wishlistUpdated", fetchWishlistCount);
+  }, [fetchWishlistCount]);
 
   /* ---------------- categories ---------------- */
   const shopCategories = [

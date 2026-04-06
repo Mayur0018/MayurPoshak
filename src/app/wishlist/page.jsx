@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useDispatch } from "react-redux";
 import { motion, AnimatePresence } from "framer-motion";
 import { addToCart } from "@/redux/slices/cartSlice";
-import { FiHeart, FiShoppingCart, FiTrash2, FiArrowRight } from "react-icons/fi";
+import { FiHeart, FiShoppingCart, FiTrash2, FiArrowRight, FiX } from "react-icons/fi";
 import toast, { Toaster } from "react-hot-toast";
 
 export default function WishlistPage() {
@@ -65,9 +65,23 @@ export default function WishlistPage() {
       if (response.ok) {
         setWishlist(wishlist.filter((item) => item.productId?._id !== productId));
         toast.success("Removed from wishlist");
+        window.dispatchEvent(new Event("wishlistUpdated"));
       }
     } catch (error) {
       toast.error("Error removing item");
+    }
+  };
+
+  const clearAllWishlist = async () => {
+    try {
+      const response = await fetch("/api/wishlist", { method: "DELETE" });
+      if (response.ok) {
+        setWishlist([]);
+        toast.success("Wishlist cleared");
+        window.dispatchEvent(new Event("wishlistUpdated"));
+      }
+    } catch (error) {
+      toast.error("Error clearing wishlist");
     }
   };
 
@@ -109,9 +123,19 @@ export default function WishlistPage() {
     <div className="min-h-screen bg-gray-50 py-16 px-4">
       <Toaster position="top-right" />
       <div className="max-w-6xl mx-auto">
-        <div className="mb-12 text-center md:text-left">
-          <p className="text-xs uppercase tracking-[0.4em] text-gray-400 font-medium mb-2">Saved Pieces</p>
-          <h1 className="text-4xl font-bold text-gray-900">Your Wishlist</h1>
+        <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-4">
+          <div className="text-center md:text-left">
+            <p className="text-xs uppercase tracking-[0.4em] text-gray-400 font-medium mb-2">Saved Pieces</p>
+            <h1 className="text-4xl font-bold text-gray-900">Your Wishlist</h1>
+          </div>
+          {wishlist.length > 0 && (
+            <button
+              onClick={clearAllWishlist}
+              className="self-center md:self-auto flex items-center gap-2 px-5 py-2.5 bg-red-50 text-red-500 border border-red-100 rounded-full text-xs font-bold hover:bg-red-500 hover:text-white transition-all"
+            >
+              <FiX size={14} /> Clear All
+            </button>
+          )}
         </div>
 
         {wishlist.length === 0 ? (

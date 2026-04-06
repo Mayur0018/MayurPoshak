@@ -11,6 +11,25 @@
 
   --font-serif: var(--font-playfair), serif;
   --font-sans: var(--font-montserrat), sans-serif;
+
+  /* === Combined Brand Accents (Amazon + Myntra + Flipkart) === */
+  --myntra-pink: #FF3F6C;
+  --myntra-pink-light: #fff0f3;
+  --flipkart-blue: #2874F0;
+  --flipkart-blue-light: #EEF4FF;
+  --amazon-orange: #FF9900;
+  --amazon-orange-light: #FFF8EE;
+  --deal-red: #E53935;
+  --deal-green: #388E3C;
+  --badge-bg: #f0f8ff;
+  --market-ink: #172337;
+  --market-surface: #fffdf8;
+  --market-surface-strong: #ffffff;
+  --market-border: #e8ebf3;
+  --market-shadow: 0 18px 45px -26px rgba(23, 35, 55, 0.24);
+  --market-gradient: linear-gradient(135deg, rgba(255, 153, 0, 0.12), rgba(40, 116, 240, 0.1), rgba(255, 63, 108, 0.08));
+  --market-gradient-strong: linear-gradient(135deg, #2874f0 0%, #ff3f6c 55%, #ff9900 100%);
+  --market-muted-bg: linear-gradient(180deg, #fffdf8 0%, #f6f9ff 100%);
 }
 
 * {
@@ -36,6 +55,70 @@ h6 {
 /* Luxury button style */
 .btn-luxury {
   @apply bg-black text-white px-8 py-3.5 rounded-full font-bold transition-all duration-300 hover:bg-gray-800 hover:shadow-xl active:scale-95 flex items-center justify-center gap-2;
+}
+
+.market-shell {
+  background: var(--market-muted-bg);
+}
+
+.market-panel {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid var(--market-border);
+  box-shadow: var(--market-shadow);
+}
+
+.market-glow {
+  background-image: var(--market-gradient);
+}
+
+.market-accent {
+  background-image: var(--market-gradient-strong);
+  color: #fff;
+}
+
+.market-accent-soft {
+  background: linear-gradient(135deg, rgba(40, 116, 240, 0.08), rgba(255, 63, 108, 0.08), rgba(255, 153, 0, 0.12));
+  color: var(--market-ink);
+}
+
+.market-chip {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(40, 116, 240, 0.14);
+  color: var(--market-ink);
+}
+
+.market-link {
+  color: var(--flipkart-blue);
+}
+
+.market-link:hover {
+  color: var(--myntra-pink);
+}
+
+.market-badge-sale {
+  background: rgba(255, 63, 108, 0.1);
+  color: var(--myntra-pink);
+}
+
+.market-badge-offer {
+  background: rgba(255, 153, 0, 0.12);
+  color: #b76a00;
+}
+
+.market-badge-stock {
+  background: rgba(56, 142, 60, 0.12);
+  color: var(--deal-green);
+}
+
+.market-input {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid var(--market-border);
+  color: var(--market-ink);
+}
+
+.market-input:focus {
+  border-color: rgba(40, 116, 240, 0.35);
+  box-shadow: 0 0 0 4px rgba(40, 116, 240, 0.1);
 }
 
 /* Hide scrollbars while keeping scroll functionality */
@@ -162,5 +245,14 @@ h6 {
   }
   body {
     @apply bg-background text-foreground;
+    background-image:
+      radial-gradient(circle at top left, rgba(255, 153, 0, 0.08), transparent 28%),
+      radial-gradient(circle at top right, rgba(40, 116, 240, 0.1), transparent 30%),
+      radial-gradient(circle at bottom center, rgba(255, 63, 108, 0.06), transparent 22%);
+  }
+
+  ::selection {
+    background: rgba(255, 63, 108, 0.18);
+    color: var(--market-ink);
   }
 }

@@ -61,6 +61,9 @@ export const useWishlist = () => {
         setWishlist((prev) => [...prev, { productId: { _id: productId } }]);
         toast.success("Added to wishlist");
       }
+
+      // Notify header badge to refresh
+      window.dispatchEvent(new Event("wishlistUpdated"));
     } catch (err) {
       toast.error("Wishlist operation failed");
     }
