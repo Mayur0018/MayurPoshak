@@ -29,7 +29,10 @@ const Categories = () => {
       <div className="grid grid-cols-3 px-4 md:px-20 gap-4 md:grid-cols-5 py-10 md:py-16 justify-items-center">
         {loading
           ? Array.from({ length: 5 }).map((_, index) => (
-              <div key={index} className="flex flex-col items-center animate-pulse">
+              <div
+                key={index}
+                className="flex flex-col items-center animate-pulse"
+              >
                 <div className="w-20 h-20 md:w-28 md:h-28 rounded-full bg-gray-300" />
                 <div className="h-3 w-12 bg-gray-300 mt-3 rounded" />
               </div>
