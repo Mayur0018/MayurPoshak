@@ -63,20 +63,26 @@ const deals = [
 
 /* ── Countdown ── */
 function useCountdown(endHour = 23, endMin = 59) {
-  const getRemaining = () => {
-    const now = new Date();
-    const end = new Date();
-    end.setHours(endHour, endMin, 59, 0);
-    if (end <= now) end.setDate(end.getDate() + 1);
-    const diff = Math.max(0, Math.floor((end - now) / 1000));
-    return { h: Math.floor(diff / 3600), m: Math.floor((diff % 3600) / 60), s: diff % 60 };
-  };
-  const [time, setTime] = useState(getRemaining);
+  const [time, setTime] = useState({ h: 0, m: 0, s: 0 });
+  const [mounted, setMounted] = useState(false);
+
   useEffect(() => {
+    setMounted(true);
+    const getRemaining = () => {
+      const now = new Date();
+      const end = new Date();
+      end.setHours(endHour, endMin, 59, 0);
+      if (end <= now) end.setDate(end.getDate() + 1);
+      const diff = Math.max(0, Math.floor((end - now) / 1000));
+      return { h: Math.floor(diff / 3600), m: Math.floor((diff % 3600) / 60), s: diff % 60 };
+    };
+    
+    setTime(getRemaining());
     const id = setInterval(() => setTime(getRemaining()), 1000);
     return () => clearInterval(id);
-  }, []);
-  return time;
+  }, [endHour, endMin]);
+
+  return { time, mounted };
 }
 
 const pad = (n) => String(n).padStart(2, "0");
@@ -96,7 +102,7 @@ const Stars = ({ rating }) => (
 );
 
 export default function DealOfDay() {
-  const time = useCountdown();
+  const { time, mounted } = useCountdown();
   const [active, setActive] = useState(0);
   const deal = deals[active];
   const stockPct = Math.round((deal.stock / deal.totalStock) * 100);
@@ -132,7 +138,7 @@ export default function DealOfDay() {
           <span className="text-xs font-bold text-gray-600 uppercase tracking-wider mr-1">
             Ends in:
           </span>
-          {[pad(time.h), pad(time.m), pad(time.s)].map((val, i) => (
+          {[mounted ? pad(time.h) : "--", mounted ? pad(time.m) : "--", mounted ? pad(time.s) : "--"].map((val, i) => (
             <React.Fragment key={i}>
               <span
                 className="text-white text-sm font-black px-2.5 py-1.5 rounded-lg tabular-nums min-w-[36px] text-center"

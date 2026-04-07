@@ -40,6 +40,9 @@ const cartSlice = createSlice({
     closeCartSidebar: (state) => {
       state.sidebarOpen = false;
     },
+    clearCart: (state) => {
+      state.cartItems = [];
+    },
   },
 });
 
@@ -50,6 +53,7 @@ export const {
   removeFromCart,
   openCartSidebar,
   closeCartSidebar,
+  clearCart,
 } = cartSlice.actions;
 
 export default cartSlice.reducer;
