@@ -1,0 +1,24 @@
+﻿
+> mayur-poshak@0.1.0 lint
+> next lint
+
+node.exe : Invalid project 
+directory provided, no 
+such directory: C:\Mayur 
+Projects\Mayur_Poshak\lint
+At line:1 char:1
++ & "C:\Program 
+Files\nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
+    + CategoryInfo         
+     : NotSpecified: (Inv  
+  alid project...yur_Pos   
+ hak\lint:String) [], R    
+emoteException
+    + FullyQualifiedErrorI 
+   d : NativeCommandError
+ 

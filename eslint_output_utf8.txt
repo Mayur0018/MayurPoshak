@@ -1,0 +1,28 @@
+﻿node.exe : 
+At line:1 char:1
++ & "C:\Program 
+Files\nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
+    + CategoryInfo         
+     : NotSpecified: (:St  
+  ring) [], RemoteExcept   
+ ion
+    + FullyQualifiedErrorI 
+   d : NativeCommandError
+ 
+Oops! Something went 
+wrong! :(
+
+ESLint: 9.39.3
+
+No files matching the 
+pattern 
+"src/**/*.{js,jsx}" were 
+found.
+Please check for typing 
+mistakes in the pattern.
+
