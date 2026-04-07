@@ -18,7 +18,7 @@ const AnnouncementBar = () => {
         {announcements.map((text, i) => (
           <span key={i} className="mx-8 tracking-wider uppercase">
             {text}
-            <span className="mx-8 text-gray-400">|</span>
+            <span className="mx-8 text-gray-40">|</span>
           </span>
         ))}
       </Marquee>

@@ -610,7 +610,7 @@ function ProductsContent() {
                )}
             </div>
           </div>
-        </section> section
+        </section>
       </main>
     </div>
   );

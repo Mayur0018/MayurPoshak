@@ -271,9 +271,9 @@ export default function ProfilePage() {
 
                    <div className="mt-12">
                       <h3 className="text-[10px] font-bold uppercase tracking-[0.3em] text-gray-400 mb-6">Recent Activity</h3>
-                      {orders.slice(0, 1).map((order) => (
+                      {orders.slice(0, 1).map((order, i) => (
                         <Link 
-                          key={order._id || Math.random()} 
+                          key={order._id || `recent-order-${i}`} 
                           href={`/orders/${order._id}`}
                           className="flex items-center justify-between p-6 border border-gray-100 rounded-2xl hover:border-black transition-all group block shadow-sm hover:shadow-md"
                         >

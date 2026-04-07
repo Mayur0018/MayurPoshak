@@ -63,7 +63,9 @@ export const useWishlist = () => {
       }
 
       // Notify header badge to refresh
-      window.dispatchEvent(new Event("wishlistUpdated"));
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new Event("wishlistUpdated"));
+      }
     } catch (err) {
       toast.error("Wishlist operation failed");
     }
