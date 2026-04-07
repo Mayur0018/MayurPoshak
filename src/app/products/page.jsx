@@ -602,7 +602,7 @@ function ProductsContent() {
                       <FunnelIcon className="h-8 w-8 text-gray-200" />
                    </div>
                    <h2 className="text-3xl font-extralight text-gray-900 uppercase tracking-[0.2em] mb-4">No Matches Found</h2>
-                   <p className="text-gray-400 text-sm mb-10 max-w-xs mx-auto">We couldn&apos;t find any products matching your current selection. Try resetting your filters.</p>
+                   <p className="text-gray-400 text-sm mb-10 max-w-xs mx-auto">{"We couldn't find any products matching your current selection. Try resetting your filters."}</p>
                    <button onClick={clearFilters} className="px-12 py-4 bg-black text-white text-xs font-bold tracking-[0.3em] rounded-full hover:bg-gray-800 transition shadow-2xl active:scale-95">
                      RESET ALL FILTERS
                    </button>

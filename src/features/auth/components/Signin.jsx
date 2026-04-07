@@ -120,7 +120,7 @@ function SigninContent() {
 
         <div className="text-center text-sm text-gray-600 space-y-1">
           <p>
-            Don&apos;t have an account?{" "}
+            {"Don't have an account? "}
             <Link href="/register" className="text-black font-semibold hover:underline">
                Sign up
             </Link>

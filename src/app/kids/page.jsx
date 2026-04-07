@@ -220,7 +220,7 @@ export default function KidsPage() {
         <div className="flex flex-col md:flex-row md:items-end justify-between border-b border-gray-200 pb-6 pt-12 md:pt-24 gap-4">
           <div>
             <p className="text-xs uppercase tracking-[0.4em] text-gray-400 font-bold">Discover</p>
-            <h1 className="text-3xl md:text-5xl font-extralight tracking-tight text-gray-900 uppercase mt-2">Kids&apos; Collection</h1>
+            <h1 className="text-3xl md:text-5xl font-extralight tracking-tight text-gray-900 uppercase mt-2">{"Kids' Collection"}</h1>
             <p className="text-sm text-gray-400 mt-2">Playful Designs • {products.length} Items</p>
           </div>
 

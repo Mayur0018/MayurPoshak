@@ -147,7 +147,7 @@ const ScratchCard = () => {
 
               <div className="p-8 text-center">
                 <h3 className="text-2xl font-black text-black tracking-tighter italic">LUCKY SURPRISE!</h3>
-                <p className="text-gray-500 mt-2 text-sm">YOU&apos;VE UNLOCKED A SPECIAL REWARD</p>
+                <p className="text-gray-500 mt-2 text-sm">{"YOU'VE UNLOCKED A SPECIAL REWARD"}</p>
 
                 <div className="mt-8 relative h-[180px] w-[300px] mx-auto rounded-xl overflow-hidden bg-gray-50 border-2 border-dashed border-gray-200 flex items-center justify-center">
                   {/* Underneath Content */}
@@ -191,7 +191,7 @@ const ScratchCard = () => {
                     onClick={() => setIsOpen(false)}
                     className="text-gray-400 text-xs font-bold hover:text-black transition-colors"
                   >
-                    NO THANKS, I&apos;LL PAY FULL PRICE
+                    {"NO THANKS, I'LL PAY FULL PRICE"}
                   </button>
                 </div>
               </div>

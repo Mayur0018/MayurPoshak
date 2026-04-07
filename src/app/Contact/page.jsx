@@ -30,7 +30,7 @@ export default function ContactPage() {
         <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
           <div className="text-center text-white">
             <h1 className="text-5xl md:text-6xl font-bold">Get In Touch</h1>
-            <p className="text-lg md:text-xl mt-2">We&apos;re here to help you</p>
+            <p className="text-lg md:text-xl mt-2">{"We're here to help you"}</p>
           </div>
         </div>
       </section>

@@ -223,7 +223,7 @@ export default function MenPage() {
         <div className="flex flex-col md:flex-row md:items-end justify-between border-b border-gray-200 pb-6 pt-12 md:pt-24 gap-4">
           <div>
             <p className="text-xs uppercase tracking-[0.3em] text-gray-400 font-medium">Collection</p>
-            <h1 className="text-3xl md:text-5xl font-extralight tracking-tight text-gray-900 uppercase mt-2">Men&apos;s Couture</h1>
+            <h1 className="text-3xl md:text-5xl font-extralight tracking-tight text-gray-900 uppercase mt-2">{"Men's Couture"}</h1>
             <p className="text-sm text-gray-400 mt-2">Showing {products.length} refined items</p>
           </div>
 
