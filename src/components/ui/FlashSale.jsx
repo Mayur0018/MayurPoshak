@@ -173,7 +173,7 @@ export default function FlashSale() {
             <h2 className="text-xl md:text-2xl font-black text-gray-900 tracking-tight">
               Flash Sale
             </h2>
-            <p className="text-xs text-gray-500">Limited time — grab before it's gone!</p>
+            <p className="text-xs text-gray-500">Limited time — grab before it&apos;s gone!</p>
           </div>
 
           {/* Countdown */}

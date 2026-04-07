@@ -95,7 +95,7 @@ export default function OrdersPage() {
             <FiShoppingBag className="text-8xl text-gray-100" />
             <div className="text-center">
               <h2 className="text-xl font-semibold text-gray-900">No orders yet</h2>
-              <p className="text-gray-400 mt-2">You haven't placed any orders with us yet.</p>
+              <p className="text-gray-400 mt-2">You haven&apos;t placed any orders with us yet.</p>
             </div>
             <Link
               href="/products"
