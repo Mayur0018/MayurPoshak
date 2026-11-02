@@ -3,7 +3,7 @@ import { jwtVerify } from 'jose'
 
 const JWT_SECRET = process.env.JWT_SECRET || "your_super_secret_jwt_key_123456";
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   // 1. Custom JWT Auth Check
   const token = request.cookies.get('token')?.value
   let jwtUser: any = null
@@ -14,7 +14,7 @@ export async function middleware(request: NextRequest) {
       const { payload } = await jwtVerify(token, secret);
       jwtUser = payload;
     } catch (error) {
-      console.error("JWT middleware error:", error);
+      console.error("JWT proxy error:", error);
     }
   }
 
@@ -40,6 +40,8 @@ export async function middleware(request: NextRequest) {
 
   return NextResponse.next()
 }
+
+export default proxy;
 
 export const config = {
   matcher: [
