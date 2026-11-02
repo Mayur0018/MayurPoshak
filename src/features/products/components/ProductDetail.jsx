@@ -85,7 +85,7 @@ const ProductDetail = () => {
                             onClick={handleAddToCart}
                             className="w-full md:w-auto px-12 py-4 bg-indigo-600 text-white font-bold rounded-lg shadow-xl hover:bg-indigo-700 transform hover:-translate-y-1 transition-all"
                         >
-                            Add to Cartt
+                            Add to Cart
                         </button>
                     </div>
                 </div>
