@@ -21,7 +21,7 @@ const orderSchema = new mongoose.Schema({
     pincode: { type: String, required: true },
     phone: { type: String, required: true },
   },
-  paymentMethod: { type: String, default: "Razorpay" },
+  paymentMethod: { type: String, default: "Stripe" },
   paymentResult: {
     id: String,
     status: String,

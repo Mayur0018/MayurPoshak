@@ -340,22 +340,20 @@ export default function ProductDetails({ product, relatedProducts = [] }) {
                 </span>
               )}
               <span
-                className={`text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full border flex items-center gap-1.5 ${
-                  product.stock > 5
-                    ? "bg-green-50 text-green-600 border-green-100"
-                    : product.stock > 0
-                      ? "bg-amber-50 text-amber-600 border-amber-100"
-                      : "bg-red-50 text-red-500 border-red-100"
-                }`}
+                className={`text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full border flex items-center gap-1.5 ${product.stock > 5
+                  ? "bg-green-50 text-green-600 border-green-100"
+                  : product.stock > 0
+                    ? "bg-amber-50 text-amber-600 border-amber-100"
+                    : "bg-red-50 text-red-500 border-red-100"
+                  }`}
               >
                 <span
-                  className={`w-1.5 h-1.5 rounded-full ${
-                    product.stock > 5
-                      ? "bg-green-500"
-                      : product.stock > 0
-                        ? "bg-amber-500"
-                        : "bg-red-500"
-                  }`}
+                  className={`w-1.5 h-1.5 rounded-full ${product.stock > 5
+                    ? "bg-green-500"
+                    : product.stock > 0
+                      ? "bg-amber-500"
+                      : "bg-red-500"
+                    }`}
                 />
                 {product.stock > 5
                   ? "In Stock"
@@ -637,21 +635,6 @@ export default function ProductDetails({ product, relatedProducts = [] }) {
         </button>
       </div>
 
-      <style jsx global>{`
-        ::-webkit-scrollbar {
-          width: 5px;
-        }
-        ::-webkit-scrollbar-track {
-          background: transparent;
-        }
-        ::-webkit-scrollbar-thumb {
-          background: #eee;
-          border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-          background: #ddd;
-        }
-      `}</style>
     </div>
   );
 }
